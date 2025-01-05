@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Change this if you're using a different database
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String
+  role        String   @default("user")  // Role field, default is 'user'
+  orders      Order[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Restaurant {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  menuItems   Menu[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Menu {
+  id            String     @id @default(cuid())
+  name          String
+  description   String?
+  price         Float
+  image         String? 
+  restaurantId  String
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
+  orderItems    OrderItem[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  orderItems  OrderItem[]
+  totalPrice  Float
+  status      String      @default("Pending") // Can be Pending, Completed, Canceled
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  quantity  Int
+  menuId    String
+  menu      Menu     @relation(fields: [menuId], references: [id])
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+}
+
