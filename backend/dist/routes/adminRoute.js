@@ -35,6 +35,7 @@ const isAdmin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
         next();
     }
     catch (error) {
+        console.error("Error verifying token:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });

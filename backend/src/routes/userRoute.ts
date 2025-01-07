@@ -194,6 +194,7 @@
 
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
+
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"; // Import bcrypt
 import { JWT_PASSWORD } from "../config";
@@ -227,32 +228,82 @@ router.post("/signup", async (req:any, res:any) => {
 });
 
 // User login
+// router.post("/login", async (req:any, res:any) => {
+//   const { email, password } = req.body;
+//   try {
+//     // Find the user
+//     const user = await prisma.user.findUnique({ where: { email } });
+//     if (!user) {
+//       return res.status(401).json({ error: "Invalid credentials" });
+//     }
+
+//     // Compare the provided password with the hashed password
+//     const isPasswordValid = await bcrypt.compare(password, user.password);
+//     if (!isPasswordValid) {
+//       return res.status(401).json({ error: "Invalid credentials" });
+//     }
+
+//     // Generate JWT token
+//     const token = jwt.sign({ userId: user.id, role: user.role }, JWT_PASSWORD!, {
+//       expiresIn: "1h",
+//     });
+
+//     res.json({ message: "Login successful", token });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Failed to login" });
+//   }
+// });
+
+
+
+
 router.post("/login", async (req:any, res:any) => {
   const { email, password } = req.body;
   try {
-    // Find the user
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // Compare the provided password with the hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // Generate JWT token
     const token = jwt.sign({ userId: user.id, role: user.role }, JWT_PASSWORD!, {
       expiresIn: "1h",
     });
 
-    res.json({ message: "Login successful", token });
+    res.json({
+      message: "Login successful",
+      token,
+      user: { id: user.id, name: user.name, email: user.email }, // Send user details
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to login" });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // View menu
 // hermoine5678$$90^&890

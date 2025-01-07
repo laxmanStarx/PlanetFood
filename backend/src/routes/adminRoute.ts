@@ -23,6 +23,7 @@ const isAdmin = async (req: any, res: any, next: NextFunction) => {
     req.userId = decoded.userId;
     next();
   } catch (error) {
+    console.error("Error verifying token:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

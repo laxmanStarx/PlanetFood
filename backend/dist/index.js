@@ -7,9 +7,14 @@ const express_1 = __importDefault(require("express"));
 const foodRoute_1 = __importDefault(require("./routes/foodRoute"));
 const userRoute_1 = __importDefault(require("./routes/userRoute"));
 const adminRoute_1 = __importDefault(require("./routes/adminRoute"));
+const cors_1 = __importDefault(require("cors"));
 const isAdmin_1 = require("./middleware/isAdmin");
 const PORT = 8080;
 const app = (0, express_1.default)();
+app.use((0, cors_1.default)({
+    origin: "*", // Specify your production frontend domain
+    methods: ["GET", "POST", "PUT", "DELETE"],
+}));
 app.use(express_1.default.json());
 app.use('/api/v1/user', userRoute_1.default);
 app.use('/foodRoute', foodRoute_1.default);
