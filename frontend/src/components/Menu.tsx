@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 interface MenuItem {
   id: string;
-  image:string;
+  image: string;
   name: string;
   description: string;
   price: number;
@@ -34,24 +34,26 @@ const Menu = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 flex flex-col items-center">
       <h1 className="text-3xl font-bold text-center mb-8">Menu</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="w-full md:w-3/4 lg:w-2/3 divide-y divide-gray-300">
         {menuItems.map((item) => (
           <div
             key={item.id}
-            className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+            className="flex flex-col md:flex-row items-center md:items-start py-6 space-y-4 md:space-y-0"
           >
-            <div className="p-4">
-            <h2 className="text-xl font-semibold text-gray-800">{<img
-  src={item.image} // Dynamically set the image URL
-  alt={item.name}
-  className="w-full h-48 object-cover"
-/>}</h2>
-              <h2 className="text-xl font-semibold text-gray-800">{item.name}</h2>
-              <p className="text-sm text-gray-500">{item.description}</p>
-              <p className="text-lg font-bold text-gray-800">${item.price.toFixed(2)}</p>
+            {/* Food Description */}
+            <div className="flex-1 text-left md:pr-4">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800">{item.name}</h2>
+              <p className="text-gray-600 mt-2">{item.description}</p>
+              <p className="text-lg font-bold text-gray-800 mt-4">${item.price.toFixed(2)}</p>
             </div>
+            {/* Food Image */}
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-40 h-40 object-cover border border-gray-200 rounded-lg"
+            />
           </div>
         ))}
       </div>
