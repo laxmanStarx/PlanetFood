@@ -7,32 +7,33 @@ const PromoteToAdmin: React.FC = () => {
 
   const promoteUser = async () => {
     try {
-      const token = localStorage.getItem("token"); // Get JWT token
-      if (!token) {
-        setError("Unauthorized: Please log in.");
-        return;
-      }
-
       const response = await fetch("http://localhost:8080/isAdmin/assign-admin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Pass token in Authorization header
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Existing token
         },
-        body: JSON.stringify({ email }), // Pass email of user to promote
+        body: JSON.stringify({ email }),
       });
-
+  
+      const data = await response.json();
+      console.log("Server response:", data); // Debug the response
+  
       if (!response.ok) {
-        const { error } = await response.json();
-        setError(error || "Failed to promote user.");
+        setError(data.error || "Failed to promote user.");
         return;
       }
-
-      const data = await response.json();
+  
       setMessage(data.message || "User promoted to admin successfully.");
+      if (data.token) {
+        localStorage.setItem("token", data.token); // Save the new token
+        console.log("New token:", data.token);
+      } else {
+        console.error("Token missing in response.");
+      }
       setEmail(""); // Clear the input field
     } catch (error) {
-      console.error(error);
+      console.error("Error in promoteUser:", error);
       setError("An error occurred. Please try again.");
     }
   };

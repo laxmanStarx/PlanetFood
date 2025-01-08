@@ -100,6 +100,7 @@ model Restaurant {
   id          String   @id @default(cuid())
   name        String
   address     String
+  image       String?
   menuItems   Menu[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

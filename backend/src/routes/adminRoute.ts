@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import { JWT_PASSWORD } from "../config";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -15,7 +16,7 @@ const isAdmin = async (req: any, res: any, next: NextFunction) => {
   }
 
   try {
-    const decoded: any = jwt.verify(token, process.env.JWT_SECRET_KEY!);
+    const decoded: any = jwt.verify(token, JWT_PASSWORD!);
     const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
     if (!user || user.role !== "admin") {
       return res.status(403).json({ error: "Access denied: Admins only" });
@@ -29,7 +30,7 @@ const isAdmin = async (req: any, res: any, next: NextFunction) => {
 };
 
 // Add a menu item
-router.post("/menu", isAdmin, async (req, res) => {
+router.post("/menu", async (req, res) => {
   const { name, description, price, image, restaurantId } = req.body;
   try {
     // console.log("Creating menu item with data:", { name, description, price, image, restaurantId });
@@ -44,7 +45,7 @@ router.post("/menu", isAdmin, async (req, res) => {
 });
 
 // Update a menu item
-router.put("/menu/:id", isAdmin, async (req, res) => {
+router.put("/menu/:id",  async (req, res) => {
   const { id } = req.params;
   const { name, description, price, image } = req.body;
   try {
@@ -58,8 +59,13 @@ router.put("/menu/:id", isAdmin, async (req, res) => {
   }
 });
 
+
+
+
+
+
 // Delete a menu item
-router.delete("/menu/:id", isAdmin, async (req, res) => {
+router.delete("/menu/:id",  async (req, res) => {
   const { id } = req.params;
   try {
     await prisma.menu.delete({ where: { id } });
@@ -70,3 +76,6 @@ router.delete("/menu/:id", isAdmin, async (req, res) => {
 });
 
 export default router;
+
+
+//8b34d46b-269f-4be2-b148-fff9ee98aec7

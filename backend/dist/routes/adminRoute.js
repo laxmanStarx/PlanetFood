@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const client_1 = require("@prisma/client");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_1 = require("../config");
 const router = (0, express_1.Router)();
 const prisma = new client_1.PrismaClient();
 // Middleware to check admin role
@@ -26,7 +27,7 @@ const isAdmin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
         return res.status(401).json({ error: "Unauthorized" });
     }
     try {
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET_KEY);
+        const decoded = jsonwebtoken_1.default.verify(token, config_1.JWT_PASSWORD);
         const user = yield prisma.user.findUnique({ where: { id: decoded.userId } });
         if (!user || user.role !== "admin") {
             return res.status(403).json({ error: "Access denied: Admins only" });
@@ -40,7 +41,7 @@ const isAdmin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 // Add a menu item
-router.post("/menu", isAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/menu", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, description, price, image, restaurantId } = req.body;
     try {
         // console.log("Creating menu item with data:", { name, description, price, image, restaurantId });
@@ -55,7 +56,7 @@ router.post("/menu", isAdmin, (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
 }));
 // Update a menu item
-router.put("/menu/:id", isAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put("/menu/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { name, description, price, image } = req.body;
     try {
@@ -70,7 +71,7 @@ router.put("/menu/:id", isAdmin, (req, res) => __awaiter(void 0, void 0, void 0,
     }
 }));
 // Delete a menu item
-router.delete("/menu/:id", isAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete("/menu/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
         yield prisma.menu.delete({ where: { id } });
@@ -81,3 +82,4 @@ router.delete("/menu/:id", isAdmin, (req, res) => __awaiter(void 0, void 0, void
     }
 }));
 exports.default = router;
+//8b34d46b-269f-4be2-b148-fff9ee98aec7

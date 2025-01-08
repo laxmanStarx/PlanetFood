@@ -14,6 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAdmin = void 0;
 const express_1 = __importDefault(require("express"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_1 = require("../config");
 const db_1 = require("../db");
 const router = express_1.default.Router();
 exports.isAdmin = router.post("/assign-admin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -28,9 +30,16 @@ exports.isAdmin = router.post("/assign-admin", (req, res) => __awaiter(void 0, v
             where: { email },
             data: { role: "admin" },
         });
+        const token = jsonwebtoken_1.default.sign({ userId: user.id, role: "admin" }, config_1.JWT_PASSWORD, {
+            expiresIn: "1h",
+        });
         res.status(200).json({
             message: `Admin role assigned to ${updatedUser.name} (${updatedUser.email})`,
+            token, // Ensure the token is included in the response
         });
+        // res.status(200).json({
+        //   message: `Admin role assigned to ${updatedUser.name} (${updatedUser.email})`,
+        // });
     }
     catch (error) {
         console.error(error);

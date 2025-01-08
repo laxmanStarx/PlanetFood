@@ -278,13 +278,46 @@ router.post("/login", async (req:any, res:any) => {
     res.json({
       message: "Login successful",
       token,
-      user: { id: user.id, name: user.name, email: user.email }, // Send user details
+      user: { id: user.id, name: user.name, email: user.email,role:user.role }, // Send user details
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to login" });
   }
 });
+
+
+
+
+
+
+router.get("/role", async (req: any, res: any) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized: No token provided" });
+  }
+
+  try {
+    const decoded: any = jwt.verify(token, JWT_PASSWORD!);
+    const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ role: user.role });
+  } catch (error) {
+    console.error("Error fetching user role:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
+
+
+
 
 
 

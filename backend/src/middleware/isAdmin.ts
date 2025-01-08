@@ -1,4 +1,7 @@
 import express,{ NextFunction, Request, Response,Router } from "express";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt"; // Import bcrypt
+import { JWT_PASSWORD } from "../config";
 
 
 
@@ -29,10 +32,18 @@ export const isAdmin = router.post("/assign-admin", async (req: any, res: any) =
         where: { email },
         data: { role: "admin" },
       });
-  
+      const token = jwt.sign({ userId: user.id, role: "admin" }, JWT_PASSWORD!, {
+        expiresIn: "1h",
+      });
+      
       res.status(200).json({
         message: `Admin role assigned to ${updatedUser.name} (${updatedUser.email})`,
+        token, // Ensure the token is included in the response
       });
+  
+      // res.status(200).json({
+      //   message: `Admin role assigned to ${updatedUser.name} (${updatedUser.email})`,
+      // });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Failed to assign admin role" });

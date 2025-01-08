@@ -88,6 +88,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+
 const Navbar = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState<string | null>(null);
@@ -109,11 +110,12 @@ const Navbar = () => {
   };
 
   return (
+    <>
     <nav className="flex items-center justify-between bg-orange-400 min-h-16 px-4">
       <div className="text-3xl">
         <button onClick={() => navigate("/")}>laxmanStarX</button>
       </div>
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 cursor-pointer">
         <span>About Us</span>
         <span>Cart</span>
         {userName ? (
@@ -136,6 +138,16 @@ const Navbar = () => {
         )}
       </div>
     </nav>
+ 
+    </>
+
+
+   
+
+
+
+
+
   );
 };
 
