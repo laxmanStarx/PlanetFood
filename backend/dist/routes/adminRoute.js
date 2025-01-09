@@ -8,38 +8,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const client_1 = require("@prisma/client");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const config_1 = require("../config");
 const router = (0, express_1.Router)();
 const prisma = new client_1.PrismaClient();
 // Middleware to check admin role
-const isAdmin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
-    if (!token) {
-        console.log("No token provided");
-        return res.status(401).json({ error: "Unauthorized" });
-    }
-    try {
-        const decoded = jsonwebtoken_1.default.verify(token, config_1.JWT_PASSWORD);
-        const user = yield prisma.user.findUnique({ where: { id: decoded.userId } });
-        if (!user || user.role !== "admin") {
-            return res.status(403).json({ error: "Access denied: Admins only" });
-        }
-        req.userId = decoded.userId;
-        next();
-    }
-    catch (error) {
-        console.error("Error verifying token:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-});
+// const isAdmin = async (req: any, res: any, next: NextFunction) => {
+//   const token = req.headers.authorization?.split(" ")[1];
+//   if (!token) {
+//     console.log("No token provided");
+//     return res.status(401).json({ error: "Unauthorized" });
+//   }
+//   try {
+//     const decoded: any = jwt.verify(token, JWT_PASSWORD!);
+//     const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+//     if (!user || user.role !== "admin") {
+//       return res.status(403).json({ error: "Access denied: Admins only" });
+//     }
+//     req.userId = decoded.userId;
+//     next();
+//   } catch (error) {
+//     console.error("Error verifying token:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
 // Add a menu item
 router.post("/menu", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, description, price, image, restaurantId } = req.body;
@@ -79,6 +72,37 @@ router.delete("/menu/:id", (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
     catch (error) {
         res.status(500).json({ error: "Failed to delete menu item" });
+    }
+}));
+router.get("/popular-items", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const popularItems = yield prisma.orderItem.groupBy({
+            by: ["menuId"], // Group by menu item
+            _count: {
+                menuId: true, // Count how many orders are associated with each menu item
+            },
+            having: {
+                menuId: {
+                    _count: {
+                        gte: 3, // Filter only items with 3 or more orders
+                    },
+                },
+            },
+        });
+        // Fetch the menu details for the grouped items
+        const menuIds = popularItems.map((item) => item.menuId);
+        const menuDetails = yield prisma.menu.findMany({
+            where: {
+                id: {
+                    in: menuIds,
+                },
+            },
+        });
+        res.json(menuDetails);
+    }
+    catch (error) {
+        console.error("Error fetching popular items:", error);
+        res.status(500).json({ error: "Failed to fetch popular items" });
     }
 }));
 exports.default = router;

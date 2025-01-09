@@ -22,12 +22,12 @@ const Home = () => {
 
   return (
     <>
-    <div className="container mx-auto mt-8">
+    <div className="container justify-center items-center  mx-auto mt-8">
       <h1 className="text-3xl font-bold text-center">Welcome to the Homepage</h1>
       {isAdmin && (
         <button
           onClick={() => navigate("/add-menu")}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+          className="mt-4 px-4 py-2 bg-red-500 text-white  rounded-full  hover:bg-blue-700  items-center justify-between  "
         >
           Go to Add Menu Form
         </button>

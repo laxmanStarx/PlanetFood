@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import cors from 'cors'
 import { isAdmin } from "./middleware/isAdmin";
 import restaurantRoute from "./routes/restaurantRoute";
+import cartRoute from "./routes/cartRoute";
 
 
 
@@ -26,6 +27,7 @@ app.use('/',restaurantRoute)
 app.use('/foodRoute',foodRoute)
 app.use('/admin',adminRoute)
 app.use('/isAdmin',isAdmin)
+app.use('/api',cartRoute)
 
 
 
