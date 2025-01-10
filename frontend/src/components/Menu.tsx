@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faMinus } from '@fortawesome/free-solid-svg-icons';
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCart } from "../contextApi/CartContext";
 
 interface MenuItem {
@@ -16,7 +16,8 @@ interface MenuItem {
 
 const Menu = () => {
   const { restaurantId } = useParams<{ restaurantId: string }>();
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const  {menuItems, setMenuItems } = useCart();
+  // const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const { cartItems, addToCart, updateQuantity } = useCart();
   const [navbarVisible, setNavbarVisible] = useState(false); 
   
@@ -56,7 +57,7 @@ const Menu = () => {
 
 
   const handleAddToCart = (menuId: string) => {
-    addToCart(menuId, 1);
+    addToCart(menuId,1);
     setNavbarVisible(true)
   };
 
@@ -81,6 +82,13 @@ const calculateTotalPrice = (): number => {
     const item = menuItems.find((menuItem) => menuItem.id === cartItem.menuId);
     return item ? total + cartItem.quantity * item.price : total;
   }, 0);
+};
+
+
+const navigate = useNavigate();
+
+const handleCheckout = () => {
+  navigate("/checkout");
 };
 
 
@@ -208,6 +216,9 @@ const calculateTotalPrice = (): number => {
                 ) : null;
               })}
             </div>
+
+            <button onClick={handleCheckout}>Submit</button>
+          
             {/* Total Price */}
             <div className="text-lg font-bold">
               Total: ${calculateTotalPrice().toFixed(2)}

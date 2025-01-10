@@ -87,11 +87,13 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../contextApi/CartContext";
 
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState<string | null>(null);
+  const { clearCart } = useCart();
 
   useEffect(() => {
     // Fetch user details from localStorage
@@ -107,6 +109,7 @@ const Navbar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/login");
+    clearCart()
   };
 
   return (

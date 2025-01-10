@@ -9,8 +9,9 @@ import Home from "./components/Home"
 import AddFoodForm from "./components/Food"
 import CheckUserRole from "./components/pages/Fetchuser"
 import AdminLogin from "./components/pages/Profile"
-import { AuthProvider } from "./contextApi/AuthContext"
+
 import Menu from "./components/Menu"
+import Checkout from "./components/Checkout"
 
 
 
@@ -22,7 +23,7 @@ function App() {
   return (
     <>   
 
-       <AuthProvider>
+      
         <BrowserRouter >
        <Navbar />
     <Routes>
@@ -30,6 +31,7 @@ function App() {
       
       <Route path="/signup" element={<SignUp />}/>
       <Route path ="/login" element={<Login />} />
+      <Route path ="/checkout" element={<Checkout />} />
       <Route path ="/admin" element={<Admin />} />
       <Route path ="/" element={<Home />} />
       <Route path = "/usser" element ={ <CheckUserRole />} />
@@ -43,7 +45,7 @@ function App() {
      
     </Routes>
     </BrowserRouter>
-    </AuthProvider>
+    
     </>
   )
 }
