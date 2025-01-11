@@ -3,8 +3,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faMinus } from '@fortawesome/free-solid-svg-icons';
+import { faBagShopping } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, useParams } from "react-router-dom";
 import { useCart } from "../contextApi/CartContext";
+
 
 interface MenuItem {
   id: string;
@@ -53,13 +55,23 @@ const Menu = () => {
 
 
 
+  // const handleAddToCart = (menuId: string,) => {
+  //   addToCart(menuId,1);
+  //   setNavbarVisible(true)
+  // };
 
 
 
-  const handleAddToCart = (menuId: string) => {
-    addToCart(menuId,1);
+  const handleAddToCart = (menuId: string, name: string, image: string, price: number) => {
+    addToCart(menuId, name, image, price, 1);
     setNavbarVisible(true)
   };
+
+
+
+
+
+
 
   const handleDecreaseQuantity = (menuId: string) => {
     const item = cartItems.find(item => item.menuId === menuId);
@@ -162,7 +174,7 @@ const handleCheckout = () => {
             <div className="flex-1 text-left md:pr-4">
               <h2 className="text-xl md:text-2xl font-bold text-gray-800">{item.name}</h2>
               <p className="text-gray-600 mt-2">{item.description}</p>
-              <p className="text-lg font-bold text-gray-800 mt-4">${item.price.toFixed(2)}</p>
+              <p className="text-lg font-bold text-gray-800 mt-4">Rs{item.price.toFixed(2)}</p>
             </div>
             {/* Food Image */}
 
@@ -176,7 +188,7 @@ const handleCheckout = () => {
     <FontAwesomeIcon
       icon={faPlus}
       className="absolute bottom-2 left-2 text-green-500 bg-slate-50 rounded-2xl text-2xl cursor-pointer"
-      onClick={() => handleAddToCart(item.id)}
+      onClick={() => handleAddToCart(item.id, item.name, item.image, item.price)}
       
     />   
 
@@ -201,7 +213,7 @@ const handleCheckout = () => {
         ))}
         </div>
         {navbarVisible && (
-        <div className=" fixed bottom-0 w-full rounded-3xl bg-gray-800 text-white p-4 z-50">
+        <div className=" fixed bottom-0 w-full  bg-green-500 text-white p-4 z-50">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               {/* Cart Items Display */}
@@ -216,8 +228,11 @@ const handleCheckout = () => {
                 ) : null;
               })}
             </div>
+            <div className="flex justify-end text-end mx-3 space-x-4 p-4 px-5 cursor-pointer">
 
-            <button onClick={handleCheckout}>Submit</button>
+            <FontAwesomeIcon icon={faBagShopping} />
+             <button onClick={handleCheckout}>Submit</button> 
+             </div>
           
             {/* Total Price */}
             <div className="text-lg font-bold">

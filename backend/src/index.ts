@@ -8,6 +8,7 @@ import cors from 'cors'
 import { isAdmin } from "./middleware/isAdmin";
 import restaurantRoute from "./routes/restaurantRoute";
 import cartRoute from "./routes/cartRoute";
+import paymentRoute from "./routes/paymentRoute"
 
 
 
@@ -19,12 +20,15 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE"],
   }));
 
-
+ 
 
 app.use(express.json())
+
+
 app.use('/api/v1/user',userRoute)
 app.use('/',restaurantRoute)
 app.use('/foodRoute',foodRoute)
+app.use("/api/payment", paymentRoute);
 app.use('/admin',adminRoute)
 app.use('/isAdmin',isAdmin)
 app.use('/api',cartRoute)

@@ -1,168 +1,68 @@
-// import { useNavigate } from "react-router-dom"; // Correct hook for navigation
-// import { PrimaryButton } from "./buttons/PrimaryButton"
-// import { SecondaryButton } from "./buttons/SecondaryButton";
-
-
-
-
-// const Navbar = () => {
-//     const navigate = useNavigate();
-
-
-//     const handleLogout = () => {
-//         // Remove token and any other stored user data
-//         localStorage.removeItem("token");
-//         localStorage.removeItem("role"); // If role is stored
-//         localStorage.removeItem("user"); // If user details are stored
-    
-//         // Redirect to the login page
-//         navigate("/login");
-//       };
-
-
-
-
-
-//   return (
-//     <>
-
-
-
-
-   
-//  <nav className="flex items-center justify-between  bg-orange-400 min-h-16 cursor-pointer border-b px-4">
-//         {/* Logo Section */}
-//          <div className="flex items-center text-3xl">
-            
-//            <button onClick={()=>
-//             navigate("/")
-//           }>laxmanStarX</button>
-//         </div> 
-
-   
-
-//         {/* Button Section  */}
-//          <div className="flex items-center space-x-4">
-//         <span>About Us</span>
-//         <span>Cart</span>
-//           <PrimaryButton
-//             onClick={() => {
-//              navigate("/login")
-//             }}
-//           >
-//             SignIn
-//           </PrimaryButton>
-
-//           <SecondaryButton onClick={handleLogout}>
-//             LogOut
-//           </SecondaryButton>
-         
-//         </div>
-//       </nav>
-
-
-
-
-
-
-
-
-
-
-
-//     </>
-
-
-//   )
-// }
-
-// export default Navbar
-
-
-
-
-
-
-
-
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../contextApi/CartContext";
-
+import { useState } from "react";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string | null>(null);
-  const { clearCart } = useCart();
+  const { cartItems = [] } = useCart();
+  const [showCart, setShowCart] = useState(false);
 
-  useEffect(() => {
-    // Fetch user details from localStorage
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setUserName(user.name);
-    }
-  }, []);
+  const handleToggleCart = () => {
+    setShowCart(!showCart);
+  };
+  const checkout=()=>{
+    navigate("/checkout")
 
-  const handleLogout = () => {
-    // Clear user data and token
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-    clearCart()
+  }
+
+  const calculateTotalItems = () => {
+    return cartItems.reduce((total, item) => total + (item.quantity || 0), 0);
   };
 
   return (
-    <>
     <nav className="flex items-center justify-between bg-orange-400 min-h-16 px-4">
       <div className="text-3xl">
         <button onClick={() => navigate("/")}>laxmanStarX</button>
       </div>
-      <div className="flex items-center space-x-4 cursor-pointer">
-        <span>About Us</span>
-        <span>Cart</span>
-        {userName ? (
-          <>
-            <span> {userName}</span>
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white px-4 py-2 rounded"
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => navigate("/login")}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Login
+      <div className="flex items-center space-x-4">
+        <span onClick={() => navigate("/about")}>About Us</span>
+        <div className="relative">
+          <button onClick={handleToggleCart} className="flex items-center space-x-2">
+            Cart ({calculateTotalItems()})
           </button>
-        )}
+          {showCart && (
+            <div className="absolute right-0 mt-2 w-64 bg-white border shadow-lg rounded-lg p-4 z-50">
+              {cartItems.length === 0 ? (
+                <p className="text-gray-500">Cart is empty</p>
+              ) : (
+                cartItems.map((cartItem) => (
+                  cartItem?.menuId ? (
+                    <div key={cartItem.menuId} className="flex items-center space-x-4 mb-4">
+                      <img
+                        src={cartItem.image || ""}
+                        alt={cartItem.name || "Item"}
+                        className="w-12 h-12 object-cover rounded"
+                      />
+                      <div className="flex-1">
+                        <p className="font-bold">{cartItem.name}</p>
+                        <p className="text-gray-600 text-sm">
+                          {cartItem.quantity} x Rs{cartItem.price?.toFixed(2) || "0.00"}
+                        </p>
+                      </div>
+                    </div>
+                  ) : null
+                ))
+              )}
+              <button onClick={checkout}>Submit</button>
+            </div>
+          )}
+        </div>
+        <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => navigate("/login")}>
+          Login
+        </button>
       </div>
     </nav>
- 
-    </>
-
-
-   
-
-
-
-
-
   );
 };
 
 export default Navbar;
-
-
-
-
-
-
-
-
-
-
-    

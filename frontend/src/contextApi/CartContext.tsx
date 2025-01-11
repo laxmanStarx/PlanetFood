@@ -11,15 +11,24 @@ interface MenuItem {
 interface CartItem {
   menuId: string;
   quantity: number;
+  name: string;
+  price: number;
+  image: string;
+  restaurantId?: string;
 }
+
+
+
 
 interface CartContextType {
   cartItems: CartItem[];
   menuItems: MenuItem[];
   setMenuItems: (items: MenuItem[]) => void;
-  addToCart: (menuId: string, quantity: number) => void;
+  addToCart: (menuId: string, name: string, image: string, price: number, quantity: number) => void;
+  // addToCart: (menuId: string, quantity: number) => void;
   updateQuantity: (menuId: string, quantity: number) => void;
   updateCart:(menuId: string, change: number)=>void
+  removeFromCart:(menuId: string)=>void
   clearCart:()=>void;
 }
 
@@ -32,10 +41,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return storedCart ? JSON.parse(storedCart) : [];
   });
 
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(() => {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(()=>{
     const storedMenuItems = localStorage.getItem("menuItems");
     return storedMenuItems ? JSON.parse(storedMenuItems) : [];
-  });
+  })
+
 
   useEffect(() => {
     // Save cart to local storage whenever it changes
@@ -43,7 +53,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [cartItems]);
 
 
-  // Persist menuItems to localStorage
+  // // Persist menuItems to localStorage
   useEffect(() => {
     localStorage.setItem("menuItems", JSON.stringify(menuItems));
   }, [menuItems]);
@@ -54,7 +64,35 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 
 
-  const addToCart = (menuId: string, quantity: number) => {
+  // const addToCart = (menuId: string, quantity: number) => {
+  //   setCartItems((prev) => {
+  //     const existingItem = prev.find((item) => item.menuId === menuId);
+  //     if (existingItem) {
+  //       return prev.map((item) =>
+  //         item.menuId === menuId
+  //           ? { ...item, quantity: item.quantity + quantity }
+  //           : item
+  //       );
+        
+  //     }
+  //     return [...prev, { menuId, quantity:1 }];
+    
+  //   });
+    
+  // };
+
+
+
+
+
+
+  const addToCart = (
+    menuId: string,
+    name: string,
+    image: string,
+    price: number,
+    quantity: number
+  ) => {
     setCartItems((prev) => {
       const existingItem = prev.find((item) => item.menuId === menuId);
       if (existingItem) {
@@ -64,9 +102,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             : item
         );
       }
-      return [...prev, { menuId, quantity }];
+      return [...prev, { menuId, name, image, price, quantity }];
     });
   };
+  
+  
+  
+  
+
+
+
+
+
+
+
 
 
   const updateCart = (menuId: string, change: number) => {
@@ -100,6 +149,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 
 
+// In CartContext.tsx or wherever your context is defined
+const removeFromCart = (menuId: string) => {
+  setCartItems((prevItems) => prevItems.filter((item) => item.menuId !== menuId));
+};
 
 
 
@@ -108,7 +161,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <CartContext.Provider
-      value={{ cartItems, menuItems, setMenuItems, addToCart,updateCart,clearCart, updateQuantity }}
+      value={{ cartItems, menuItems, setMenuItems, addToCart,updateCart,clearCart, updateQuantity,removeFromCart }}
     >
       {children}
     </CartContext.Provider>
