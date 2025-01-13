@@ -12,6 +12,7 @@ const isAdmin_1 = require("./middleware/isAdmin");
 const restaurantRoute_1 = __importDefault(require("./routes/restaurantRoute"));
 const cartRoute_1 = __importDefault(require("./routes/cartRoute"));
 const paymentRoute_1 = __importDefault(require("./routes/paymentRoute"));
+// import paymentRoute from "./routes/paymentRoute"
 const PORT = 8080;
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({

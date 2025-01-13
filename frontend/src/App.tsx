@@ -12,6 +12,7 @@ import AdminLogin from "./components/pages/Profile"
 
 import Menu from "./components/Menu"
 import Checkout from "./components/Checkout"
+import SuccessPage from "./components/pages/Success"
 
 
 
@@ -39,6 +40,7 @@ function App() {
       <Route path = "/add-menu" element ={ <AddFoodForm  />} />
       <Route path = "/admi-form" element = {<AdminLogin />} />
       <Route path="/restaurant/:restaurantId/menu" element={<Menu />} />
+      <Route path = "/success" element = {<SuccessPage />} />
 
    
     
