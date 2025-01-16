@@ -177,6 +177,7 @@ import { loadStripe } from "@stripe/stripe-js";
 
 const stripePromise = loadStripe("pk_test_51QfoSFKYglU8W7YCY1minmNmAaoNvVe7CjZ7KT94Lwj6InGq84HxIRQgdOvpBo6bZSrHYm6YVjkav83mc5pQc6Rd00a1n9pjVj");
 
+
 const Checkout: React.FC = () => {
   const { cartItems, clearCart, updateCart, removeFromCart } = useCart();
   const [menuItems, setMenuItems] = useState<any[]>([]);
@@ -349,7 +350,6 @@ const Checkout: React.FC = () => {
 };
 
 export default Checkout;
-
 
 
 

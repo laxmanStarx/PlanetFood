@@ -23,7 +23,7 @@ app.use(express_1.default.json());
 app.use('/api/v1/user', userRoute_1.default);
 app.use('/', restaurantRoute_1.default);
 app.use('/foodRoute', foodRoute_1.default);
-app.use("/api/payment", paymentRoute_1.default);
+app.use("/api/v1/payment", paymentRoute_1.default);
 app.use('/admin', adminRoute_1.default);
 app.use('/isAdmin', isAdmin_1.isAdmin);
 app.use('/api', cartRoute_1.default);
