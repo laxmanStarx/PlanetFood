@@ -33,7 +33,7 @@ const Menu = () => {
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        const response = await fetch(`${backendUrl}/menu/${restaurantId}`);
+        const response = await fetch(`${backendUrl}api/v1/admin/menu/${restaurantId}`);
         if (!response.ok) throw new Error("Failed to fetch menu items");
         const data = await response.json();
         setMenuItems(data);

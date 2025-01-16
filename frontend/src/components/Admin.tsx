@@ -8,7 +8,7 @@ const PromoteToAdmin: React.FC = () => {
 
   const promoteUser = async () => {
     try {
-      const response = await fetch(`${backendUrl}isAdmin/assign-admin`, {
+      const response = await fetch(`${backendUrl}api/v1/isAdmin/assign-admin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

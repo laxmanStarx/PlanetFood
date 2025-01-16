@@ -28,12 +28,12 @@ app.use(express.json())
 
 
 app.use('/api/v1/user',userRoute)
-app.use('/',restaurantRoute)
-app.use('/foodRoute',foodRoute)
+app.use('/api/v1/',restaurantRoute)
+app.use('/api/v1/foodRoute',foodRoute)
 app.use("/api/v1/payment", paymentRoute);
-app.use('/admin',adminRoute)
-app.use('/isAdmin',isAdmin)
-app.use('/api',cartRoute)
+app.use('/api/v1/admin',adminRoute)
+app.use('/api/v1/isAdmin',isAdmin)
+app.use('/api/v1',cartRoute)
 
 
 

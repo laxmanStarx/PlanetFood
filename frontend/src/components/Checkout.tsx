@@ -187,7 +187,7 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        const response = await fetch(`${backendUrl}/foodRoute`);
+        const response = await fetch(`${backendUrl}api/v1/foodRoute`);
         if (!response.ok) {
           throw new Error("Failed to fetch menu items");
         }

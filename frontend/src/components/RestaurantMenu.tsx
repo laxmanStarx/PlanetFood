@@ -16,7 +16,7 @@ const RestaurantMenu = () => {
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        const response = await fetch(`${backendUrl}/restaurants`);
+        const response = await fetch(`${backendUrl}/api/v1/restaurants`);
         const data = await response.json();
         setRestaurants(data);
       } catch (error) {
