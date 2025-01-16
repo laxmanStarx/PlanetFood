@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+const backendUrl = process.env.REACT_APP_BACKEND_URL
 
 
 const AdminLogin: React.FC = () => {
@@ -7,12 +8,13 @@ const AdminLogin: React.FC = () => {
   const [error, setError] = useState("");
   const [userDetails, setUserDetails] = useState<any>(null);
 
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
 
     try {
-      const response = await fetch(`${backendUrl}api/v1/user/login", {
+      const response = await fetch(`${backendUrl}api/v1/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
