@@ -16,6 +16,8 @@ interface MenuItem {
   price: number;
 }
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL
+
 const Menu = () => {
   const { restaurantId } = useParams<{ restaurantId: string }>();
   const  {menuItems, setMenuItems } = useCart();
@@ -31,7 +33,7 @@ const Menu = () => {
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/menu/${restaurantId}`);
+        const response = await fetch(`${backendUrl}/menu/${restaurantId}`);
         if (!response.ok) throw new Error("Failed to fetch menu items");
         const data = await response.json();
         setMenuItems(data);

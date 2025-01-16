@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+const backendUrl = process.env.REACT_APP_BACKEND_URL
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -15,7 +16,7 @@ const Login = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8080/api/v1/user/login", {
+      const response = await fetch(`${backendUrl}api/v1/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

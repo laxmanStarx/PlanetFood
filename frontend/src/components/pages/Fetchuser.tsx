@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+const backendUrl = process.env.REACT_APP_BACKEND_URL
 
 const CheckUserRole: React.FC = () => {
   const [role, setRole] = useState<string>("");
   const [error, setError] = useState<string>("");
+ 
 
   const fetchUserRole = async () => {
     try {
@@ -12,7 +14,7 @@ const CheckUserRole: React.FC = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:8080/user/role", {
+      const response = await fetch(`${backendUrl}user/role`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`, // Pass token in Authorization header

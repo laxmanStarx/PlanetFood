@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+const backendUrl = process.env.REACT_APP_BACKEND_URL
 
 const AddFoodForm: React.FC = () => {
   const [name, setName] = useState("");
@@ -22,7 +23,7 @@ const AddFoodForm: React.FC = () => {
     };
 
     try {
-      await axios.post("http://localhost:8080/admin/menu", foodData); // Adjust the endpoint as needed
+      await axios.post(`${backendUrl}admin/menu`, foodData); // Adjust the endpoint as needed
       setSuccess("Food item added successfully!");
       setError("");
       // Clear form fields

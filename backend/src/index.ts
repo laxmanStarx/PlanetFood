@@ -18,7 +18,7 @@ const PORT = 8080
 const app = express()
 
 app.use(cors({
-    origin: "*", // Specify your production frontend domain
+    origin: ["hhttps://planet-food-zoom.vercel.app"], // Specify your production frontend domain
     methods: ["GET", "POST", "PUT", "DELETE"],
   }));
 

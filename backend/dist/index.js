@@ -16,7 +16,7 @@ const paymentRoute_1 = __importDefault(require("./routes/paymentRoute"));
 const PORT = 8080;
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
-    origin: "*", // Specify your production frontend domain
+    origin: ["hhttps://planet-food-zoom.vercel.app"], // Specify your production frontend domain
     methods: ["GET", "POST", "PUT", "DELETE"],
 }));
 app.use(express_1.default.json());

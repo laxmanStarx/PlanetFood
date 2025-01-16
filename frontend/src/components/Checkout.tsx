@@ -12,7 +12,7 @@
 //   useEffect(() => {
 //     const fetchMenuItems = async () => {
 //       try {
-//         const response = await fetch("http://localhost:8080/foodRoute");
+//         const response = await fetch(`${backendUrl}foodRoute");
 //         if (!response.ok) {
 //           throw new Error("Failed to fetch menu items");
 //         }
@@ -176,7 +176,7 @@ import { FaTrash } from "react-icons/fa";
 import { loadStripe } from "@stripe/stripe-js";
 
 const stripePromise = loadStripe("pk_test_51QfoSFKYglU8W7YCY1minmNmAaoNvVe7CjZ7KT94Lwj6InGq84HxIRQgdOvpBo6bZSrHYm6YVjkav83mc5pQc6Rd00a1n9pjVj");
-
+const backendUrl = process.env.REACT_APP_BACKEND_URL
 
 const Checkout: React.FC = () => {
   const { cartItems, clearCart, updateCart, removeFromCart } = useCart();
@@ -187,7 +187,7 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        const response = await fetch("http://localhost:8080/foodRoute");
+        const response = await fetch(`${backendUrl}/foodRoute`);
         if (!response.ok) {
           throw new Error("Failed to fetch menu items");
         }
@@ -224,7 +224,7 @@ const Checkout: React.FC = () => {
     });
 
     try {
-      const response = await fetch("http://localhost:8080/api/payment/create-checkout-session", {
+      const response = await fetch(`${backendUrl}/api/payment/create-checkout-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
