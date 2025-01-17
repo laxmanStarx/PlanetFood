@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-const backendUrl = process.env.REACT_APP_BACKEND_URL
+
 
 const PromoteToAdmin: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -8,7 +8,7 @@ const PromoteToAdmin: React.FC = () => {
 
   const promoteUser = async () => {
     try {
-      const response = await fetch(`${backendUrl}api/v1/isAdmin/assign-admin`, {
+      const response = await fetch(`localhost:8080/api/v1/isAdmin/assign-admin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

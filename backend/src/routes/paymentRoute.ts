@@ -112,6 +112,42 @@ router.post(
   }
 );
 
+router.post("/create-checkout-session", async (req, res) => {
+  try {
+    const { items } = req.body; // Expecting items from frontend
+
+    // Map items to Stripe line items
+    const lineItems = items.map((item: any) => ({
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: item.name,
+        },
+        unit_amount: item.price, // Price in cents
+      },
+      quantity: item.quantity,
+    }));
+
+    // Create the Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      mode: "payment",
+      success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`, // Redirect on success
+      cancel_url: `${process.env.CLIENT_URL}/cancel`, // Redirect on cancellation
+      metadata: {
+        items: JSON.stringify(items), // Pass metadata for webhook
+      },
+    });
+
+    res.status(200).json({ url: session.url });
+  } catch (err) {
+    console.error("Error creating Checkout Session:", err);
+    res.status(500).json({ error: "Failed to create checkout session" });
+  }
+});
+
+
 export default router;
 
 

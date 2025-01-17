@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-const backendUrl = process.env.REACT_APP_BACKEND_URL
+
 
 const CheckUserRole: React.FC = () => {
   const [role, setRole] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
  
 
   const fetchUserRole = async () => {
@@ -14,7 +16,7 @@ const CheckUserRole: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`${backendUrl}user/role`, {
+      const response = await fetch(`${backendUrl}/api/v1/user/role`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`, // Pass token in Authorization header

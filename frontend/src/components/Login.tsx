@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-const backendUrl = process.env.REACT_APP_BACKEND_URL
+
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const handleChange = (e:any) => {
     const { name, value } = e.target;
@@ -16,7 +17,7 @@ const Login = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${backendUrl}api/v1/user/login`, {
+      const response = await fetch(`${backendUrl}/api/v1/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

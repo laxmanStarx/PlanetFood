@@ -176,7 +176,9 @@ import { FaTrash } from "react-icons/fa";
 import { loadStripe } from "@stripe/stripe-js";
 
 const stripePromise = loadStripe("pk_test_51QfoSFKYglU8W7YCY1minmNmAaoNvVe7CjZ7KT94Lwj6InGq84HxIRQgdOvpBo6bZSrHYm6YVjkav83mc5pQc6Rd00a1n9pjVj");
-const backendUrl = process.env.REACT_APP_BACKEND_URL
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
 const Checkout: React.FC = () => {
   const { cartItems, clearCart, updateCart, removeFromCart } = useCart();
@@ -187,7 +189,7 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        const response = await fetch(`${backendUrl}api/v1/foodRoute`);
+        const response = await fetch(`${backendUrl}/foodRoute`);
         if (!response.ok) {
           throw new Error("Failed to fetch menu items");
         }
@@ -216,15 +218,19 @@ const Checkout: React.FC = () => {
 
     const items = cartItems.map((cartItem) => {
       const menuItem = menuItems.find((menu) => menu.id === cartItem.menuId);
+      if (!menuItem) {
+        console.error("Menu item not found for cart item:", cartItem.menuId);
+        return null;
+      }
       return {
-        name: menuItem?.name,
-        price: menuItem?.price || 0,
+        name: menuItem.name,
+        price: Math.round(menuItem.price * 100), // Convert to cents
         quantity: cartItem.quantity,
       };
-    });
-
+    }).filter(Boolean); // Remove null items
+    
     try {
-      const response = await fetch(`${backendUrl}/api/payment/create-checkout-session`, {
+      const response = await fetch(`${backendUrl}/payment/create-checkout-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

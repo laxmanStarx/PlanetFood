@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-const backendUrl = process.env.REACT_APP_BACKEND_URL
+
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -30,7 +34,7 @@ const SignUp = () => {
   }
 
   try {
-    const response = await fetch(`${backendUrl}api/v1/user/signup`, {
+    const response = await fetch(`${backendUrl}/api/v1/user/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

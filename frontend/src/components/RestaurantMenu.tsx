@@ -7,7 +7,10 @@ interface Restaurant {
   address: string;
   image: string;
 }
-const backendUrl = process.env.REACT_APP_BACKEND_URL
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+
 
 const RestaurantMenu = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -16,7 +19,7 @@ const RestaurantMenu = () => {
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        const response = await fetch(`${backendUrl}/api/v1/restaurants`);
+        const response = await fetch(`${backendUrl}/restaurants`);
         const data = await response.json();
         setRestaurants(data);
       } catch (error) {

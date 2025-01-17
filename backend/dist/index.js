@@ -16,17 +16,17 @@ const paymentRoute_1 = __importDefault(require("./routes/paymentRoute"));
 const PORT = 8080;
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
-    origin: ["hhttps://planet-food-zoom.vercel.app"], // Specify your production frontend domain
+    origin: "*", // Specify your production frontend domain
     methods: ["GET", "POST", "PUT", "DELETE"],
 }));
 app.use(express_1.default.json());
 app.use('/api/v1/user', userRoute_1.default);
 app.use('/', restaurantRoute_1.default);
 app.use('/foodRoute', foodRoute_1.default);
-app.use("/api/v1/payment", paymentRoute_1.default);
-app.use('/admin', adminRoute_1.default);
-app.use('/isAdmin', isAdmin_1.isAdmin);
-app.use('/api', cartRoute_1.default);
+app.use("/payment", paymentRoute_1.default);
+app.use('/api/v1/admin', adminRoute_1.default);
+app.use('/api/v1/isAdmin', isAdmin_1.isAdmin);
+app.use('/', cartRoute_1.default);
 app.listen(PORT, () => {
     console.log(`Your Server is listening at hello ${PORT}`);
 });

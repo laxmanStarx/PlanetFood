@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
-const backendUrl = process.env.REACT_APP_BACKEND_URL
+
+
+
+
 
 const AddFoodForm: React.FC = () => {
   const [name, setName] = useState("");
@@ -10,6 +13,7 @@ const AddFoodForm: React.FC = () => {
   const [restaurantId, setRestaurantId] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +27,7 @@ const AddFoodForm: React.FC = () => {
     };
 
     try {
-      await axios.post(`${backendUrl}admin/menu`, foodData); // Adjust the endpoint as needed
+      await axios.post(`${backendUrl}/api/v1/admin/menu`, foodData); // Adjust the endpoint as needed
       setSuccess("Food item added successfully!");
       setError("");
       // Clear form fields
