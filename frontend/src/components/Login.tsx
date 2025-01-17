@@ -33,7 +33,7 @@ const Login = () => {
   
       const data = await response.json();
       localStorage.setItem("token", data.token); // Save JWT token
-      console.log(data.token)
+      // console.log(data.token)
       localStorage.setItem("user", JSON.stringify(data.user)); // Save user details
       setSuccess("Login successful!");
   
