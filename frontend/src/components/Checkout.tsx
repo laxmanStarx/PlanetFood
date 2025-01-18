@@ -228,6 +228,7 @@ const Checkout: React.FC = () => {
         quantity: cartItem.quantity,
       };
     }).filter(Boolean); // Remove null items
+    const userId = localStorage.getItem("userId");
     
     try {
       const response = await fetch(`${backendUrl}/payment/create-checkout-session`, {
@@ -235,7 +236,7 @@ const Checkout: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ items, userId }),
       });
 
       const { url } = await response.json();

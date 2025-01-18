@@ -84,35 +84,46 @@ router.post(
       if (event.type === "checkout.session.completed") {
         const session = event.data.object as Stripe.Checkout.Session;
 
-        // Log session data for debugging
         console.log("Session Metadata:", session.metadata);
 
         // Retrieve metadata
         const userId = session.metadata?.userId;
         const items = JSON.parse(session.metadata?.items || "[]");
 
+        if (!userId || items.length === 0) {
+          throw new Error("Missing required metadata (userId or items)");
+        }
+
         // Save order in the database
-        console.log("Saving order with metadata:", { userId, items });
-        await prisma.order
-          .create({
-            data: {
-              userId: userId!,
-              totalPrice: session.amount_total! / 100, // Convert cents to dollars
-              status: "Paid",
-              orderItems: {
-                create: items.map((item: any) => ({
-                  menuId: item.menuId,
-                  quantity: item.quantity,
-                })),
-              },
+        const order = await prisma.order.create({
+          data: {
+            userId,
+            totalPrice: session.amount_total! / 100, // Convert cents to dollars
+            status: "Paid",
+            orderItems: {
+              create: items.map((item: any) => ({
+                menuId: item.menuId,
+                quantity: item.quantity,
+              })),
             },
-          })
-          .then((order) => {
-            console.log("Order saved successfully:", order);
-          })
-          .catch((err) => {
-            console.error("Error saving order to DB:", err);
-          });
+          },
+        });
+
+        console.log("Order saved successfully:", order);
+
+        // Save payment in the database
+        const payment = await prisma.payment.create({
+          data: {
+            userId,
+            orderId: order.id,
+            stripePaymentId: session.payment_intent as string,
+            amount: session.amount_total! / 100,
+            currency: session.currency!,
+            status: "Completed",
+          },
+        });
+
+        console.log("Payment saved successfully:", payment);
       }
 
       res.status(200).json({ received: true });
@@ -123,15 +134,21 @@ router.post(
   }
 );
 
+
 // Create Checkout Session
 router.post("/create-checkout-session", async (req, res) => {
   try {
-    const { items } = req.body;
+    const { items, userId } = req.body;
 
     if (!items || !Array.isArray(items)) {
       throw new Error("Invalid 'items' in request body");
     }
 
+    if (!userId) {
+      throw new Error("Missing 'userId' in request body");
+    }
+
+    // Map items to Stripe line items
     const lineItems = items.map((item: any) => {
       if (!item.name || !item.price || !item.quantity) {
         throw new Error(`Invalid item format: ${JSON.stringify(item)}`);
@@ -155,8 +172,8 @@ router.post("/create-checkout-session", async (req, res) => {
       success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
       metadata: {
-        userId: req.body.userId, // Ensure userId is passed in the request
-        items: JSON.stringify(items),
+        userId, // Pass the userId here
+        items: JSON.stringify(items), // Pass items as a string
       },
     });
 
@@ -166,6 +183,7 @@ router.post("/create-checkout-session", async (req, res) => {
     res.status(500).json({ error: err || "Internal Server Error" });
   }
 });
+
 
 export default router;
 
