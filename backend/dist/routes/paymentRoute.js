@@ -55,22 +55,27 @@ const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY);
-// Use raw body for Stripe signature verification
+// Webhook for Stripe
 router.post("/webhook", body_parser_1.default.raw({ type: "application/json" }), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const sig = req.headers["stripe-signature"];
     try {
         const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+        console.log("Received event type:", event.type);
         if (event.type === "checkout.session.completed") {
             const session = event.data.object;
+            // Log session data for debugging
+            console.log("Session Metadata:", session.metadata);
             // Retrieve metadata
             const userId = (_a = session.metadata) === null || _a === void 0 ? void 0 : _a.userId;
             const items = JSON.parse(((_b = session.metadata) === null || _b === void 0 ? void 0 : _b.items) || "[]");
             // Save order in the database
-            yield prisma.order.create({
+            console.log("Saving order with metadata:", { userId, items });
+            yield prisma.order
+                .create({
                 data: {
                     userId: userId,
-                    totalPrice: session.amount_total / 100, // Convert to dollars
+                    totalPrice: session.amount_total / 100, // Convert cents to dollars
                     status: "Paid",
                     orderItems: {
                         create: items.map((item) => ({
@@ -79,8 +84,13 @@ router.post("/webhook", body_parser_1.default.raw({ type: "application/json" }),
                         })),
                     },
                 },
+            })
+                .then((order) => {
+                console.log("Order saved successfully:", order);
+            })
+                .catch((err) => {
+                console.error("Error saving order to DB:", err);
             });
-            console.log("Order saved to database for session:", session.id);
         }
         res.status(200).json({ received: true });
     }
@@ -89,36 +99,44 @@ router.post("/webhook", body_parser_1.default.raw({ type: "application/json" }),
         res.status(400).send(`Webhook Error: ${err}`);
     }
 }));
+// Create Checkout Session
 router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { items } = req.body; // Expecting items from frontend
-        // Map items to Stripe line items
-        const lineItems = items.map((item) => ({
-            price_data: {
-                currency: "usd",
-                product_data: {
-                    name: item.name,
+        const { items } = req.body;
+        if (!items || !Array.isArray(items)) {
+            throw new Error("Invalid 'items' in request body");
+        }
+        const lineItems = items.map((item) => {
+            if (!item.name || !item.price || !item.quantity) {
+                throw new Error(`Invalid item format: ${JSON.stringify(item)}`);
+            }
+            return {
+                price_data: {
+                    currency: "usd",
+                    product_data: {
+                        name: item.name,
+                    },
+                    unit_amount: item.price, // Price in cents
                 },
-                unit_amount: item.price, // Price in cents
-            },
-            quantity: item.quantity,
-        }));
-        // Create the Checkout Session
+                quantity: item.quantity,
+            };
+        });
         const session = yield stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             line_items: lineItems,
             mode: "payment",
-            success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`, // Redirect on success
-            cancel_url: `${process.env.CLIENT_URL}/cancel`, // Redirect on cancellation
+            success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.CLIENT_URL}/cancel`,
             metadata: {
-                items: JSON.stringify(items), // Pass metadata for webhook
+                userId: req.body.userId, // Ensure userId is passed in the request
+                items: JSON.stringify(items),
             },
         });
         res.status(200).json({ url: session.url });
     }
     catch (err) {
-        console.error("Error creating Checkout Session:", err);
-        res.status(500).json({ error: "Failed to create checkout session" });
+        console.error("Error in /create-checkout-session:", err);
+        res.status(500).json({ error: err || "Internal Server Error" });
     }
 }));
 exports.default = router;

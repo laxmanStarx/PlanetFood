@@ -65,7 +65,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-// Use raw body for Stripe signature verification
+// Webhook for Stripe
 router.post(
   "/webhook",
   bodyParser.raw({ type: "application/json" }),
@@ -79,29 +79,40 @@ router.post(
         process.env.STRIPE_WEBHOOK_SECRET!
       );
 
+      console.log("Received event type:", event.type);
+
       if (event.type === "checkout.session.completed") {
         const session = event.data.object as Stripe.Checkout.Session;
+
+        // Log session data for debugging
+        console.log("Session Metadata:", session.metadata);
 
         // Retrieve metadata
         const userId = session.metadata?.userId;
         const items = JSON.parse(session.metadata?.items || "[]");
 
         // Save order in the database
-        await prisma.order.create({
-          data: {
-            userId: userId!,
-            totalPrice: session.amount_total! / 100, // Convert to dollars
-            status: "Paid",
-            orderItems: {
-              create: items.map((item: any) => ({
-                menuId: item.menuId,
-                quantity: item.quantity,
-              })),
+        console.log("Saving order with metadata:", { userId, items });
+        await prisma.order
+          .create({
+            data: {
+              userId: userId!,
+              totalPrice: session.amount_total! / 100, // Convert cents to dollars
+              status: "Paid",
+              orderItems: {
+                create: items.map((item: any) => ({
+                  menuId: item.menuId,
+                  quantity: item.quantity,
+                })),
+              },
             },
-          },
-        });
-
-        console.log("Order saved to database for session:", session.id);
+          })
+          .then((order) => {
+            console.log("Order saved successfully:", order);
+          })
+          .catch((err) => {
+            console.error("Error saving order to DB:", err);
+          });
       }
 
       res.status(200).json({ received: true });
@@ -112,41 +123,49 @@ router.post(
   }
 );
 
+// Create Checkout Session
 router.post("/create-checkout-session", async (req, res) => {
   try {
-    const { items } = req.body; // Expecting items from frontend
+    const { items } = req.body;
 
-    // Map items to Stripe line items
-    const lineItems = items.map((item: any) => ({
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: item.name,
+    if (!items || !Array.isArray(items)) {
+      throw new Error("Invalid 'items' in request body");
+    }
+
+    const lineItems = items.map((item: any) => {
+      if (!item.name || !item.price || !item.quantity) {
+        throw new Error(`Invalid item format: ${JSON.stringify(item)}`);
+      }
+      return {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.name,
+          },
+          unit_amount: item.price, // Price in cents
         },
-        unit_amount: item.price, // Price in cents
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity,
+      };
+    });
 
-    // Create the Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`, // Redirect on success
-      cancel_url: `${process.env.CLIENT_URL}/cancel`, // Redirect on cancellation
+      success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL}/cancel`,
       metadata: {
-        items: JSON.stringify(items), // Pass metadata for webhook
+        userId: req.body.userId, // Ensure userId is passed in the request
+        items: JSON.stringify(items),
       },
     });
 
     res.status(200).json({ url: session.url });
   } catch (err) {
-    console.error("Error creating Checkout Session:", err);
-    res.status(500).json({ error: "Failed to create checkout session" });
+    console.error("Error in /create-checkout-session:", err);
+    res.status(500).json({ error: err || "Internal Server Error" });
   }
 });
-
 
 export default router;
 
