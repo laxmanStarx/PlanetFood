@@ -65,7 +65,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-// Webhook for Stripe
+// Use raw body for Stripe signature verification
 router.post(
   "/webhook",
   bodyParser.raw({ type: "application/json" }),
@@ -79,26 +79,18 @@ router.post(
         process.env.STRIPE_WEBHOOK_SECRET!
       );
 
-      console.log("Received event type:", event.type);
-
       if (event.type === "checkout.session.completed") {
         const session = event.data.object as Stripe.Checkout.Session;
-
-        console.log("Session Metadata:", session.metadata);
 
         // Retrieve metadata
         const userId = session.metadata?.userId;
         const items = JSON.parse(session.metadata?.items || "[]");
 
-        if (!userId || items.length === 0) {
-          throw new Error("Missing required metadata (userId or items)");
-        }
-
         // Save order in the database
-        const order = await prisma.order.create({
+        await prisma.order.create({
           data: {
-            userId,
-            totalPrice: session.amount_total! / 100, // Convert cents to dollars
+            userId: userId!,
+            totalPrice: session.amount_total! / 100, // Convert to dollars
             status: "Paid",
             orderItems: {
               create: items.map((item: any) => ({
@@ -109,21 +101,7 @@ router.post(
           },
         });
 
-        console.log("Order saved successfully:", order);
-
-        // Save payment in the database
-        const payment = await prisma.payment.create({
-          data: {
-            userId,
-            orderId: order.id,
-            stripePaymentId: session.payment_intent as string,
-            amount: session.amount_total! / 100,
-            currency: session.currency!,
-            status: "Completed",
-          },
-        });
-
-        console.log("Payment saved successfully:", payment);
+        console.log("Order saved to database for session:", session.id);
       }
 
       res.status(200).json({ received: true });
@@ -134,18 +112,12 @@ router.post(
   }
 );
 
-
-// Create Checkout Session
 router.post("/create-checkout-session", async (req, res) => {
   try {
-    const { items, userId } = req.body;
+    const { items } = req.body;
 
     if (!items || !Array.isArray(items)) {
       throw new Error("Invalid 'items' in request body");
-    }
-
-    if (!userId) {
-      throw new Error("Missing 'userId' in request body");
     }
 
     // Map items to Stripe line items
@@ -165,6 +137,7 @@ router.post("/create-checkout-session", async (req, res) => {
       };
     });
 
+    // Create the Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
@@ -172,8 +145,7 @@ router.post("/create-checkout-session", async (req, res) => {
       success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
       metadata: {
-        userId, // Pass the userId here
-        items: JSON.stringify(items), // Pass items as a string
+        items: JSON.stringify(items),
       },
     });
 
