@@ -69,7 +69,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 router.post(
   "/webhook",
   bodyParser.raw({ type: "application/json" }),
-  async (req, res) => {
+  async (req:any, res:any) => {
     const sig = req.headers["stripe-signature"] as string;
 
     try {
@@ -86,11 +86,16 @@ router.post(
         const userId = session.metadata?.userId;
         const items = JSON.parse(session.metadata?.items || "[]");
 
-        // Save order in the database
-        await prisma.order.create({
+        if (!userId) {
+          console.error("User ID is missing in metadata.");
+          return res.status(400).json({ error: "Invalid user ID" });
+        }
+
+        // Create the order in the database
+        const order = await prisma.order.create({
           data: {
-            userId: userId!,
-            totalPrice: session.amount_total! / 100, // Convert to dollars
+            userId: userId,
+            totalPrice: session.amount_total! / 100, // Convert from cents to currency
             status: "Paid",
             orderItems: {
               create: items.map((item: any) => ({
@@ -101,41 +106,47 @@ router.post(
           },
         });
 
-        console.log("Order saved to database for session:", session.id);
+        // Save the payment details in the database
+        await prisma.payment.create({
+          data: {
+            userId: userId,
+            orderId: order.id,
+            stripePaymentId: session.id, // Store Stripe session ID
+            amount: session.amount_total! / 100,
+            currency: session.currency!,
+            status: "Completed",
+          },
+        });
+
+        console.log(" Order & Payment saved for session:", session.id);
       }
 
       res.status(200).json({ received: true });
     } catch (err) {
-      console.error("Error verifying webhook:", err);
+      console.error(" Webhook error:", err);
       res.status(400).send(`Webhook Error: ${err}`);
     }
   }
 );
 
+
 router.post("/create-checkout-session", async (req, res) => {
   try {
-    const { items } = req.body;
+    const { items, userId } = req.body;
 
     if (!items || !Array.isArray(items)) {
       throw new Error("Invalid 'items' in request body");
     }
 
     // Map items to Stripe line items
-    const lineItems = items.map((item: any) => {
-      if (!item.name || !item.price || !item.quantity) {
-        throw new Error(`Invalid item format: ${JSON.stringify(item)}`);
-      }
-      return {
-        price_data: {
-          currency: "inr",
-          product_data: {
-            name: item.name,
-          },
-          unit_amount: item.price, // Price in cents
-        },
-        quantity: item.quantity,
-      };
-    });
+    const lineItems = items.map((item: any) => ({
+      price_data: {
+        currency: "inr",
+        product_data: { name: item.name },
+        unit_amount: item.price, // Price in cents
+      },
+      quantity: item.quantity,
+    }));
 
     // Create the Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -145,6 +156,7 @@ router.post("/create-checkout-session", async (req, res) => {
       success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
       metadata: {
+        userId, // Send user ID
         items: JSON.stringify(items),
       },
     });
@@ -250,20 +262,20 @@ export default router;
 //       expand: ["metadata"],
 //     });
 
-//     console.log("✅ Stripe Session Retrieved:", session);
+//     console.log(" Stripe Session Retrieved:", session);
 
 //     const userId = session.metadata?.userId;
 //     const items = JSON.parse(session.metadata?.items || "[]");
 
-//     console.log("🟢 userId:", userId);
-//     console.log("🟢 items:", items);
+//     console.log(" userId:", userId);
+//     console.log(" items:", items);
 
 //     if (!userId) {
 //       console.log(" Error: Missing userId");
 //       return res.status(400).json({ error: "Missing userId" });
 //     }
 //     if (!items || items.length === 0) {
-//       console.log("❌ Error: No items found in metadata");
+//       console.log(" Error: No items found in metadata");
 //       return res.status(400).json({ error: "No items found" });
 //     }
 
@@ -282,11 +294,11 @@ export default router;
 //       },
 //     });
 
-//     console.log("✅ Order saved successfully:", order);
+//     console.log(" Order saved successfully:", order);
 
 //     res.status(200).json({ message: "Order saved successfully", order });
 //   } catch (err) {
-//     console.error("❌ Error in /save-order:", err);
+//     console.error(" Error in /save-order:", err);
 //     res.status(500).json({ error: "Internal Server Error" });
 //   }
 // });

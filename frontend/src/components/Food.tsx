@@ -15,6 +15,7 @@ const AddFoodForm: React.FC = () => {
   const [success, setSuccess] = useState("");
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -99,3 +100,18 @@ const AddFoodForm: React.FC = () => {
 };
 
 export default AddFoodForm;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

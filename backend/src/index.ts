@@ -9,6 +9,8 @@ import { isAdmin } from "./middleware/isAdmin";
 import restaurantRoute from "./routes/restaurantRoute";
 import cartRoute from "./routes/cartRoute";
 import paymentRoute from "./routes/paymentRoute";
+import cloudinary from "cloudinary"
+import uploadRoute from "./routes/uploadRoute";
 
 // import paymentRoute from "./routes/paymentRoute"
 
@@ -34,8 +36,7 @@ app.use("/payment", paymentRoute);
 app.use('/api/v1/admin',adminRoute)
 app.use('/api/v1/isAdmin',isAdmin)
 app.use('/',cartRoute)
-
-
+app.use("/", uploadRoute);
 
 
 
@@ -45,4 +46,9 @@ app.listen(PORT,()=>{
     console.log(`Your Server is listening at hello ${PORT}`)
 })
 
-
+// Initialize Cloudinary
+// cloudinary.v2.config({
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Add to your .env
+//   api_key: process.env.CLOUDINARY_API_KEY, // Add to your .env
+//   api_secret: process.env.CLOUDINARY_API_SECRET, // Add to your .env
+// });
