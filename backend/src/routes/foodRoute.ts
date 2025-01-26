@@ -29,15 +29,15 @@ router.get("/:id", async (req:any, res:any) => {
 
 
 // Fetch menu items by category
-router.get("/category/:category", async (req, res) => {
-  const { category } = req.params;
-  try {
-    const menus = await prisma.menu.findMany({ where: { category } });
-    res.json(menus);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch menu items by category" });
-  }
-});
+// router.get("/category/:category", async (req, res) => {
+//   const { category } = req.params;
+//   try {
+//     const menus = await prisma.menu.findMany({ where: { category } });
+//     res.json(menus);
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to fetch menu items by category" });
+//   }
+// });
 
 
 
