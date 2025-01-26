@@ -12,6 +12,7 @@ import paymentRoute from "./routes/paymentRoute";
 import cloudinary from "cloudinary"
 import uploadRoute from "./routes/uploadRoute";
 
+
 // import paymentRoute from "./routes/paymentRoute"
 
 
@@ -42,13 +43,15 @@ app.use("/", uploadRoute);
 
 
 
+
+
 app.listen(PORT,()=>{
     console.log(`Your Server is listening at hello ${PORT}`)
 })
 
 // Initialize Cloudinary
-// cloudinary.v2.config({
-//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Add to your .env
-//   api_key: process.env.CLOUDINARY_API_KEY, // Add to your .env
-//   api_secret: process.env.CLOUDINARY_API_SECRET, // Add to your .env
-// });
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Add to your .env
+  api_key: process.env.CLOUDINARY_API_KEY, // Add to your .env
+  api_secret: process.env.CLOUDINARY_API_SECRET, // Add to your .env
+});

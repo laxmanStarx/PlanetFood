@@ -36,4 +36,15 @@ router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(500).json({ error: "Failed to fetch menu item" });
     }
 }));
+// Fetch menu items by category
+router.get("/category/:category", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { category } = req.params;
+    try {
+        const menus = yield prisma.menu.findMany({ where: { category } });
+        res.json(menus);
+    }
+    catch (error) {
+        res.status(500).json({ error: "Failed to fetch menu items by category" });
+    }
+}));
 exports.default = router;

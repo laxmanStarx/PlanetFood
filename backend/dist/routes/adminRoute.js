@@ -48,6 +48,37 @@ router.post("/menu", (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(500).json({ error: "Failed to add menu item" });
     }
 }));
+// Configure Multer for file uploads
+// const upload = multer({ dest: "uploads/" }); // Temporary storage directory
+// router.post(
+//   "/menu",
+//   upload.single("image"), // Handle single file upload with field name "image"
+//   async (req:any, res:any) => {
+//     const { name, description, price, restaurantId } = req.body;
+//     const file = req.file; // Uploaded file details
+//     if (!name || !description || !price || !restaurantId || !file) {
+//       return res.status(400).json({ error: "All fields are required." });
+//     }
+//     try {
+//       // Example: Save file path or move it to cloud storage
+//       // const imagePath = file.path;
+//       const normalizedImagePath = req.file.path.replace(/\\/g, "/"); // Normalize the path
+//       const menu = await prisma.menu.create({
+//         data: {
+//           name,
+//           description,
+//           price: parseFloat(price),
+//           image: normalizedImagePath,
+//           restaurantId,
+//         },
+//       });
+//       res.status(201).json({ message: "Menu item created successfully.", menu });
+//     } catch (error) {
+//       console.error("Error creating menu item:", error);
+//       res.status(500).json({ error: "Failed to create menu item." });
+//     }
+//   }
+// );
 // Update a menu item
 router.put("/menu/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;

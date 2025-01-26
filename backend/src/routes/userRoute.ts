@@ -318,28 +318,6 @@ router.get("/role", async (req: any, res: any) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// View menu
-// hermoine5678$$90^&890
 router.get("/menu", async (req, res) => {
   try {
     const menus = await prisma.menu.findMany();

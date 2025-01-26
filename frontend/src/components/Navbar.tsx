@@ -44,7 +44,7 @@ const Navbar = () => {
   return (
     <nav className="flex items-center justify-between bg-orange-400 min-h-16 px-4">
       <div className="text-3xl">
-        <button onClick={() => navigate("/")}>laxmanStarX</button>
+        <button onClick={() => navigate("/")}>FoodStarX</button>
       </div>
       <div className="flex items-center space-x-4">
         <span onClick={() => navigate("/about")}>About Us</span>

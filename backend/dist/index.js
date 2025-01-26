@@ -12,6 +12,7 @@ const isAdmin_1 = require("./middleware/isAdmin");
 const restaurantRoute_1 = __importDefault(require("./routes/restaurantRoute"));
 const cartRoute_1 = __importDefault(require("./routes/cartRoute"));
 const paymentRoute_1 = __importDefault(require("./routes/paymentRoute"));
+const cloudinary_1 = __importDefault(require("cloudinary"));
 const uploadRoute_1 = __importDefault(require("./routes/uploadRoute"));
 // import paymentRoute from "./routes/paymentRoute"
 const PORT = 8080;
@@ -33,8 +34,8 @@ app.listen(PORT, () => {
     console.log(`Your Server is listening at hello ${PORT}`);
 });
 // Initialize Cloudinary
-// cloudinary.v2.config({
-//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Add to your .env
-//   api_key: process.env.CLOUDINARY_API_KEY, // Add to your .env
-//   api_secret: process.env.CLOUDINARY_API_SECRET, // Add to your .env
-// });
+cloudinary_1.default.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Add to your .env
+    api_key: process.env.CLOUDINARY_API_KEY, // Add to your .env
+    api_secret: process.env.CLOUDINARY_API_SECRET, // Add to your .env
+});

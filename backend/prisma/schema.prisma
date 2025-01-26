@@ -29,6 +29,7 @@ model User {
   role        String   @default("user")  // Role field, default is 'user'
   orders      Order[]
   payments    Payment[]
+  ratings     Rating[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -39,6 +40,8 @@ model Restaurant {
   address     String
   image       String?
   menuItems   Menu[]
+  averageRating  Float?   @default(0) // New field
+  ratings     Rating[]   // Relation to store ratings
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -48,7 +51,8 @@ model Menu {
   name          String
   description   String?
   price         Float
-  image         String? 
+  image         String 
+   category      String     @default("Uncategorized") // Default value added
   restaurantId  String
   restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
   orderItems    OrderItem[]
@@ -91,6 +95,19 @@ model Payment {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+
+
+model Rating {
+  id           String   @id @default(cuid())
+  rating       Int      
+  description  String?
+  userId       String
+  restaurantId String
+  user         User     @relation(fields: [userId], references: [id]) // Foreign key
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+}
+
 
 
 

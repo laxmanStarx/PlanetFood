@@ -16,6 +16,7 @@ import SuccessPage from "./components/pages/Success"
 
 
 
+
 function App() {
 
 
@@ -41,6 +42,7 @@ function App() {
       <Route path = "/admi-form" element = {<AdminLogin />} />
       <Route path="/restaurant/:restaurantId/menu" element={<Menu />} />
       <Route path = "/success" element = {<SuccessPage />} />
+      
 
    
     

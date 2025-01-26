@@ -26,6 +26,7 @@ const Menu = () => {
   const { cartItems, addToCart, updateQuantity } = useCart();
   const [navbarVisible, setNavbarVisible] = useState(false); 
   const [selectedFood, setSelectedFood] = useState<MenuItem | null>(null);
+  
 
   const [carouselImages, setCarouselImages] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0); // Track the current image index

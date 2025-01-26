@@ -95,12 +95,12 @@ router.post("/webhook", body_parser_1.default.raw({ type: "application/json" }),
                     status: "Completed",
                 },
             });
-            console.log("✅ Order & Payment saved for session:", session.id);
+            console.log(" Order & Payment saved for session:", session.id);
         }
         res.status(200).json({ received: true });
     }
     catch (err) {
-        console.error("❌ Webhook error:", err);
+        console.error(" Webhook error:", err);
         res.status(400).send(`Webhook Error: ${err}`);
     }
 }));
@@ -199,17 +199,17 @@ exports.default = router;
 //     const session = await stripe.checkout.sessions.retrieve(sessionId, {
 //       expand: ["metadata"],
 //     });
-//     console.log("✅ Stripe Session Retrieved:", session);
+//     console.log(" Stripe Session Retrieved:", session);
 //     const userId = session.metadata?.userId;
 //     const items = JSON.parse(session.metadata?.items || "[]");
-//     console.log("🟢 userId:", userId);
-//     console.log("🟢 items:", items);
+//     console.log(" userId:", userId);
+//     console.log(" items:", items);
 //     if (!userId) {
 //       console.log(" Error: Missing userId");
 //       return res.status(400).json({ error: "Missing userId" });
 //     }
 //     if (!items || items.length === 0) {
-//       console.log("❌ Error: No items found in metadata");
+//       console.log(" Error: No items found in metadata");
 //       return res.status(400).json({ error: "No items found" });
 //     }
 //     // Save order in the database
@@ -226,10 +226,10 @@ exports.default = router;
 //         },
 //       },
 //     });
-//     console.log("✅ Order saved successfully:", order);
+//     console.log(" Order saved successfully:", order);
 //     res.status(200).json({ message: "Order saved successfully", order });
 //   } catch (err) {
-//     console.error("❌ Error in /save-order:", err);
+//     console.error(" Error in /save-order:", err);
 //     res.status(500).json({ error: "Internal Server Error" });
 //   }
 // });

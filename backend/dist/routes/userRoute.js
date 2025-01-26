@@ -247,8 +247,6 @@ router.get("/role", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(500).json({ error: "Internal server error" });
     }
 }));
-// View menu
-// hermoine5678$$90^&890
 router.get("/menu", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const menus = yield prisma.menu.findMany();
