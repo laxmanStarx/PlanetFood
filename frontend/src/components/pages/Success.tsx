@@ -3,12 +3,6 @@
 import React from "react";
 
 
-
-
-
-
-
-
 const SuccessPage: React.FC = () => {
   return (
     <div className="container mx-auto text-center">
