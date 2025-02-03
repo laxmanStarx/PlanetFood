@@ -3,7 +3,19 @@
 @tailwind utilities;
 
 
-
+.zig-zag-curve {
+    background: linear-gradient(
+      135deg,
+      transparent 25%,
+      #8b5cf6 25%,
+      #8b5cf6 50%,
+      transparent 50%,
+      transparent 75%,
+      #8b5cf6 75%,
+      #8b5cf6 100%
+    );
+    background-size: 20px 20px;
+  }
 
 
 

@@ -173,9 +173,12 @@
 import React, { useEffect, useState } from "react";
 import { useCart } from "../contextApi/CartContext";
 import { FaTrash } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+
+
 import { loadStripe } from "@stripe/stripe-js";
 
-const stripePromise = loadStripe("pk_test_51QfoSFKYglU8W7YCY1minmNmAaoNvVe7CjZ7KT94Lwj6InGq84HxIRQgdOvpBo6bZSrHYm6YVjkav83mc5pQc6Rd00a1n9pjVj");
+const stripePromise = loadStripe("import.meta.env.STRIPE_API");
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -185,6 +188,15 @@ const Checkout: React.FC = () => {
   const [menuItems, setMenuItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+
+  const navigate = useNavigate();
+
+
+
+
+
+
 
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -215,7 +227,13 @@ const Checkout: React.FC = () => {
 
   const handleCheckout = async () => {
     const stripe = await stripePromise;
-
+    const userId = localStorage.getItem("userId");
+  
+    if (!userId) {
+      alert("User not logged in. Please log in to continue.");
+      return;
+    }
+  
     const items = cartItems.map((cartItem) => {
       const menuItem = menuItems.find((menu) => menu.id === cartItem.menuId);
       if (!menuItem) {
@@ -223,32 +241,51 @@ const Checkout: React.FC = () => {
         return null;
       }
       return {
+        menuId: cartItem.menuId,
         name: menuItem.name,
-        price: Math.round(menuItem.price * 100), // Convert to cents
+        price: menuItem.price,
         quantity: cartItem.quantity,
+        image: menuItem.image,
       };
     }).filter(Boolean); // Remove null items
-    const userId = localStorage.getItem("userId");
-    
+  
     try {
-      const response = await fetch(`${backendUrl}/payment/create-checkout-session`, {
+      // Step 1: Save order to NeonDB (PostgreSQL)
+      const orderResponse = await fetch(`${backendUrl}/foodRoute/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, items }),
+      
+      });
+  
+      if (!orderResponse.ok) {
+        throw new Error("Failed to save order to the database.");
+      }
+
+      navigate("/orders")
+  
+      console.log("Order saved successfully!");
+  
+      // Step 2: Proceed with Stripe Payment
+      const stripeResponse = await fetch(`${backendUrl}/payment/create-checkout-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ items, userId }),
       });
-
-      const { url } = await response.json();
+  
+      const { url } = await stripeResponse.json();
       if (stripe && url) {
         window.location.href = url;
       }
     } catch (err) {
-      console.error("Error redirecting to Stripe Checkout", err);
-      alert("Failed to initiate payment. Please try again.");
+      console.error("Error during checkout", err);
+      alert("Checkout failed. Please try again.");
     }
   };
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -340,7 +377,7 @@ const Checkout: React.FC = () => {
           </table>
           <button
             className="mt-4 bg-green-500 text-white px-4 py-2 rounded"
-            onClick={handleCheckout}
+            onClick={handleCheckout} 
           >
             Pay Now
           </button>
@@ -357,6 +394,7 @@ const Checkout: React.FC = () => {
 };
 
 export default Checkout;
+
 
 
 

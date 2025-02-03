@@ -2,9 +2,12 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 
+
+
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -33,15 +36,17 @@ const Login = () => {
   
       const data = await response.json();
       localStorage.setItem("token", data.token); // Save JWT token
-      // console.log(data.token)
       localStorage.setItem("user", JSON.stringify(data.user)); // Save user details
+      localStorage.setItem("userId", data.user.id); // Save userId
+  
       setSuccess("Login successful!");
   
-      setTimeout(() => navigate("/"), 2000);
+      setTimeout(() => navigate("/"), 1000);
     } catch (err) {
       setError("Something went wrong. Please try again.");
     }
   };
+  
 
   return (
     <div className="bg-grey-lighter min-h-screen flex flex-col">
@@ -84,3 +89,55 @@ const Login = () => {
 };
 
 export default Login;
+
+
+
+
+// import { useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { useAuth } from "../contextApi/AuthContext";
+
+// const LoginPage = () => {
+//   const [userIdInput, setUserIdInput] = useState("");
+//   const { login } = useAuth();
+//   const navigate = useNavigate();
+
+//   const handleLogin = () => {
+//     if (userIdInput.trim()) {
+//       login(userIdInput); // Store userId in AuthContext
+//       navigate("/"); // Redirect to checkout after login
+//     } else {
+//       alert("Please enter a valid User ID");
+//     }
+//   };
+
+//   return (
+//     <div>
+//       <h2>Login Page</h2>
+//       <input
+//         type="text"
+//         placeholder="Enter User ID"
+//         value={userIdInput}
+//         onChange={(e) => setUserIdInput(e.target.value)}
+//       />
+//       <button onClick={handleLogin}>Login</button>
+//     </div>
+//   );
+// };
+
+// export default LoginPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

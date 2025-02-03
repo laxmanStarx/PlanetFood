@@ -13,6 +13,9 @@ import AdminLogin from "./components/pages/Profile"
 import Menu from "./components/Menu"
 import Checkout from "./components/Checkout"
 import SuccessPage from "./components/pages/Success"
+import RestaurantForm from "./components/pages/RestaurantForm"
+import OrderPage from "./components/Order"
+
 
 
 
@@ -33,7 +36,7 @@ function App() {
       
       <Route path="/signup" element={<SignUp />}/>
       <Route path ="/login" element={<Login />} />
-      <Route path ="/checkout" element={<Checkout />} />
+      <Route path ="/checkout" element={ <Checkout />} />
       <Route path ="/admin" element={<Admin />} />
       <Route path ="/" element={<Home />} />
       <Route path = "/usser" element ={ <CheckUserRole />} />
@@ -42,6 +45,9 @@ function App() {
       <Route path = "/admi-form" element = {<AdminLogin />} />
       <Route path="/restaurant/:restaurantId/menu" element={<Menu />} />
       <Route path = "/success" element = {<SuccessPage />} />
+
+      <Route path="/restaurant-form" element={<RestaurantForm />} />
+      <Route path="/orders" element={<OrderPage />} />
       
 
    

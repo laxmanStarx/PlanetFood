@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 router.post("/", async (req:any, res:any) => {
   const { userId, menuId, quantity } = req.body;
 
-  if (!userId || !menuId || !quantity) {
+  if ( !menuId || !quantity) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
@@ -16,7 +16,7 @@ router.post("/", async (req:any, res:any) => {
     // Check if an active order exists for the user
     let order = await prisma.order.findFirst({
       where: {
-        userId,
+      
         status: "Pending",
       },
     });

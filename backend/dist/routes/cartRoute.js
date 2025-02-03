@@ -16,14 +16,13 @@ const prisma = new client_1.PrismaClient();
 // Add item to cart
 router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, menuId, quantity } = req.body;
-    if (!userId || !menuId || !quantity) {
+    if (!menuId || !quantity) {
         return res.status(400).json({ error: "Missing required fields" });
     }
     try {
         // Check if an active order exists for the user
         let order = yield prisma.order.findFirst({
             where: {
-                userId,
                 status: "Pending",
             },
         });

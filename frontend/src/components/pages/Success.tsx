@@ -1,119 +1,52 @@
+import React, { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
+const PaymentSuccess = () => {
+  const [searchParams] = useSearchParams();
+  const [status, setStatus] = useState('loading');
+  const navigate = useNavigate();
 
-import React from "react";
+  useEffect(() => {
+    const sessionId = searchParams.get('session_id');
+    if (sessionId) {
+      // You could verify the session status here
+      setStatus('success');
+    }
+  }, [searchParams]);
 
-
-const SuccessPage: React.FC = () => {
   return (
-    <div className="container mx-auto text-center">
-      <h1 className="text-3xl font-bold text-green-500 mt-10">
-        Payment Successful!
-      </h1>
-      <p className="text-gray-700 mt-4">Thank you for your purchase.</p>
-      <a
-        href="/"
-        className="mt-6 inline-block bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Go to Home
-      </a>
-      <h1> FeedBack Form</h1>
-
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md text-center">
+        <div className="mb-4 text-green-500">
+          <svg
+            className="w-16 h-16 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">
+          Payment Successful!
+        </h2>
+        <p className="text-gray-600 mb-8">
+          Thank you for your order. Your payment has been processed successfully.
+        </p>
+        <button
+          onClick={() => navigate('/orders')}
+          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+        >
+          View Orders
+        </button>
+      </div>
     </div>
   );
 };
 
-export default SuccessPage;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React, { useEffect, useState } from "react";
-// import { useSearchParams } from "react-router-dom";
-
-// const SuccessPage: React.FC = () => {
-//   const [message, setMessage] = useState("Saving your order...");
-//   const [searchParams] = useSearchParams();
-
-//   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
-//   useEffect(() => {
-//     const saveOrder = async () => {
-//       const sessionId = searchParams.get("session_id");
-
-//       if (!sessionId) {
-//         setMessage("Session ID missing. Could not verify payment.");
-//         return;
-//       }
-
-//       try {
-//         const response = await fetch(`${backendUrl}/save-order`, {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify({ sessionId }),
-//         });
-
-//         if (!response.ok) {
-//           throw new Error("Failed to save order");
-//         }
-
-//         setMessage("Order saved successfully! Thank you for your purchase.");
-//       } catch (error) {
-//         console.error("Error saving order:", error);
-//         setMessage("Error saving order. Please contact support.");
-//       }
-//     };
-
-//     saveOrder();
-//   }, []);
-
-//   return (
-//     <div className="container mx-auto text-center">
-//       <h1 className="text-3xl font-bold text-green-500 mt-10">
-//         Payment Successful!
-//       </h1>
-//       <p className="text-gray-700 mt-4">{message}</p>
-//       <a
-//         href="/"
-//         className="mt-6 inline-block bg-blue-500 text-white px-4 py-2 rounded"
-//       >
-//         Go to Home
-//       </a>
-//     </div>
-//   );
-// };
-
-// export default SuccessPage;
-
-
-
+export default PaymentSuccess;

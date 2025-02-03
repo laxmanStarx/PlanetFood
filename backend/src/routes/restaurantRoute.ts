@@ -56,37 +56,53 @@ router.get("/restaurants", async (req, res) => {
   
 
 
-  // router.post("/ratings", async (req:any, res:any) => {
-  //   const { userId, restaurantId, rating, description } = req.body;
+  // router.post("/feedback", async (req:any, res:any) => {
+  //   const { restaurantId, rating, comment } = req.body;
+  
+  //   if (!restaurantId || !rating || !comment) {
+  //     return res.status(400).json({ message: "All fields are required." });
+  //   }
   
   //   try {
-  //     // Validate userId
-  //     const user = await prisma.user.findUnique({ where: { id: userId } });
-  //     if (!user) {
-  //       return res.status(400).json({ error: "Invalid userId. User does not exist." });
-  //     }
-  
-  //     // Validate restaurantId
-  //     const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
-  //     if (!restaurant) {
-  //       return res.status(400).json({ error: "Invalid restaurantId. Restaurant does not exist." });
-  //     }
-  
-  //     // Create the rating
-  //     const newRating = await prisma.rating.create({
-  //       data: { userId, restaurantId, rating, description },
+  //     // Assuming you have a Feedback model in your database
+  //     await prisma.rating.create({
+  //       restaurantId,
+  //       rating,
+  //       comment,
   //     });
   
-  //     res.status(201).json(newRating);
+  //     res.status(201).json({ message: "Feedback saved successfully." });
   //   } catch (error) {
-  //     console.error("Error submitting rating:", error);
-  //     res.status(500).json({ error: "Failed to submit rating" });
+  //     console.error("Error saving feedback:", error);
+  //     res.status(500).json({ message: "Failed to save feedback." });
   //   }
   // });
   
   
   
+  
+// POST to add a new restaurant
+router.post("/restaurants", async (req:any, res:any) => {
+  const { name, address, image } = req.body;
 
+  if (!name || !address) {
+    return res.status(400).json({ error: "Name and address are required" });
+  }
+
+  try {
+    const newRestaurant = await prisma.restaurant.create({
+      data: {
+        name,
+        address,
+        image: image || null, // Optional field
+      },
+    });
+    res.status(201).json(newRestaurant);
+  } catch (error) {
+    console.error("Error adding restaurant:", error);
+    res.status(500).json({ error: "Failed to add restaurant" });
+  }
+});
 
 
 

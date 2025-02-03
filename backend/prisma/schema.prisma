@@ -29,7 +29,7 @@ model User {
   role        String   @default("user")  // Role field, default is 'user'
   orders      Order[]
   payments    Payment[]
-  ratings     Rating[]
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -99,14 +99,13 @@ model Payment {
 
 
 model Rating {
-  id           String   @id @default(cuid())
-  rating       Int      
+  id           String     @id @default(cuid())
+  rating       Int
   description  String?
-  userId       String
   restaurantId String
-  user         User     @relation(fields: [userId], references: [id]) // Foreign key
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
 }
+
 
 
 

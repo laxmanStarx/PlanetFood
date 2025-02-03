@@ -37,14 +37,71 @@ router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 }));
 // Fetch menu items by category
-router.get("/category/:category", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { category } = req.params;
+// router.get("/category/:category", async (req, res) => {
+//   const { category } = req.params;
+//   try {
+//     const menus = await prisma.menu.findMany({ where: { category } });
+//     res.json(menus);
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to fetch menu items by category" });
+//   }
+// });
+router.get("/orders", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.query; // Get userId from query parameters
+    // Check if userId is provided
+    if (!userId) {
+        return res.status(400).json({ error: "User ID is required." });
+    }
     try {
-        const menus = yield prisma.menu.findMany({ where: { category } });
-        res.json(menus);
+        // Fetch orders for the given userId
+        const orders = yield prisma.order.findMany({
+            where: {
+                userId: userId, // Filter by userId
+            },
+            include: {
+                orderItems: true, // Include associated orderItems
+            },
+        });
+        // Respond with the fetched orders
+        res.status(200).json(orders);
     }
     catch (error) {
-        res.status(500).json({ error: "Failed to fetch menu items by category" });
+        console.error("Error fetching orders:", error);
+        res.status(500).json({ error: "Internal server error while fetching orders." });
+    }
+}));
+router.post("/orders", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId, items } = req.body;
+    // Check if userId and items are provided
+    if (!userId || !items || items.length === 0) {
+        return res.status(400).json({ error: "User ID and items are required." });
+    }
+    // Calculate total price
+    const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0);
+    try {
+        // Create an order with associated order items
+        const order = yield prisma.order.create({
+            data: {
+                userId,
+                totalPrice,
+                status: "Pending",
+                orderItems: {
+                    create: items.map((item) => ({
+                        menuId: item.menuId,
+                        quantity: item.quantity,
+                    })),
+                },
+            },
+            include: {
+                orderItems: true,
+            },
+        });
+        // Respond with the created order
+        res.status(201).json(order);
+    }
+    catch (error) {
+        console.error("Error creating order:", error);
+        res.status(500).json({ error: "Internal server error while creating order." });
     }
 }));
 exports.default = router;
