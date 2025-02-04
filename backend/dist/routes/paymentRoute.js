@@ -55,14 +55,20 @@ const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY);
+if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
+    console.error("🚨 Missing Stripe environment variables!");
+    process.exit(1); // Stop server if env vars are missing
+}
 // Use raw body for Stripe signature verification
 router.post("/webhook", body_parser_1.default.raw({ type: "application/json" }), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const sig = req.headers["stripe-signature"];
     try {
         const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+        console.log("Received Stripe event:", event.type); // ✅ Debugging line
         if (event.type === "checkout.session.completed") {
             const session = event.data.object;
+            console.log("✅ Payment Successful for session:", session.id); // ✅ Debugging line
             // Retrieve metadata
             const userId = (_a = session.metadata) === null || _a === void 0 ? void 0 : _a.userId;
             const items = JSON.parse(((_b = session.metadata) === null || _b === void 0 ? void 0 : _b.items) || "[]");
@@ -70,56 +76,61 @@ router.post("/webhook", body_parser_1.default.raw({ type: "application/json" }),
                 console.error("User ID is missing in metadata.");
                 return res.status(400).json({ error: "Invalid user ID" });
             }
-            // Create the order in the database
-            const order = yield prisma.order.create({
-                data: {
-                    userId: userId,
-                    totalPrice: session.amount_total / 100, // Convert from cents to currency
-                    status: "Paid",
-                    orderItems: {
-                        create: items.map((item) => ({
-                            menuId: item.menuId,
-                            quantity: item.quantity,
-                        })),
-                    },
-                },
+            // Find order linked to this payment
+            const order = yield prisma.order.findFirst({
+                where: { userId: userId, status: "Pending" },
             });
-            // Save the payment details in the database
+            if (!order) {
+                console.error("Order not found for user:", userId);
+                return res.status(400).json({ error: "Order not found" });
+            }
+            // ✅ Update Order Status to "Paid"
+            yield prisma.order.update({
+                where: { id: order.id },
+                data: { status: "Paid" },
+            });
+            // ✅ Save Payment Details
             yield prisma.payment.create({
                 data: {
-                    userId: userId,
+                    userId,
                     orderId: order.id,
-                    stripePaymentId: session.id, // Store Stripe session ID
+                    stripePaymentId: session.id,
                     amount: session.amount_total / 100,
                     currency: session.currency,
                     status: "Completed",
                 },
             });
-            console.log(" Order & Payment saved for session:", session.id);
+            console.log("✅ Order & Payment saved for session:", session.id);
         }
         res.status(200).json({ received: true });
     }
     catch (err) {
-        console.error(" Webhook error:", err);
+        console.error("❌ Webhook error:", err);
         res.status(400).send(`Webhook Error: ${err}`);
     }
 }));
 router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { items, userId } = req.body;
-        if (!items || !Array.isArray(items)) {
-            throw new Error("Invalid 'items' in request body");
-        }
-        // Map items to Stripe line items
+        if (!userId)
+            return res.status(400).json({ error: "User ID is required" });
+        if (!items || !Array.isArray(items))
+            return res.status(400).json({ error: "Invalid items" });
+        //  Convert items to Stripe line_items
         const lineItems = items.map((item) => ({
             price_data: {
                 currency: "inr",
                 product_data: { name: item.name },
-                unit_amount: item.price, // Price in cents
+                unit_amount: Math.max(item.price * 100, 5000), // 👈 Ensure minimum ₹50 (₹50 * 100 = 5000 paisa)
             },
             quantity: item.quantity,
         }));
-        // Create the Checkout Session
+        //  Calculate total price
+        const totalAmount = lineItems.reduce((sum, item) => sum + item.price_data.unit_amount * item.quantity, 0);
+        if (totalAmount < 5000) {
+            return res.status(400).json({ error: "Minimum order amount must be ₹50." });
+        }
+        //  Create Stripe Checkout Session
         const session = yield stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             line_items: lineItems,
@@ -127,15 +138,15 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
             success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.CLIENT_URL}/cancel`,
             metadata: {
-                userId, // Send user ID
+                userId,
                 items: JSON.stringify(items),
             },
         });
         res.status(200).json({ url: session.url });
     }
     catch (err) {
-        console.error("Error in /create-checkout-session:", err);
-        res.status(500).json({ error: err || "Internal Server Error" });
+        console.error(" Error in /create-checkout-session:", err.message);
+        res.status(500).json({ error: err.message || "Internal Server Error" });
     }
 }));
 exports.default = router;

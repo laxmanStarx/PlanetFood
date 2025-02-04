@@ -190,7 +190,7 @@ const Checkout: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
 
 
@@ -251,7 +251,7 @@ const Checkout: React.FC = () => {
   
     try {
       // Step 1: Save order to NeonDB (PostgreSQL)
-      const orderResponse = await fetch(`${backendUrl}/foodRoute/orders`, {
+      const orderResponse = await fetch(`${backendUrl}/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -264,7 +264,7 @@ const Checkout: React.FC = () => {
         throw new Error("Failed to save order to the database.");
       }
 
-      navigate("/orders")
+      // navigate("/orders")
   
       console.log("Order saved successfully!");
   
