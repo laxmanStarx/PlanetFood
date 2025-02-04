@@ -133,7 +133,7 @@ router.post(
           return res.status(400).json({ error: "Order not found" });
         }
 
-        // ✅ Update Order Status to "Paid"
+       
         await prisma.order.update({
           where: { id: order.id },
           data: { status: "Paid" },
@@ -151,12 +151,12 @@ router.post(
           },
         });
 
-        console.log("✅ Order & Payment saved for session:", session.id);
+        console.log(" Order & Payment saved for session:", session.id);
       }
 
       res.status(200).json({ received: true });
     } catch (err) {
-      console.error("❌ Webhook error:", err);
+      console.error(" Webhook error:", err);
       res.status(400).send(`Webhook Error: ${err}`);
     }
   }
@@ -176,7 +176,7 @@ router.post("/create-checkout-session", async (req:any, res:any) => {
       price_data: {
         currency: "inr",
         product_data: { name: item.name },
-        unit_amount: Math.max(item.price * 100, 5000), // 👈 Ensure minimum ₹50 (₹50 * 100 = 5000 paisa)
+        unit_amount: Math.max(item.price * 100, 5000), //  Ensure minimum ₹50 (₹50 * 100 = 5000 paisa)
       },
       quantity: item.quantity,
     }));
@@ -188,6 +188,18 @@ router.post("/create-checkout-session", async (req:any, res:any) => {
       return res.status(400).json({ error: "Minimum order amount must be ₹50." });
     }
 
+    const order = await prisma.order.create({
+      data: {
+        userId: userId,
+        status: "Pending",
+        totalPrice: totalAmount,
+      },
+    });
+
+
+
+
+
     //  Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -197,7 +209,8 @@ router.post("/create-checkout-session", async (req:any, res:any) => {
       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
       metadata: {
         userId,
-        items: JSON.stringify(items),
+        orderId: order.id
+        // items: JSON.stringify(items),
       },
     });
 
