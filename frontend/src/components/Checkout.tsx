@@ -173,7 +173,7 @@
 import React, { useEffect, useState } from "react";
 import { useCart } from "../contextApi/CartContext";
 import { FaTrash } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+
 
 
 import { loadStripe } from "@stripe/stripe-js";
