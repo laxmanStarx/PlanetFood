@@ -23,7 +23,7 @@ const Home = () => {
   return (
     <>
     <div className="container justify-center items-center  mx-auto mt-8">
-      <h1 className="text-3xl font-bold text-center">Welcome to the Homepage</h1>
+     
 
 
 

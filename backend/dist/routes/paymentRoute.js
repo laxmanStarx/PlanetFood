@@ -56,59 +56,71 @@ const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY);
 if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
-    console.error("🚨 Missing Stripe environment variables!");
+    console.error(" Missing Stripe environment variables!");
     process.exit(1); // Stop server if env vars are missing
 }
-// Use raw body for Stripe signature verification
-router.post("/webhook", body_parser_1.default.raw({ type: "application/json" }), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    const sig = req.headers["stripe-signature"];
-    try {
-        const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-        console.log("Received Stripe event:", event.type); // ✅ Debugging line
-        if (event.type === "checkout.session.completed") {
-            const session = event.data.object;
-            console.log("✅ Payment Successful for session:", session.id); // ✅ Debugging line
-            // Retrieve metadata
-            const userId = (_a = session.metadata) === null || _a === void 0 ? void 0 : _a.userId;
-            const items = JSON.parse(((_b = session.metadata) === null || _b === void 0 ? void 0 : _b.items) || "[]");
-            if (!userId) {
-                console.error("User ID is missing in metadata.");
-                return res.status(400).json({ error: "Invalid user ID" });
-            }
-            // Find order linked to this payment
-            const order = yield prisma.order.findFirst({
-                where: { userId: userId, status: "Pending" },
-            });
-            if (!order) {
-                console.error("Order not found for user:", userId);
-                return res.status(400).json({ error: "Order not found" });
-            }
-            // ✅ Update Order Status to "Paid"
-            yield prisma.order.update({
-                where: { id: order.id },
-                data: { status: "Paid" },
-            });
-            // ✅ Save Payment Details
-            yield prisma.payment.create({
-                data: {
-                    userId,
-                    orderId: order.id,
-                    stripePaymentId: session.id,
-                    amount: session.amount_total / 100,
-                    currency: session.currency,
-                    status: "Completed",
-                },
-            });
-            console.log("✅ Order & Payment saved for session:", session.id);
-        }
-        res.status(200).json({ received: true });
-    }
-    catch (err) {
-        console.error("❌ Webhook error:", err);
-        res.status(400).send(`Webhook Error: ${err}`);
-    }
-}));
+//  Middleware for JSON Parsing (Only for non-webhook routes)
+router.use(express_1.default.json());
+/**
+ *  Stripe Webhook Route (Uses raw body)
+ */
+// router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req: any, res: any) => {
+//   const sig = req.headers["stripe-signature"];
+//   if (!sig) {
+//     console.error(" No Stripe signature found!");
+//     return res.status(400).send("Webhook Error: No signature.");
+//   }
+//   try {
+//     const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+//     console.log(" Webhook received:", event.type);
+//     console.log(" Event Data:", JSON.stringify(event, null, 2));
+//     if (event.type === "checkout.session.completed") {
+//       const session = event.data.object as Stripe.Checkout.Session;
+//       console.log(" Payment Successful for Session:", session.id);
+//       console.log("🔹 Metadata:", session.metadata);
+//       const userId = session.metadata?.userId;
+//       const orderId = session.metadata?.orderId;
+//       if (!userId || !orderId) {
+//         console.error(" Missing userId or orderId in metadata!");
+//         return res.status(400).json({ error: "Invalid metadata" });
+//       }
+//       console.log("🔹 Searching for order with ID:", orderId);
+//       const order = await prisma.order.findUnique({ where: { id: orderId } });
+//       if (!order) {
+//         console.error(" Order not found:", orderId);
+//         return res.status(400).json({ error: "Order not found" });
+//       }
+//       console.log(" Order Found:", order);
+//       //  Update Order Status
+//       console.log("🔹 Updating Order Status...");
+//       await prisma.order.update({
+//         where: { id: order.id },
+//         data: { status: "Paid" },
+//       });
+//       console.log(" Order Updated!");
+//       //  Store Payment Details
+//       console.log(" Storing Payment Details...");
+//       await prisma.payment.create({
+//         data: {
+//           userId,
+//           orderId,
+//           stripePaymentId: session.id,
+//           amount: session.amount_total! / 100,
+//           currency: session.currency!,
+//           status: "Completed",
+//         },
+//       });
+//       console.log(" Payment Details Stored Successfully!");
+//     }
+//     res.status(200).json({ received: true });
+//   } catch (err: any) {
+//     console.error(" Webhook error:", err);
+//     res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
+// });
+/**
+ *  Create Checkout Session Route
+ */
 router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { items, userId } = req.body;
@@ -121,7 +133,7 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
             price_data: {
                 currency: "inr",
                 product_data: { name: item.name },
-                unit_amount: Math.max(item.price * 100, 5000), // 👈 Ensure minimum ₹50 (₹50 * 100 = 5000 paisa)
+                unit_amount: Math.max(item.price * 100, 5000), // Minimum ₹50
             },
             quantity: item.quantity,
         }));
@@ -130,7 +142,18 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
         if (totalAmount < 5000) {
             return res.status(400).json({ error: "Minimum order amount must be ₹50." });
         }
+        //  Create Order in Database
+        console.log("🔹 Creating Order in DB...");
+        const order = yield prisma.order.create({
+            data: {
+                userId: userId,
+                status: "Pending",
+                totalPrice: totalAmount / 100, // Convert to INR
+            },
+        });
+        console.log(" Order Created with ID:", order.id);
         //  Create Stripe Checkout Session
+        console.log("🔹 Creating Stripe Checkout Session...");
         const session = yield stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             line_items: lineItems,
@@ -139,14 +162,74 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
             cancel_url: `${process.env.CLIENT_URL}/cancel`,
             metadata: {
                 userId,
-                items: JSON.stringify(items),
+                orderId: order.id, // Store orderId in metadata
             },
         });
+        console.log(" Stripe Session Created:", session.id);
         res.status(200).json({ url: session.url });
     }
     catch (err) {
         console.error(" Error in /create-checkout-session:", err.message);
         res.status(500).json({ error: err.message || "Internal Server Error" });
+    }
+}));
+/**
+ *  Stripe Webhook Route (Uses raw body)
+ */
+router.post("/webhook", body_parser_1.default.raw({ type: "application/json" }), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const sig = req.headers["stripe-signature"];
+    if (!sig) {
+        console.error(" No Stripe signature found!");
+        return res.status(400).send("Webhook Error: No signature.");
+    }
+    try {
+        const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+        console.log(" Webhook received:", event.type);
+        console.log(" Event Data:", JSON.stringify(event, null, 2));
+        if (event.type === "checkout.session.completed") {
+            const session = event.data.object;
+            console.log(" Payment Successful for Session:", session.id);
+            console.log("🔹 Metadata:", session.metadata);
+            const userId = (_a = session.metadata) === null || _a === void 0 ? void 0 : _a.userId;
+            const orderId = (_b = session.metadata) === null || _b === void 0 ? void 0 : _b.orderId;
+            if (!userId || !orderId) {
+                console.error(" Missing userId or orderId in metadata!");
+                return res.status(400).json({ error: "Invalid metadata" });
+            }
+            console.log("🔹 Searching for order with ID:", orderId);
+            const order = yield prisma.order.findUnique({ where: { id: orderId } });
+            if (!order) {
+                console.error(" Order not found:", orderId);
+                return res.status(400).json({ error: "Order not found" });
+            }
+            console.log(" Order Found:", order);
+            //  Update Order Status
+            console.log("🔹 Updating Order Status...");
+            yield prisma.order.update({
+                where: { id: order.id },
+                data: { status: "Paid" },
+            });
+            console.log(" Order Updated!");
+            //  Store Payment Details
+            console.log(" Storing Payment Details...");
+            yield prisma.payment.create({
+                data: {
+                    userId,
+                    orderId,
+                    stripePaymentId: session.id,
+                    amount: session.amount_total / 100,
+                    currency: session.currency,
+                    status: "Completed",
+                },
+            });
+            console.log(" Payment Details Stored Successfully!");
+        }
+        res.status(200).json({ received: true });
+    }
+    catch (err) {
+        console.error(" Webhook error:", err);
+        res.status(400).send(`Webhook Error: ${err.message}`);
     }
 }));
 exports.default = router;
