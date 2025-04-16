@@ -122,6 +122,8 @@ model Recommendation {
   updatedAt DateTime @updatedAt
 }
 
+// npm install && npm run build 
+
 
 
 

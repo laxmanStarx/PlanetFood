@@ -31,5 +31,41 @@ router.post("/api/recommendations", async (req:any, res:any) => {
     }
   });
 
+
+
+
+  router.get("/api/recommendations", async (req:any, res:any) => {
+    const { userId } = req.query;
+  
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId" });
+    }
+  
+    try {
+      const record = await prisma.recommendation.findUnique({
+        where: { userId: String(userId) }
+      });
+  
+      if (!record) {
+        return res.status(404).json({ error: "No recommendations found" });
+      }
+  
+      const parsedRecommendations = JSON.parse(record.products);
+      res.status(200).json(parsedRecommendations);
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+      res.status(500).json({ error: "Server error" });
+    }
+  });
+  
+
+
+
+
+
+
+
+
+
   export default router;
   
