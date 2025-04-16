@@ -12,7 +12,7 @@ import paymentRoute from "./routes/paymentRoute";
 import cloudinary from "cloudinary"
 import uploadRoute from "./routes/uploadRoute";
 import orderRoute from "./routes/orderRoute";
-import recommendationRoute from "./routes/recommendation"
+import recommendationRoute from  "./routes/recommendationRoute";
 
 
 // import paymentRoute from "./routes/paymentRoute"
