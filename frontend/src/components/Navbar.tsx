@@ -11,7 +11,8 @@ interface User {
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { cartItems = [] } = useCart();
+ 
+  const { cartItems = [],clearCart } = useCart();
   const [showCart, setShowCart] = useState(false);
   const [user, setUser] = useState<User | null>(null); // Type the state as User or null
 
@@ -29,6 +30,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token"); // Remove token if stored
+    clearCart()
     setUser(null); // Clear user state
     navigate("/login"); // Redirect to login page
   };
