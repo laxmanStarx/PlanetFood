@@ -67,7 +67,7 @@ router.post("/api/recommendations", async (req: any, res: any) => {
     return res.status(400).json({ error: "Missing userId or recommendations" });
   }
 
-  console.log("Incoming payload:", { userId, recommendations });
+  console.log("🟡 Incoming data:", { userId, recommendations });
 
   try {
     const result = await prisma.recommendation.upsert({
@@ -76,13 +76,14 @@ router.post("/api/recommendations", async (req: any, res: any) => {
       create: { userId, products: recommendations }
     });
 
-    console.log("DB result:", result);
+    console.log("✅ Prisma upsert result:", result);
     res.status(200).json({ success: true, message: "Recommendations saved successfully!" });
-  } catch (error) {
-    console.error("❌ Prisma error:", error);
+  } catch (error: any) {
+    console.error("❌ Prisma error details:", error?.message || error);
     res.status(500).json({ error: "Failed to save recommendations" });
   }
 });
+
 
 
 
