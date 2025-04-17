@@ -15,6 +15,7 @@ const paymentRoute_1 = __importDefault(require("./routes/paymentRoute"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
 const uploadRoute_1 = __importDefault(require("./routes/uploadRoute"));
 const orderRoute_1 = __importDefault(require("./routes/orderRoute"));
+const recommendationRoute_1 = __importDefault(require("./routes/recommendationRoute"));
 // import paymentRoute from "./routes/paymentRoute"
 const PORT = 8080;
 const app = (0, express_1.default)();
@@ -32,6 +33,7 @@ app.use('/api/v1/isAdmin', isAdmin_1.isAdmin);
 app.use('/', cartRoute_1.default);
 app.use("/", uploadRoute_1.default);
 app.use("/orders", orderRoute_1.default);
+app.use(recommendationRoute_1.default);
 app.listen(PORT, () => {
     console.log(`Your Server is listening at hello ${PORT}`);
 });

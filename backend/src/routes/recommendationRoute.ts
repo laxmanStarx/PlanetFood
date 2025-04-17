@@ -67,7 +67,7 @@ router.post("/api/recommendations", async (req: any, res: any) => {
     return res.status(400).json({ error: "Missing userId or recommendations" });
   }
 
-  console.log("🟡 Incoming data:", { userId, recommendations });
+  console.log(" Incoming data:", { userId, recommendations });
 
   try {
     const result = await prisma.recommendation.upsert({
@@ -76,7 +76,7 @@ router.post("/api/recommendations", async (req: any, res: any) => {
       create: { userId, products: recommendations }
     });
 
-    console.log("✅ Prisma upsert result:", result);
+    console.log(" Prisma upsert result:", result);
     res.status(200).json({ success: true, message: "Recommendations saved successfully!" });
   } catch (error: any) {
     console.error("❌ Prisma error details:", error?.message || error);
@@ -89,23 +89,42 @@ router.post("/api/recommendations", async (req: any, res: any) => {
 
 
 
-  router.get("/api/recommendations", async (req:any, res:any) => {
-    const { userId } = req.query;
-  
-    if (!userId) {
-      return res.status(400).json({ error: "userId required" });
-    }
-  
-    const recommendation = await prisma.recommendation.findUnique({
-      where: { userId: String(userId) },
-    });
-  
-    if (!recommendation) {
-      return res.status(404).json({ error: "No recommendations found" });
-    }
-  
-    res.status(200).json({ recommendations: recommendation.products });
+router.get("/api/recommendations", async (req: any, res: any) => {
+  const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ error: "userId required" });
+  }
+
+  const recommendation = await prisma.recommendation.findUnique({
+    where: { userId: String(userId) },
   });
+
+  if (!recommendation) {
+    return res.status(404).json({ error: "No recommendations found" });
+  }
+
+  let parsedRecommendations = recommendation.products;
+
+  // If the products are a string (stringified JSON), parse it
+  if (typeof parsedRecommendations === 'string') {
+    try {
+      parsedRecommendations = JSON.parse(parsedRecommendations);
+    } catch (error) {
+      console.error("Error parsing recommendations:", error);
+      return res.status(500).json({ error: "Failed to parse recommendations" });
+    }
+  }
+
+  // Ensure it's an array before returning
+  if (Array.isArray(parsedRecommendations)) {
+    res.status(200).json({ recommendations: parsedRecommendations });
+  } else {
+    res.status(400).json({ error: "Recommendations are not in the correct format" });
+  }
+});
+
+
   
 
 
