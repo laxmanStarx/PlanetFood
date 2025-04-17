@@ -90,6 +90,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import RecommendationSection from "./Recommendatin";
 
 interface Restaurant {
   id: string;
@@ -178,30 +179,12 @@ const RestaurantMenu = () => {
 
       {/* Recommendations Section */}
       <div className="mt-16">
-        <h2 className="text-2xl font-bold text-center mb-6">Recommended for You</h2>
+        {/* <h2 className="text-2xl font-bold text-center mb-6">Recommended for You</h2> */}
 
-        {loading ? (
-          <div className="text-center">Loading recommendations...</div>
-        ) : recommendations.length === 0 ? (
-          <div className="text-center text-gray-500">No recommendations available.</div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {recommendations.map((productId) => (
-              <div
-                key={productId}
-                className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-800">Product ID: {productId}</h3>
-                  {/* You can fetch more product details here based on the productId */}
-                </div>
-                <div className="p-4 border-t text-center text-blue-500 font-semibold">
-                  View Product
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <RecommendationSection userId="cm5l4omqb0wgyf7wehd" />
+
+
+        
       </div>
 
       {/* Tailwind Custom Animation */}
@@ -225,3 +208,7 @@ const RestaurantMenu = () => {
 };
 
 export default RestaurantMenu;
+
+
+// cm5l4omqb0000tt5wgyf7wehd
+// cm5l4omqb0000tt5wgyf7wehd

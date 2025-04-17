@@ -32,6 +32,11 @@ const Menu = () => {
   const [currentIndex, setCurrentIndex] = useState(0); // Track the current image index
   const [error, setError] = useState("");
 
+
+  
+
+  // ✅ Optional: retrieve userId from local storage (or Auth Context)
+
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
@@ -48,7 +53,12 @@ const Menu = () => {
       }
     };
 
+
+
+
+
     fetchMenuItems();
+    
   }, [restaurantId]);
 
 
@@ -281,6 +291,9 @@ const handleCheckout = () => {
       )}
 
 
+
+
+
     </div>
 
 
@@ -291,6 +304,38 @@ const handleCheckout = () => {
 };
 
 export default Menu;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -89,6 +89,54 @@ router.post("/api/recommendations", async (req: any, res: any) => {
 
 
 
+// router.get("/api/recommendations", async (req: any, res: any) => {
+//   const { userId } = req.query;
+
+//   if (!userId) {
+//     return res.status(400).json({ error: "userId required" });
+//   }
+
+//   const recommendation = await prisma.recommendation.findUnique({
+//     where: { userId: String(userId) },
+//   });
+
+//   if (!recommendation) {
+//     return res.status(404).json({ error: "No recommendations found" });
+//   }
+
+//   let productIds = recommendation.products;
+
+//   if (typeof productIds === 'string') {
+//     try {
+//       productIds = JSON.parse(productIds);
+//     } catch (error) {
+//       console.error("Error parsing productIds:", error);
+//       return res.status(500).json({ error: "Failed to parse productIds" });
+//     }
+//   }
+
+//   if (!Array.isArray(productIds)) {
+//     return res.status(400).json({ error: "Invalid recommendations format" });
+//   }
+
+//   try {
+//     const recommendedMenus = await prisma.menu.findMany({
+//       where: {
+//         id: { in: productIds },
+//       },
+//     });
+
+//     res.status(200).json({ recommendations: recommendedMenus });
+//   } catch (error: any) {
+//     console.error("Error fetching menus:", error?.message || error);
+//     res.status(500).json({ error: "Failed to fetch recommended products" });
+//   }
+// });
+
+
+
+  
+
 router.get("/api/recommendations", async (req: any, res: any) => {
   const { userId } = req.query;
 
@@ -104,28 +152,41 @@ router.get("/api/recommendations", async (req: any, res: any) => {
     return res.status(404).json({ error: "No recommendations found" });
   }
 
-  let parsedRecommendations = recommendation.products;
+  let productIds = recommendation.products;
 
-  // If the products are a string (stringified JSON), parse it
-  if (typeof parsedRecommendations === 'string') {
+  // Parse if stored as a JSON string
+  if (typeof productIds === 'string') {
     try {
-      parsedRecommendations = JSON.parse(parsedRecommendations);
+      productIds = JSON.parse(productIds);
     } catch (error) {
-      console.error("Error parsing recommendations:", error);
-      return res.status(500).json({ error: "Failed to parse recommendations" });
+      console.error("Error parsing productIds:", error);
+      return res.status(500).json({ error: "Failed to parse productIds" });
     }
   }
 
-  // Ensure it's an array before returning
-  if (Array.isArray(parsedRecommendations)) {
-    res.status(200).json({ recommendations: parsedRecommendations });
-  } else {
-    res.status(400).json({ error: "Recommendations are not in the correct format" });
+  // Check it's a valid array
+  if (!Array.isArray(productIds)) {
+    return res.status(400).json({ error: "Invalid recommendations format" });
+  }
+
+  // ✅ Ensure productIds is a clean string[]
+  const stringIds = productIds.filter((id): id is string => typeof id === 'string');
+
+  try {
+    const recommendedMenus = await prisma.menu.findMany({
+      where: {
+        id: { in: stringIds },
+      },
+    });
+
+    // res.status(200).json({ recommendations: recommendedMenus });
+    res.status(200).json({ recommendations: recommendedMenus });
+
+  } catch (error: any) {
+    console.error("Error fetching menus:", error?.message || error);
+    res.status(500).json({ error: "Failed to fetch recommended products" });
   }
 });
-
-
-  
 
 
 
