@@ -41,7 +41,7 @@ app.use('/api/v1/isAdmin',isAdmin)
 app.use('/',cartRoute)
 app.use("/", uploadRoute);
 app.use("/orders", orderRoute)
-app.use("/", recommendationRoute)
+app.use( recommendationRoute)
 
 
 
