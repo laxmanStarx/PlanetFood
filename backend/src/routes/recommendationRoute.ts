@@ -34,27 +34,24 @@ router.post("/api/recommendations", async (req:any, res:any) => {
 
 
 
-  router.get("/api/recommendations", async (req:any, res:any) => {
-    const { userId } = req.query;
+  router.post("/api/recommendations", async (req:any, res:any) => {
+    const { userId, recommendations } = req.body;
   
-    if (!userId) {
-      return res.status(400).json({ error: "Missing userId" });
+    if (!userId || !recommendations) {
+      return res.status(400).json({ error: "Missing userId or recommendations" });
     }
   
     try {
-      const record = await prisma.recommendation.findUnique({
-        where: { userId: String(userId) }
+      await prisma.recommendation.upsert({
+        where: { userId },
+        update: { products: recommendations },
+        create: { userId, products: recommendations }
       });
   
-      if (!record) {
-        return res.status(404).json({ error: "No recommendations found" });
-      }
-  
-      const parsedRecommendations = JSON.parse(record.products);
-      res.status(200).json(parsedRecommendations);
+      return res.status(200).json({ success: true });
     } catch (error) {
-      console.error("Error fetching recommendations:", error);
-      res.status(500).json({ error: "Server error" });
+      console.error("❌ Error saving recommendations:", error);
+      return res.status(500).json({ error: "Failed to save recommendations" });
     }
   });
   

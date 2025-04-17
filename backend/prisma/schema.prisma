@@ -117,7 +117,7 @@ model Rating {
 model Recommendation {
   id        String   @id @default(cuid())
   userId    String   @unique
-  products  String
+  products  Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
