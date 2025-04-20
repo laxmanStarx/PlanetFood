@@ -89,7 +89,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+
 
 
 interface Restaurant {
@@ -104,8 +104,8 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const RestaurantMenu = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [recommendations, setRecommendations] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  // const [recommendations, setRecommendations] = useState<string[]>([]);
+  // const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const userId = "cm5l4omqb0wgyf7wehd"; // You can dynamically pass this value as needed
 
@@ -122,29 +122,29 @@ const RestaurantMenu = () => {
     };
 
     // Fetch recommendations
-    const fetchRecommendations = async () => {
-      try {
-        const res = await axios.get(`/api/recommendations?userId=${userId}`);
-        console.log("Recommendations data:", res.data.recommendations);
+    // const fetchRecommendations = async () => {
+    //   try {
+    //     const res = await axios.get(`/api/recommendations?userId=${userId}`);
+    //     console.log("Recommendations data:", res.data.recommendations);
     
-        // Parse the recommendations if they're a string
-        let recommendations = res.data.recommendations;
+    //     // Parse the recommendations if they're a string
+    //     let recommendations = res.data.recommendations;
     
-        if (typeof recommendations === "string") {
-          recommendations = JSON.parse(recommendations);
-        }
+    //     if (typeof recommendations === "string") {
+    //       recommendations = JSON.parse(recommendations);
+    //     }
     
-        setRecommendations(recommendations || []);
-      } catch (err) {
-        console.error("Error fetching recommendations:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    //     setRecommendations(recommendations || []);
+    //   } catch (err) {
+    //     console.error("Error fetching recommendations:", err);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
     
 
     fetchRestaurants();
-    fetchRecommendations();
+   
   }, [userId]);
 
   return (
