@@ -90,7 +90,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import RecommendationSection from "./Recommendatin";
+
 
 interface Restaurant {
   id: string;
@@ -181,7 +181,7 @@ const RestaurantMenu = () => {
       <div className="mt-16">
         {/* <h2 className="text-2xl font-bold text-center mb-6">Recommended for You</h2> */}
 
-        <RecommendationSection userId="cm5l4omqb0wgyf7wehd" />
+        {/* <RecommendationSection userId="cm5l4omqb0wgyf7wehd" /> */}
 
 
         
