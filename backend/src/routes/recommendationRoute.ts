@@ -1,6 +1,7 @@
 // Add this to your backend code (Express server)
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
+import axios from "axios";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -136,57 +137,27 @@ router.post("/api/recommendations", async (req: any, res: any) => {
 
 
   
+const RECOMMEND_API_URL = 'http://localhost:8000/recommend'; // or your Render URL
 
-router.get("/api/recommendations", async (req: any, res: any) => {
+router.get('/recommend', async (req:any, res:any) => {
   const { userId } = req.query;
 
   if (!userId) {
-    return res.status(400).json({ error: "userId required" });
+    return res.status(400).json({ error: 'userId query param is required' });
   }
-
-  const recommendation = await prisma.recommendation.findUnique({
-    where: { userId: String(userId) },
-  });
-
-  if (!recommendation) {
-    return res.status(404).json({ error: "No recommendations found" });
-  }
-
-  let productIds = recommendation.products;
-
-  // Parse if stored as a JSON string
-  if (typeof productIds === 'string') {
-    try {
-      productIds = JSON.parse(productIds);
-    } catch (error) {
-      console.error("Error parsing productIds:", error);
-      return res.status(500).json({ error: "Failed to parse productIds" });
-    }
-  }
-
-  // Check it's a valid array
-  if (!Array.isArray(productIds)) {
-    return res.status(400).json({ error: "Invalid recommendations format" });
-  }
-
-  // ✅ Ensure productIds is a clean string[]
-  const stringIds = productIds.filter((id): id is string => typeof id === 'string');
 
   try {
-    const recommendedMenus = await prisma.menu.findMany({
-      where: {
-        id: { in: stringIds },
-      },
+    const response = await axios.get(RECOMMEND_API_URL, {
+      params: { user_id: userId } // FastAPI expects "user_id"
     });
 
-    // res.status(200).json({ recommendations: recommendedMenus });
-    res.status(200).json({ recommendations: recommendedMenus });
-
-  } catch (error: any) {
-    console.error("Error fetching menus:", error?.message || error);
-    res.status(500).json({ error: "Failed to fetch recommended products" });
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error('Error fetching recommendations:');
+    res.status(500).json({ error: 'Failed to fetch recommendations' });
   }
 });
+
 
 
 
