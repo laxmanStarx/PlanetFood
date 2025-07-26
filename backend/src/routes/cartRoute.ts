@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 // Add item to cart
 router.post("/", async (req:any, res:any) => {
-  const { userId, menuId, quantity } = req.body;
+  const { userId, menuId, quantity} = req.body;
 
   if ( !menuId || !quantity) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -21,12 +21,14 @@ router.post("/", async (req:any, res:any) => {
       },
     });
 
+     
     // If no active order, create a new one
     if (!order) {
       order = await prisma.order.create({
         data: {
           userId,
           totalPrice: 0,
+         
         },
       });
     }
@@ -52,6 +54,7 @@ router.post("/", async (req:any, res:any) => {
           orderId: order.id,
           menuId,
           quantity,
+        
         },
       });
     }

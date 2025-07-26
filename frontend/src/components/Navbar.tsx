@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../contextApi/CartContext";
 import { useState, useEffect } from "react";
-
 // Define the User type
 interface User {
   name: string;
@@ -44,7 +43,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex items-center justify-between bg-orange-400 min-h-16 px-4">
+    <nav className="flex items-center justify-between bg-white shadow-md shadow-blue-100 min-h-16 px-4">
       <div className="text-3xl">
 
         <button onClick={() => navigate("/")}>foodStarX</button>
@@ -87,7 +86,7 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <span className="font-bold"> {user.name}!</span>
             <button
-              className="bg-red-500 text-white px-4 py-2 rounded"
+              className="rgb-animate rounded-md bg-fuchsia-400"
               onClick={handleLogout}
             >
               Logout
@@ -95,7 +94,7 @@ const Navbar = () => {
           </div>
         ) : (
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="bg-blue-500 text-white px-4 py-2 rounded rgb-animate"
             onClick={() => navigate("/login")}
           >
             Login

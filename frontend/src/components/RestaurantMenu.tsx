@@ -89,6 +89,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import RecommendationSection from "./Recommendatin";
 
 
 
@@ -100,6 +101,9 @@ interface Restaurant {
   averageRating?: number;
 }
 
+
+
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const RestaurantMenu = () => {
@@ -107,7 +111,7 @@ const RestaurantMenu = () => {
   // const [recommendations, setRecommendations] = useState<string[]>([]);
   // const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const userId = "cm5l4omqb0wgyf7wehd"; // You can dynamically pass this value as needed
+  const userId = localStorage.getItem('userId');  // You can dynamically pass this value as needed
 
   useEffect(() => {
     // Fetch restaurants
@@ -169,6 +173,24 @@ const RestaurantMenu = () => {
                 {restaurant.name}
               </h2>
               <p className="text-sm text-gray-500">{restaurant.address}</p>
+
+
+                {/* Show average rating if available */}
+         {restaurant.averageRating !== undefined && (
+    <p className="text-sm text-yellow-600 mt-1">
+      ⭐ {restaurant.averageRating.toFixed(1)} / 5
+    </p>
+  )}
+
+
+
+
+
+
+
+
+
+
             </div>
             <div className="p-4 border-t text-center text-blue-500 font-semibold">
               View Details
@@ -182,6 +204,7 @@ const RestaurantMenu = () => {
         {/* <h2 className="text-2xl font-bold text-center mb-6">Recommended for You</h2> */}
 
         {/* <RecommendationSection userId="cm5l4omqb0wgyf7wehd" /> */}
+        <RecommendationSection  userId={userId} /> 
 
 
         

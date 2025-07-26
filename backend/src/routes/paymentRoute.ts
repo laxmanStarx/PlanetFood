@@ -149,9 +149,11 @@ router.use(express.json());
  */
 router.post("/create-checkout-session", async (req: any, res: any) => {
   try {
-    const { items, userId } = req.body;
+    const { items, userId,restaurantId } = req.body;
 
     if (!userId) return res.status(400).json({ error: "User ID is required" });
+    // if (!restaurantId) return res.status(400).json({ error: "Restaurant ID is required" });
+
     if (!items || !Array.isArray(items)) return res.status(400).json({ error: "Invalid items" });
 
     //  Convert items to Stripe line_items
@@ -178,9 +180,81 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
         userId: userId,
         status: "Pending",
         totalPrice: totalAmount / 100, // Convert to INR
+        // restaurantId: restaurantId,
       },
     });
     console.log(" Order Created with ID:", order.id);
+
+    await generateRecommendationsAndUpdateDB(userId);
+
+
+
+
+  // Utility function to generate and update recommendations
+async function generateRecommendationsAndUpdateDB(userId: string) {
+  // Fetch past order items for the user
+  const userOrders = await prisma.order.findMany({
+    where: { userId },
+    include: {
+      orderItems: {
+        include: { menu: true }
+      }
+    }
+  });
+
+  // Flatten all product IDs purchased by the user
+  const purchasedProductIds = userOrders
+    .flatMap(order => order.orderItems.map(item => item.menuId));
+
+  // Count frequency or apply your own logic for recommendation
+  const freqMap: Record<string, number> = {};
+  for (const id of purchasedProductIds) {
+    freqMap[id] = (freqMap[id] || 0) + 1;
+  }
+
+  // Sort productIds by frequency (most purchased first)
+  const sortedProductIds = Object.keys(freqMap).sort(
+    (a, b) => freqMap[b] - freqMap[a]
+  );
+
+  // Save/update recommendations for the user
+  await prisma.recommendation.upsert({
+    where: { userId },
+    update: { products: sortedProductIds },
+    create: {
+      userId,
+      products: sortedProductIds
+    },
+  });
+
+  console.log("✅ Recommendations updated for user:", userId);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     //  Create Stripe Checkout Session
     console.log("🔹 Creating Stripe Checkout Session...");
@@ -188,7 +262,7 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
       metadata: {
         userId,
@@ -269,10 +343,12 @@ router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req
 
       //  Store Payment Details
       console.log(" Storing Payment Details...");
+      // const restaurantId = order.restaurantId;
       await prisma.payment.create({
         data: {
           userId,
           orderId,
+          // restaurantId,
           stripePaymentId: session.id,
           amount: session.amount_total! / 100,
           currency: session.currency!,
@@ -431,7 +507,7 @@ export default router;
 
 
 
-
+// success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
 
 
 

@@ -69,6 +69,7 @@ model Order {
   status      String      @default("Pending") // e.g., Pending, Completed, Canceled
   payment     Payment?    @relation("OrderPayment") // Reference the relation by a unique name
   createdAt   DateTime    @default(now())
+ 
   updatedAt   DateTime    @updatedAt
 }
 
@@ -78,6 +79,7 @@ model OrderItem {
   menuId    String
   menu      Menu     @relation(fields: [menuId], references: [id])
   orderId   String
+ 
   order     Order    @relation(fields: [orderId], references: [id])
 }
 
@@ -91,6 +93,7 @@ model Payment {
   stripePaymentId String   @unique // ID from Stripe or payment gateway
   amount          Float    // Amount paid
   currency        String   // e.g., "USD", "EUR"
+ 
   status          String   @default("Pending") // e.g., Pending, Completed, Failed
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

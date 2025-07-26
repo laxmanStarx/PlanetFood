@@ -13,6 +13,7 @@ import cloudinary from "cloudinary"
 import uploadRoute from "./routes/uploadRoute";
 import orderRoute from "./routes/orderRoute";
 import recommendationRoute from  "./routes/recommendationRoute";
+import ratingRoutes from "./routes/ratings";
 
 
 // import paymentRoute from "./routes/paymentRoute"
@@ -41,6 +42,7 @@ app.use('/api/v1/isAdmin',isAdmin)
 app.use('/',cartRoute)
 app.use("/", uploadRoute);
 app.use("/orders", orderRoute)
+app.use("/api/v1/ratings", ratingRoutes)
 app.use("/", recommendationRoute)
 
 

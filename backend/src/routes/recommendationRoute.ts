@@ -136,29 +136,39 @@ router.post("/api/recommendations", async (req: any, res: any) => {
 
 
 
-  
-const RECOMMEND_API_URL = 'http://localhost:8000/recommend'; // or your Render URL
-
-router.get('/recommend', async (req:any, res:any) => {
-  const { userId } = req.query;
-
-  if (!userId) {
-    return res.status(400).json({ error: 'userId query param is required' });
-  }
+router.get('/api/recommendations/:userId', async (req:any, res:any) => {
+  const { userId } = req.params;
 
   try {
-    const response = await axios.get(RECOMMEND_API_URL, {
-      params: { user_id: userId } // FastAPI expects "user_id"
+    const rec = await prisma.recommendation.findUnique({
+      where: { userId },
     });
 
-    res.status(200).json(response.data);
-  } catch (error) {
-    console.error('Error fetching recommendations:');
+    if (!rec || !rec.products) {
+      return res.status(404).json({ message: 'No recommendations found' });
+    }
+
+    // Fetch menu item details
+    const menus = await prisma.menu.findMany({
+      where: {
+        id: { in: rec.products as string[] },
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        image: true,
+        category: true,
+      },
+    });
+
+    res.json({ recommendations: menus });
+  } catch (err) {
+    console.error('Error fetching recommendations:', err);
     res.status(500).json({ error: 'Failed to fetch recommendations' });
   }
 });
-
-
 
 
 
