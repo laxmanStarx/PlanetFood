@@ -14,8 +14,10 @@ const Foodypaste = () => {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   useEffect(() => {
-    axios.get(`${process.env.VITE_BACKEND_URL}/foodRoute`)
+    axios.get(`${backendUrl}/foodRoute`)
       .then((res) => {
         if (Array.isArray(res.data)) {
           setMenu(res.data);
