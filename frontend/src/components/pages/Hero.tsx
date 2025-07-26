@@ -5,9 +5,9 @@ export default function Hero() {
       <div className="md:w-1/2 space-y-6">
         <p className="text-gray-600 uppercase tracking-wider text-sm">Welcome to our restaurant</p>
         <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-          Profitez d'une <br />
-          nourriture saine <br />
-          et délicieuse.
+          Delightful Dining <br />
+          Nourishing Nutrients <br />
+          and delicious food.
         </h1>
 
         {/* Buttons */}

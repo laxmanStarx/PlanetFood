@@ -79,7 +79,7 @@ const Foodypaste = () => {
         {filteredMenu.map((item) => (
           <div
             key={item.id}
-            className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition"
+            className=" bg-gradient-to-br from-red-900 via-orange-200 to-transparent rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition "
           >
 
             <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-gray-200 to-transparent opacity-0 group-hover:opacity-60 transition duration-500 rounded-2xl pointer-events-none" />
