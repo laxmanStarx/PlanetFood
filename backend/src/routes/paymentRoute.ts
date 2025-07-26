@@ -185,50 +185,50 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
     });
     console.log(" Order Created with ID:", order.id);
 
-    await generateRecommendationsAndUpdateDB(userId);
+    // await generateRecommendationsAndUpdateDB(userId);
 
 
 
 
   // Utility function to generate and update recommendations
-async function generateRecommendationsAndUpdateDB(userId: string) {
-  // Fetch past order items for the user
-  const userOrders = await prisma.order.findMany({
-    where: { userId },
-    include: {
-      orderItems: {
-        include: { menu: true }
-      }
-    }
-  });
+// async function generateRecommendationsAndUpdateDB(userId: string) {
+//   // Fetch past order items for the user
+//   const userOrders = await prisma.order.findMany({
+//     where: { userId },
+//     include: {
+//       orderItems: {
+//         include: { menu: true }
+//       }
+//     }
+//   });
 
   // Flatten all product IDs purchased by the user
-  const purchasedProductIds = userOrders
-    .flatMap(order => order.orderItems.map(item => item.menuId));
+  // const purchasedProductIds = userOrders
+  //   .flatMap(order => order.orderItems.map(item => item.menuId));
 
-  // Count frequency or apply your own logic for recommendation
-  const freqMap: Record<string, number> = {};
-  for (const id of purchasedProductIds) {
-    freqMap[id] = (freqMap[id] || 0) + 1;
-  }
+  // // Count frequency or apply your own logic for recommendation
+  // const freqMap: Record<string, number> = {};
+  // for (const id of purchasedProductIds) {
+  //   freqMap[id] = (freqMap[id] || 0) + 1;
+  // }
 
-  // Sort productIds by frequency (most purchased first)
-  const sortedProductIds = Object.keys(freqMap).sort(
-    (a, b) => freqMap[b] - freqMap[a]
-  );
+  // // Sort productIds by frequency (most purchased first)
+  // const sortedProductIds = Object.keys(freqMap).sort(
+  //   (a, b) => freqMap[b] - freqMap[a]
+  // );
 
   // Save/update recommendations for the user
-  await prisma.recommendation.upsert({
-    where: { userId },
-    update: { products: sortedProductIds },
-    create: {
-      userId,
-      products: sortedProductIds
-    },
-  });
+//   await prisma.recommendation.upsert({
+//     where: { userId },
+//     update: { products: sortedProductIds },
+//     create: {
+//       userId,
+//       products: sortedProductIds
+//     },
+//   });
 
-  console.log("✅ Recommendations updated for user:", userId);
-}
+//   console.log("✅ Recommendations updated for user:", userId);
+// }
 
 
 
@@ -272,7 +272,9 @@ async function generateRecommendationsAndUpdateDB(userId: string) {
 
     console.log(" Stripe Session Created:", session.id);
     res.status(200).json({ url: session.url });
-  } catch (err: any) {
+  } 
+  
+  catch (err: any) {
     console.error(" Error in /create-checkout-session:", err.message);
     res.status(500).json({ error: err.message || "Internal Server Error" });
   }
