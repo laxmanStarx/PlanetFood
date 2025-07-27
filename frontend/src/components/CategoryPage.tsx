@@ -6,8 +6,10 @@ const CategoryPage = () => {
   const { categoryName } = useParams();
   const [items, setItems] = useState([]);
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   useEffect(() => {
-    axios.get("http://localhost:8080/foodRoute")
+   axios.get(`${backendUrl}/foodRoute`)
       .then(res => {
         const filtered = res.data.filter(
           (item: any) => item.category === categoryName
