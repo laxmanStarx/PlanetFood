@@ -15,6 +15,8 @@ import Checkout from "./components/Checkout"
 import SuccessPage from "./components/pages/Success"
 import RestaurantForm from "./components/pages/RestaurantForm"
 import OrderPage from "./components/Order"
+import CategoryPage from "./components/CategoryPage"
+
 
 
 
@@ -45,6 +47,8 @@ function App() {
       <Route path = "/admi-form" element = {<AdminLogin />} />
       <Route path="/restaurant/:restaurantId/menu" element={<Menu />} />
       <Route path = "/success" element = {<SuccessPage />} />
+
+      <Route path="/category/:categoryName" element={<CategoryPage />} />
 
       <Route path="/restaurant-form" element={<RestaurantForm />} />
       <Route path="/orders" element={<OrderPage />} />

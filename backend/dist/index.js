@@ -15,7 +15,7 @@ const paymentRoute_1 = __importDefault(require("./routes/paymentRoute"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
 const uploadRoute_1 = __importDefault(require("./routes/uploadRoute"));
 const orderRoute_1 = __importDefault(require("./routes/orderRoute"));
-const recommendationRoute_1 = __importDefault(require("./routes/recommendationRoute"));
+// import recommendationRoute from  "./routes/recommendationRoute";
 const ratings_1 = __importDefault(require("./routes/ratings"));
 // import paymentRoute from "./routes/paymentRoute"
 const PORT = 8080;
@@ -35,7 +35,7 @@ app.use('/', cartRoute_1.default);
 app.use("/", uploadRoute_1.default);
 app.use("/orders", orderRoute_1.default);
 app.use("/api/v1/ratings", ratings_1.default);
-app.use("/", recommendationRoute_1.default);
+// app.use("/", recommendationRoute)
 app.listen(PORT, () => {
     console.log(`Your Server is listening at hello ${PORT}`);
 });

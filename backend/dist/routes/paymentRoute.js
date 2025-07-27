@@ -154,48 +154,48 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
             },
         });
         console.log(" Order Created with ID:", order.id);
-        yield generateRecommendationsAndUpdateDB(userId);
+        // await generateRecommendationsAndUpdateDB(userId);
         // Utility function to generate and update recommendations
-        function generateRecommendationsAndUpdateDB(userId) {
-            return __awaiter(this, void 0, void 0, function* () {
-                // Fetch past order items for the user
-                const userOrders = yield prisma.order.findMany({
-                    where: { userId },
-                    include: {
-                        orderItems: {
-                            include: { menu: true }
-                        }
-                    }
-                });
-                // Flatten all product IDs purchased by the user
-                const purchasedProductIds = userOrders
-                    .flatMap(order => order.orderItems.map(item => item.menuId));
-                // Count frequency or apply your own logic for recommendation
-                const freqMap = {};
-                for (const id of purchasedProductIds) {
-                    freqMap[id] = (freqMap[id] || 0) + 1;
-                }
-                // Sort productIds by frequency (most purchased first)
-                const sortedProductIds = Object.keys(freqMap).sort((a, b) => freqMap[b] - freqMap[a]);
-                // Save/update recommendations for the user
-                yield prisma.recommendation.upsert({
-                    where: { userId },
-                    update: { products: sortedProductIds },
-                    create: {
-                        userId,
-                        products: sortedProductIds
-                    },
-                });
-                console.log("✅ Recommendations updated for user:", userId);
-            });
-        }
+        // async function generateRecommendationsAndUpdateDB(userId: string) {
+        //   // Fetch past order items for the user
+        //   const userOrders = await prisma.order.findMany({
+        //     where: { userId },
+        //     include: {
+        //       orderItems: {
+        //         include: { menu: true }
+        //       }
+        //     }
+        //   });
+        // Flatten all product IDs purchased by the user
+        // const purchasedProductIds = userOrders
+        //   .flatMap(order => order.orderItems.map(item => item.menuId));
+        // // Count frequency or apply your own logic for recommendation
+        // const freqMap: Record<string, number> = {};
+        // for (const id of purchasedProductIds) {
+        //   freqMap[id] = (freqMap[id] || 0) + 1;
+        // }
+        // // Sort productIds by frequency (most purchased first)
+        // const sortedProductIds = Object.keys(freqMap).sort(
+        //   (a, b) => freqMap[b] - freqMap[a]
+        // );
+        // Save/update recommendations for the user
+        //   await prisma.recommendation.upsert({
+        //     where: { userId },
+        //     update: { products: sortedProductIds },
+        //     create: {
+        //       userId,
+        //       products: sortedProductIds
+        //     },
+        //   });
+        //   console.log("✅ Recommendations updated for user:", userId);
+        // }
         //  Create Stripe Checkout Session
         console.log("🔹 Creating Stripe Checkout Session...");
         const session = yield stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             line_items: lineItems,
             mode: "payment",
-            success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.FRONTEND_URL}/cancel`,
             metadata: {
                 userId,

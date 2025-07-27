@@ -20,7 +20,7 @@ export default function Hero() {
       {/* Right Croissant Image */}
       <div className="md:w-1/2 mt-12 md:mt-0 flex justify-center">
         <img
-          src="https://res.cloudinary.com/dykahal7o/image/upload/v1753548026/Screenshot_2025-07-26_221011_avpfas.png" // Make sure this is a transparent PNG
+          src="https://res.cloudinary.com/dykahal7o/image/upload/v1753633505/Screenshot_2025-07-27_215345_ft1z5v.png" // Make sure this is a transparent PNG
           alt="Croissant"
           className="w-96 h-96 md:w-[450px]  object-cover rounded-full drop-shadow-2xl"
         />

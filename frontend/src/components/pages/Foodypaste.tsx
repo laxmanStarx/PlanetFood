@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface MenuItem {
   id: string;
@@ -17,7 +18,7 @@ const Foodypaste = () => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
-    axios.get(`${backendUrl}/foodRoute`)
+    axios.get("http://localhost:8080/foodRoute")
       .then((res) => {
         if (Array.isArray(res.data)) {
           setMenu(res.data);
@@ -35,15 +36,24 @@ const Foodypaste = () => {
   // Get unique categories from menu
   const categories = ["All", ...Array.from(new Set(menu.map(item => item.category)))];
 
+  const navigate = useNavigate()
+
   // Filtered menu based on selectedCategory
   const filteredMenu = selectedCategory === "All"
     ? menu
     : menu.filter(item => item.category === selectedCategory);
 
-  return (
-    <div className="p-6">
+  
+  
+  
+    return (
+
+
+
+
+    <div className="p-6 justify-center items-center text-center">
       {/* Category Buttons */}
-      <div className="mb-6 flex flex-wrap gap-3">
+      <div className="mb-6 flex flex-wrap gap-3 justify-center items-center">
 
         {categories.map((category) => (
     category === "Non Veg" ? (
@@ -53,7 +63,7 @@ const Foodypaste = () => {
       className={`px-4 py-2 rounded-full border transition ${
         selectedCategory === category
           ? "bg-red-600 text-white" 
-          : "bg-white text-gray-800 border-gray-300  hover:bg-green-100 "
+          : "bg-white text-gray-800 border-gray-300  hover:bg-green-100"
       } ` }
     >
       {category}
@@ -75,19 +85,16 @@ const Foodypaste = () => {
       </div>
 
       {/* Menu Cards */}
-      <div className=" lg:max-w-5xl   grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 cursor-pointer">
+      <div className="flex justify-center items-center">
+ <div className=" lg:max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4  ">
         {filteredMenu.map((item) => (
           <div
             key={item.id}
-            className=" bg-gradient-to-br from-red-900 via-orange-200 to-transparent rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition "
+            onClick={() => navigate(`/category/${encodeURIComponent(item.category)}`)}
+            className="cursor-pointer relative bg-gradient-to-br from-red-900 via-orange-200 to-transparent rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition"
           >
-
             <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-gray-200 to-transparent opacity-0 group-hover:opacity-60 transition duration-500 rounded-2xl pointer-events-none" />
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-full h-48 object-cover"
-            />
+            <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
             <div className="p-4">
               <h3 className="text-lg font-semibold">{item.name}</h3>
               <p className="text-sm text-gray-500">{item.description}</p>
@@ -99,6 +106,7 @@ const Foodypaste = () => {
           </div>
         ))}
       </div>
+    </div>
     </div>
   );
 };

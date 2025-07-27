@@ -287,7 +287,7 @@ const Checkout: React.FC = () => {
     }
   };
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className=" justify-center items-center text-center py-10">Loading...</div>;
   }
 
   if (error) {
@@ -308,6 +308,7 @@ const Checkout: React.FC = () => {
                 <th className="border border-gray-200 p-2">Name</th>
                 <th className="border px-4 py-2">Quantity</th>
                 <th className="border px-4 py-2">Price</th>
+             
               </tr>
             </thead>
             <tbody>
@@ -357,6 +358,7 @@ const Checkout: React.FC = () => {
                         className="ml-2 text-red-500 cursor-pointer"
                       />
                     </td>
+                    
                   </tr>
                 );
               })}
