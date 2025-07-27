@@ -18,7 +18,7 @@ const Foodypaste = () => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
-    axios.get("http://localhost:8080/foodRoute")
+    axios.get(`${backendUrl}/foodRoute`)
       .then((res) => {
         if (Array.isArray(res.data)) {
           setMenu(res.data);
