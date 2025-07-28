@@ -19,15 +19,14 @@ const prisma = new client_1.PrismaClient();
 // POST: Submit a rating
 // POST /api/ratings
 router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user, userId, restaurantId, rating, description } = req.body;
-    if (!user || !userId || !restaurantId || typeof rating !== "number" || rating < 1 || rating > 5) {
+    const { userId, restaurantId, rating } = req.body;
+    if (!userId || !restaurantId || typeof rating !== "number" || rating < 1 || rating > 5) {
         return res.status(400).json({ error: "Missing or invalid userId, restaurantId, or rating" });
     }
     try {
         const newRating = yield prisma.rating.create({
             data: {
                 rating,
-                description,
                 restaurant: { connect: { id: restaurantId } },
                 user: { connect: { id: userId } },
             },
