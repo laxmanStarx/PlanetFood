@@ -120,7 +120,7 @@ model Payment {
 model Rating {
   id           String     @id @default(cuid())
   rating       Int
-  description  String?
+
   userId       String
   user         User       @relation(fields: [userId], references: [id])
   restaurantId String
