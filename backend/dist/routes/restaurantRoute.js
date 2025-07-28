@@ -88,4 +88,19 @@ router.post("/restaurants", (req, res) => __awaiter(void 0, void 0, void 0, func
         res.status(500).json({ error: "Failed to add restaurant" });
     }
 }));
+router.get("/api/restaurant/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const restaurant = yield prisma.restaurant.findUnique({
+        where: { id },
+        select: {
+            id: true,
+            name: true,
+            address: true,
+            averageRating: true,
+        },
+    });
+    if (!restaurant)
+        return res.status(404).json({ message: "Not found" });
+    res.json(restaurant);
+}));
 exports.default = router;

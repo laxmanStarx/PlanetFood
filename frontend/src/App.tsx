@@ -16,6 +16,7 @@ import SuccessPage from "./components/pages/Success"
 import RestaurantForm from "./components/pages/RestaurantForm"
 import OrderPage from "./components/Order"
 import CategoryPage from "./components/CategoryPage"
+import RateUs from "./components/RateUs"
 
 
 
@@ -49,6 +50,7 @@ function App() {
       <Route path = "/success" element = {<SuccessPage />} />
 
       <Route path="/category/:categoryName" element={<CategoryPage />} />
+       <Route path="/rateus" element={<RateUs />} />
 
       <Route path="/restaurant-form" element={<RestaurantForm />} />
       <Route path="/orders" element={<OrderPage />} />

@@ -88,26 +88,58 @@ const Foodypaste = () => {
       <div className="flex justify-center items-center">
  <div className=" lg:max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4  ">
         {filteredMenu.map((item) => (
-          <div
-            key={item.id}
-            onClick={() => navigate(`/category/${encodeURIComponent(item.category)}`)}
-            className="cursor-pointer relative bg-gradient-to-br from-red-900 via-orange-200 to-transparent rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-gray-200 to-transparent opacity-0 group-hover:opacity-60 transition duration-500 rounded-2xl pointer-events-none" />
-            <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold">{item.name}</h3>
-              <p className="text-sm text-gray-500">{item.description}</p>
-              <div className="mt-2 flex justify-between items-center">
-                <span className="text-green-600 font-bold">₹{item.price}</span>
-                <span className="text-sm bg-gray-200 rounded px-2 py-1">{item.category}</span>
-              </div>
-            </div>
-          </div>
+         <div
+  key={item.id}
+  onClick={() => navigate(`/category/${encodeURIComponent(item.category)}`)}
+  className="cursor-pointer bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border group"
+>
+  {/* Image section */}
+  <div className="relative">
+    <img
+      src={item.image}
+      alt={item.name}
+      className="w-full h-48 object-cover"
+    />
+
+    {/* Optional: promo badge */}
+    <span className="absolute top-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+      Promoted
+    </span>
+
+    {/* Optional: offer badge */}
+    <span className="absolute bottom-2 left-2 bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded">
+      Flat 10% OFF
+    </span>
+  </div>
+
+  {/* Text section */}
+  <div className="p-4 text-left">
+    <div className="flex justify-between items-start">
+      <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
+
+      {/* Rating badge */}
+      {/* <span className="text-sm bg-green-600 text-white px-2 py-1 rounded-md font-medium">
+        4.2★
+      </span> */}
+    </div>
+
+    {/* Description and category */}
+    <p className="text-sm text-gray-500 mt-1 truncate">{item.description}</p>
+
+    <div className="flex justify-between items-center mt-2 text-sm text-gray-600">
+      <span>₹{item.price} for one</span>
+      <span>{item.category}</span>
+    </div>
+
+    {/* Optional: status or distance */}
+    <p className="text-sm text-red-600 mt-1">Opens tomorrow at 12noon</p>
+  </div>
+</div>
         ))}
-      </div>
-    </div>
-    </div>
+        </div>
+        </div>
+        </div>
+
   );
 };
 

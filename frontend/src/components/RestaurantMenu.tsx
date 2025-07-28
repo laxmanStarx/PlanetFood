@@ -154,50 +154,57 @@ const RestaurantMenu = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold text-center mb-8">Restaurants</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {restaurants.map((restaurant) => (
-          <div
-            key={restaurant.id}
-            className="bg-white shadow-lg rounded-lg overflow-hidden 
-            hover:shadow-xl transition-shadow duration-300 cursor-pointer 
-            animate-rgbGlow"
-            onClick={() => navigate(`/restaurant/${restaurant.id}/menu`)}
-          >
-            <img
-              src={restaurant.image}
-              alt={restaurant.name}
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h2 className="text-xl font-semibold text-gray-800">
-                {restaurant.name}
-              </h2>
-              <p className="text-sm text-gray-500">{restaurant.address}</p>
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  {[...restaurants]
+    .sort((a, b) => (b.averageRating ?? 0) - (a.averageRating ?? 0))
+    .map((restaurant) => (
+      <div
+        key={restaurant.id}
+        className="bg-white shadow-lg rounded-lg overflow-hidden 
+        hover:shadow-xl transition-shadow duration-300 cursor-pointer 
+        animate-rgbGlow"
+        onClick={() => navigate(`/restaurant/${restaurant.id}/menu`)}
+      >
+        <img
+          src={restaurant.image}
+          alt={restaurant.name}
+          className="w-full h-48 object-cover"
+        />
+        <div className="p-4">
+          <h2 className="text-xl font-semibold text-gray-800">
+            {restaurant.name}
+          </h2>
+          <p className="text-sm text-gray-500">{restaurant.address}</p>
+
+          {restaurant.averageRating !== undefined && (
+            <p className=" text-red-900 text-md mt-1">
+<div className="flex items-center mt-2 space-x-1">
+  {[1, 2, 3, 4, 5].map((i) => (
+    <div key={i} className="flex">
+      {(restaurant.averageRating ?? 0) >= i ? (
+        <img
+          src="https://res.cloudinary.com/dykahal7o/image/upload/v1753708074/Screenshot_2025-07-28_183741_jbe6nr.png"
+          alt="rating bubble"
+          className="w-6 h-6"
+        />
+      ) : (
+        <div className="w-4 h-4 bg-gray-300 rounded-full" />
+      )}
+    </div>
+  ))}
+</div>
 
 
-                {/* Show average rating if available */}
-         {restaurant.averageRating !== undefined && (
-    <p className="text-sm text-yellow-600 mt-1">
-      ⭐ {restaurant.averageRating.toFixed(1)} / 5
-    </p>
-  )}
-
-
-
-
-
-
-
-
-
-
-            </div>
-            <div className="p-4 border-t text-center text-blue-500 font-semibold">
-              View Details
-            </div>
-          </div>
-        ))}
+            </p>
+          )}
+        </div>
+        <div className="p-4 border-t text-center text-yellow-500 font-semibold">
+          View Details
+        </div>
       </div>
+    ))}
+</div>
+
 
       {/* Recommendations Section */}
       <div className="mt-16">

@@ -106,6 +106,21 @@ router.post("/restaurants", async (req:any, res:any) => {
 
 
 
+router.get("/api/restaurant/:id", async (req:any, res:any) => {
+  const { id } = req.params;
+  const restaurant = await prisma.restaurant.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      address: true,
+      averageRating: true,
+    },
+  });
+
+  if (!restaurant) return res.status(404).json({ message: "Not found" });
+  res.json(restaurant);
+})
 
 
 

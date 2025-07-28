@@ -17,6 +17,7 @@ const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 // POST: Submit a rating
+// POST /api/ratings
 router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, restaurantId, rating, description } = req.body;
     try {
@@ -24,10 +25,11 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             data: {
                 rating,
                 description,
-                restaurantId,
+                restaurant: { connect: { id: restaurantId } },
+                user: { connect: { id: userId } },
             },
         });
-        // Optional: Update restaurant's average rating
+        // Recalculate average rating
         const ratings = yield prisma.rating.findMany({
             where: { restaurantId },
         });
@@ -44,27 +46,12 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 // GET: Get user ratings
+// GET /api/ratings/user/:userId
 router.get("/user/:userId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const ratings = yield prisma.rating.findMany({
-            where: {
-                restaurant: {
-                    menuItems: {
-                        some: {
-                            orderItems: {
-                                some: {
-                                    order: {
-                                        userId: req.params.userId,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-            include: {
-                restaurant: true,
-            },
+            where: { userId: req.params.userId },
+            include: { restaurant: true },
         });
         res.json(ratings);
     }

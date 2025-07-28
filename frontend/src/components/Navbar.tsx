@@ -51,6 +51,7 @@ const Navbar = () => {
       </div>
       <div className="flex items-center space-x-4">
         <span onClick={() => navigate("/about")}>About Us</span>
+         <button  className=" text-black cursor-pointer " onClick={()=>navigate("/rateus")}>Rate US</button>
         <div className="relative">
           <button onClick={handleToggleCart} className="flex items-center space-x-2">
             Cart ({calculateTotalItems()})
@@ -81,7 +82,9 @@ const Navbar = () => {
               <button onClick={checkout}>Submit</button>
             </div>
           )}
+
         </div>
+       
         {user ? (
           <div className="flex items-center space-x-4">
             <span className="font-bold"> {user.name}!</span>
