@@ -8,8 +8,11 @@ const prisma = new PrismaClient();
 // POST /api/ratings
 
 
-router.post("/", async (req, res) => {
+router.post("/", async (req:any, res:any) => {
   const { userId, restaurantId, rating, description } = req.body;
+     if (!userId || !restaurantId || typeof rating !== "number" || rating < 1 || rating > 5) {
+    return res.status(400).json({ error: "Missing or invalid userId, restaurantId, or rating" });
+  }
 
   try {
     const newRating = await prisma.rating.create({

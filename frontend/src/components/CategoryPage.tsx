@@ -9,7 +9,7 @@ const CategoryPage = () => {
 const categoryImages: { [key: string]: string } = {
   Pzza: "https://res.cloudinary.com/dykahal7o/image/upload/v1737967371/pizzas_dhkq9l.jpg",
   NonVeg: "https://res.cloudinary.com/dykahal7o/image/upload/v1753548026/Screenshot_2025-07-26_221011_avpfas.png",
-  Chinese: "https://yourdomain.com/chinese-banner.jpg",
+  Veg: "https://res.cloudinary.com/dykahal7o/image/upload/v1753728673/Screenshot_2025-07-29_002104_cfgebm.png",
   // Add more categories as needed
 };
 
