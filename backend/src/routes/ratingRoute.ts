@@ -9,8 +9,8 @@ const prisma = new PrismaClient();
 
 
 router.post("/", async (req:any, res:any) => {
-  const { userId, restaurantId, rating, description } = req.body;
-     if (!userId || !restaurantId || typeof rating !== "number" || rating < 1 || rating > 5) {
+  const { user,userId, restaurantId, rating, description } = req.body;
+     if (!user|| !userId || !restaurantId || typeof rating !== "number" || rating < 1 || rating > 5) {
     return res.status(400).json({ error: "Missing or invalid userId, restaurantId, or rating" });
   }
 
