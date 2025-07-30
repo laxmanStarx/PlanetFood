@@ -108,7 +108,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const RestaurantMenu = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [ratings, setRatings] = useState<any[]>([])
+
  
 
   // const [recommendations, setRecommendations] = useState<string[]>([]);
@@ -144,17 +144,6 @@ const RestaurantMenu = () => {
 
 
 
-    useEffect(() => {
-    // Fetch restaurants
-    const fetchRatings = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/ratings/user/${userId}");
-        const data = await response.json();
-        setRatings(data.ratings);
-      } catch (error) {
-        console.error("Error fetching restaurants:", error);
-      }
-    };
 
 
 
@@ -166,9 +155,7 @@ const RestaurantMenu = () => {
 
     
 
-    fetchRatings();
-   
-  }, [userId]);
+    
 
   
 
