@@ -1,6 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../contextApi/CartContext";
 import { useState, useEffect } from "react";
+import RateUs from "./RateUs"
+
+import { IoBagAddOutline } from "react-icons/io5";
 // Define the User type
 interface User {
   name: string;
@@ -10,6 +13,7 @@ interface User {
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const [showRateUs, setShowRateUs] = useState(false);
  
   const { cartItems = [],clearCart } = useCart();
   const [showCart, setShowCart] = useState(false);
@@ -51,10 +55,78 @@ const Navbar = () => {
       </div>
       <div className="flex items-center space-x-4">
         <span onClick={() => navigate("/about")}>About Us</span>
-         <button  className=" text-black cursor-pointer " onClick={()=>navigate("/rateus")}>Rate US</button>
+          <button
+        className="text-black cursor-pointer"
+        onClick={() => setShowRateUs(true)}
+      >
+        Rate Us
+      </button>
+
+      {/* {showRateUs && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative lg:max-w-[full]">
+            <button
+              onClick={() => setShowRateUs(false)}
+              className="absolute top-2 right-2 text-red-600 font-bold"
+            >
+              ✕
+            </button>
+            <RateUs onClose={() => setShowRateUs(false)} />
+          </div>
+        </div>
+      )} */}
         <div className="relative">
-          <button onClick={handleToggleCart} className="flex items-center space-x-2">
-            Cart ({calculateTotalItems()})
+
+
+                {showRateUs && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative lg:max-w-[full]">
+            <button
+              onClick={() => setShowRateUs(false)}
+              className="absolute top-2 right-2 text-red-600 font-bold"
+            >
+              ✕
+            </button>
+            <RateUs onClose={() => setShowRateUs(false)} />
+          </div>
+        </div>
+      )}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          <button onClick={handleToggleCart} className="flex items-center space-x-2 bg-green-400  rounded-full">
+          <IoBagAddOutline  />{calculateTotalItems()}
           </button>
           {showCart && (
             <div className="absolute right-0 mt-2 w-64 bg-white border shadow-lg rounded-lg p-4 z-50">

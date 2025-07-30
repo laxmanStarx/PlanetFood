@@ -108,6 +108,9 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const RestaurantMenu = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [ratings, setRatings] = useState<any[]>([])
+ 
+
   // const [recommendations, setRecommendations] = useState<string[]>([]);
   // const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -125,31 +128,53 @@ const RestaurantMenu = () => {
       }
     };
 
-    // Fetch recommendations
-    // const fetchRecommendations = async () => {
-    //   try {
-    //     const res = await axios.get(`/api/recommendations?userId=${userId}`);
-    //     console.log("Recommendations data:", res.data.recommendations);
-    
-    //     // Parse the recommendations if they're a string
-    //     let recommendations = res.data.recommendations;
-    
-    //     if (typeof recommendations === "string") {
-    //       recommendations = JSON.parse(recommendations);
-    //     }
-    
-    //     setRecommendations(recommendations || []);
-    //   } catch (err) {
-    //     console.error("Error fetching recommendations:", err);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
+
+
+
+
+
+
+
+
     
 
     fetchRestaurants();
    
   }, [userId]);
+
+
+
+    useEffect(() => {
+    // Fetch restaurants
+    const fetchRatings = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/ratings/user/${userId}");
+        const data = await response.json();
+        setRatings(data.ratings);
+      } catch (error) {
+        console.error("Error fetching restaurants:", error);
+      }
+    };
+
+
+
+
+
+
+
+
+
+    
+
+    fetchRatings();
+   
+  }, [userId]);
+
+  
+
+
+
+
 
   return (
     <div className="container mx-auto p-4">
@@ -181,7 +206,8 @@ const RestaurantMenu = () => {
 <div className="flex items-center mt-2 space-x-1">
   {[1, 2, 3, 4, 5].map((i) => (
     <div key={i} className="flex">
-      {(restaurant.averageRating ?? 0) >= i ? (
+        {/* {ratings.map((item) => (  */}
+       {(restaurant.averageRating ?? 0) >= i ? (
         <img
           src="https://res.cloudinary.com/dykahal7o/image/upload/v1753708074/Screenshot_2025-07-28_183741_jbe6nr.png"
           alt="rating bubble"

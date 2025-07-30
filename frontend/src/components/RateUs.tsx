@@ -1,23 +1,23 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify"; // Only toast, not ToastContainer
+import 'react-toastify/dist/ReactToastify.css';
 
-interface Restaurant {
-  id: string;
-  name: string;
-  address: string;
-  averageRating?: number;
+interface RateUsProps {
+  onClose?: () => void;
 }
 
-function RateUs() {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]); // ✅ typed correctly
+const RateUs: React.FC<RateUsProps> = ({ onClose }) => {
+  const [restaurants, setRestaurants] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [rating, setRating] = useState(5);
 
-
   useEffect(() => {
-    fetch("http://localhost:8080/restaurants")
-      .then(res => res.json())
-      .then(setRestaurants)
-      .catch(err => console.error("Failed to fetch restaurants:", err));
+    const fetchRestaurants = async () => {
+      const res = await fetch("http://localhost:8080/restaurants");
+      const data = await res.json();
+      setRestaurants(data);
+    };
+    fetchRestaurants();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,69 +30,59 @@ function RateUs() {
         body: JSON.stringify({
           restaurantId: selectedId,
           rating,
-        
           userId: localStorage.getItem("userId"),
         }),
       });
 
-      alert("Rating submitted!");
+      toast.success("Rating submitted!");
       setSelectedId("");
       setRating(5);
-     
-    } catch (error) {
-      console.error("Error submitting rating:", error);
+
+      onClose?.();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to submit rating");
     }
   };
 
   return (
-    <>
-
-    <div className="min-h-screen top-0 bg-[url('https://res.cloudinary.com/dykahal7o/image/upload/v1753734783/Screenshot_2025-07-29_020248_v7rdjc.png')] bg-cover max-w-[full]   bg-no-repeat my-10  rounded-2xl  max-h-[full] mx-auto p-4 flex flex-col items-center justify-center text-center py-10 ">
-  {/* Your entire app or page content here */}
-
-     {/* <div className=" bg-orange-400 my-10 max-h-full rounded-2xl max-w-[500px]  mx-auto p-4 flex flex-col items-center justify-center text-center py-10 "> */}
-     
     <form onSubmit={handleSubmit}>
-      <div className="flex font-bold text-4xl cursor-pointer justify-center text-center ">
-      <h2 >Rate a Restaurant</h2>
-      </div>
+      <h2 className="text-xl font-bold mb-4">Rate a Restaurant</h2>
 
-      <div className="flex text-center justify-center items-center cursor-pointer rounded-sm py-2">
-
-      <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)} required>
-        <option value="">Select Restaurant</option>
+      <select
+        value={selectedId}
+        onChange={(e) => setSelectedId(e.target.value)}
+        required
+        className="w-full border px-2 py-1 mb-4"
+      >
+        <option value="">Select a restaurant</option>
         {restaurants.map((r) => (
           <option key={r.id} value={r.id}>
-            {r.name} — {r.address}
+            {r.name}
           </option>
         ))}
       </select>
-      </div>
 
-      <div className="items-center justify-center flex py-5 mx-auto cursor-pointer w-10">
-     
-
-      <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+      <select
+        value={rating}
+        onChange={(e) => setRating(Number(e.target.value))}
+        className="w-full border px-2 py-1 mb-4"
+      >
         {[1, 2, 3, 4, 5].map((n) => (
           <option key={n} value={n}>
             {n} Star
           </option>
         ))}
       </select>
-      </div>
 
-      <div className="flex bg-green-800 hover:bg-cyan-700 cursor-pointer text-center justify-center items-center rounded-md">
-
-
-
-      <button type="submit" className=" text-center items-center justify-center">Submit Rating</button>
-      </div>
+      <button
+        type="submit"
+        className="bg-green-600 text-white px-4 py-2 rounded w-full"
+      >
+        Submit
+      </button>
     </form>
-    </div>
-    {/* </div> */}
-   
-     </>
   );
-}
+};
 
 export default RateUs;

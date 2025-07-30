@@ -65,10 +65,10 @@ const Home = () => {
                     <div className="flex justify-center items-center mb-8">
            {isAdmin && (
                <button
-                 onClick={() => navigate("/add-menu")}
+                 onClick={() => navigate("/restaurant-form")}
                className="px-6 py-3 bg-red-500 text-white rounded-full hover:bg-blue-700 transition-colors"
                >
-                Go to Add Menu Form
+                Go to Restaurant Form
                </button>
             )}
            </div>
