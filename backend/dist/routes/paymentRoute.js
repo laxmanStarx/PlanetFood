@@ -195,7 +195,7 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
             payment_method_types: ["card"],
             line_items: lineItems,
             mode: "payment",
-            success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.FRONTEND_URL}/cancel`,
             metadata: {
                 userId,
@@ -214,60 +214,71 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
  *  Stripe Webhook Route (Uses raw body)
  */
 router.post("/webhook", body_parser_1.default.raw({ type: "application/json" }), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a, _b, _c, _d;
     const sig = req.headers["stripe-signature"];
     if (!sig) {
-        console.error(" No Stripe signature found!");
+        console.error("❌ No Stripe signature");
         return res.status(400).send("Webhook Error: No signature.");
     }
     try {
         const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-        console.log(" Webhook received:", event.type);
-        console.log(" Event Data:", JSON.stringify(event, null, 2));
+        console.log("✅ Webhook event received:", event.type);
+        // 🔸 Checkout Completed (Recommended for Stripe Checkout)
         if (event.type === "checkout.session.completed") {
             const session = event.data.object;
-            console.log(" Payment Successful for Session:", session.id);
-            console.log("🔹 Metadata:", session.metadata);
             const userId = (_a = session.metadata) === null || _a === void 0 ? void 0 : _a.userId;
             const orderId = (_b = session.metadata) === null || _b === void 0 ? void 0 : _b.orderId;
             if (!userId || !orderId) {
-                console.error(" Missing userId or orderId in metadata!");
+                console.error("❌ Metadata missing in checkout.session");
                 return res.status(400).json({ error: "Invalid metadata" });
             }
-            console.log("🔹 Searching for order with ID:", orderId);
-            const order = yield prisma.order.findUnique({ where: { id: orderId } });
-            if (!order) {
-                console.error(" Order not found:", orderId);
-                return res.status(400).json({ error: "Order not found" });
-            }
-            console.log(" Order Found:", order);
-            //  Update Order Status
-            console.log("🔹 Updating Order Status...");
+            // Update order and create payment
             yield prisma.order.update({
-                where: { id: order.id },
+                where: { id: orderId },
                 data: { status: "Paid" },
             });
-            console.log(" Order Updated!");
-            //  Store Payment Details
-            console.log(" Storing Payment Details...");
-            // const restaurantId = order.restaurantId;
             yield prisma.payment.create({
                 data: {
                     userId,
                     orderId,
-                    // restaurantId,
                     stripePaymentId: session.id,
                     amount: session.amount_total / 100,
                     currency: session.currency,
                     status: "Completed",
                 },
             });
-            console.log(" Payment Details Stored Successfully!");
+            console.log("✅ Payment recorded via checkout.session.completed");
+        }
+        // 🔹 PaymentIntent Succeeded (Backup flow)
+        else if (event.type === "payment_intent.succeeded") {
+            const intent = event.data.object;
+            const userId = (_c = intent.metadata) === null || _c === void 0 ? void 0 : _c.userId;
+            const orderId = (_d = intent.metadata) === null || _d === void 0 ? void 0 : _d.orderId;
+            if (!userId || !orderId) {
+                console.error("❌ Metadata missing in payment_intent");
+                return res.status(400).json({ error: "Invalid metadata" });
+            }
+            // Update order and create payment
+            yield prisma.order.update({
+                where: { id: orderId },
+                data: { status: "Paid" },
+            });
+            yield prisma.payment.create({
+                data: {
+                    userId,
+                    orderId,
+                    stripePaymentId: intent.id,
+                    amount: intent.amount / 100,
+                    currency: intent.currency,
+                    status: "Completed",
+                },
+            });
+            console.log("✅ Payment recorded via payment_intent.succeeded");
         }
         res.status(200).json({ received: true });
     }
     catch (err) {
-        console.error(" Webhook error:", err);
+        console.error("❌ Webhook error:", err.message);
         res.status(400).send(`Webhook Error: ${err.message}`);
     }
 }));

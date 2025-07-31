@@ -262,7 +262,7 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.CLIENT_URL }/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
       metadata: {
         userId,
@@ -298,59 +298,45 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
 /** 
  *  Stripe Webhook Route (Uses raw body)
  */
-router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req: any, res: any) => {
+router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req:any, res:any) => {
   const sig = req.headers["stripe-signature"];
 
   if (!sig) {
-    console.error(" No Stripe signature found!");
+    console.error("❌ No Stripe signature");
     return res.status(400).send("Webhook Error: No signature.");
   }
 
   try {
-    const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
-    console.log(" Webhook received:", event.type);
-    console.log(" Event Data:", JSON.stringify(event, null, 2));
+    const event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
 
+    console.log("✅ Webhook event received:", event.type);
+
+    // 🔸 Checkout Completed (Recommended for Stripe Checkout)
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
-
-      console.log(" Payment Successful for Session:", session.id);
-      console.log("🔹 Metadata:", session.metadata);
 
       const userId = session.metadata?.userId;
       const orderId = session.metadata?.orderId;
 
       if (!userId || !orderId) {
-        console.error(" Missing userId or orderId in metadata!");
+        console.error("❌ Metadata missing in checkout.session");
         return res.status(400).json({ error: "Invalid metadata" });
       }
 
-      console.log("🔹 Searching for order with ID:", orderId);
-      const order = await prisma.order.findUnique({ where: { id: orderId } });
-
-      if (!order) {
-        console.error(" Order not found:", orderId);
-        return res.status(400).json({ error: "Order not found" });
-      }
-
-      console.log(" Order Found:", order);
-
-      //  Update Order Status
-      console.log("🔹 Updating Order Status...");
+      // Update order and create payment
       await prisma.order.update({
-        where: { id: order.id },
+        where: { id: orderId },
         data: { status: "Paid" },
       });
-      console.log(" Order Updated!");
 
-      //  Store Payment Details
-      console.log(" Storing Payment Details...");
-      // const restaurantId = order.restaurantId;
       await prisma.payment.create({
         data: {
           userId,
           orderId,
-          // restaurantId,
           stripePaymentId: session.id,
           amount: session.amount_total! / 100,
           currency: session.currency!,
@@ -358,15 +344,48 @@ router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req
         },
       });
 
-      console.log(" Payment Details Stored Successfully!");
+      console.log("✅ Payment recorded via checkout.session.completed");
+    }
+
+    // 🔹 PaymentIntent Succeeded (Backup flow)
+    else if (event.type === "payment_intent.succeeded") {
+      const intent = event.data.object as Stripe.PaymentIntent;
+
+      const userId = intent.metadata?.userId;
+      const orderId = intent.metadata?.orderId;
+
+      if (!userId || !orderId) {
+        console.error("❌ Metadata missing in payment_intent");
+        return res.status(400).json({ error: "Invalid metadata" });
+      }
+
+      // Update order and create payment
+      await prisma.order.update({
+        where: { id: orderId },
+        data: { status: "Paid" },
+      });
+
+      await prisma.payment.create({
+        data: {
+          userId,
+          orderId,
+          stripePaymentId: intent.id,
+          amount: intent.amount / 100,
+          currency: intent.currency,
+          status: "Completed",
+        },
+      });
+
+      console.log("✅ Payment recorded via payment_intent.succeeded");
     }
 
     res.status(200).json({ received: true });
   } catch (err: any) {
-    console.error(" Webhook error:", err);
+    console.error("❌ Webhook error:", err.message);
     res.status(400).send(`Webhook Error: ${err.message}`);
   }
 });
+
 
 
 
