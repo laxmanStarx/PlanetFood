@@ -78,17 +78,17 @@ router.post("/create-checkout-session", express.json(), async (req:any, res:any)
       return res.status(400).json({ error: "Missing orderId or lineItems" });
     }
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      line_items: lineItems,
-      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      
-      cancel_url: `${process.env.CLIENT_URL}/cancel`,
-      metadata: {
-        orderId,
-      },
-    });
+const session = await stripe.checkout.sessions.create({
+  payment_method_types: ["card"],
+  mode: "payment",
+  line_items: lineItems,
+  success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+  cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+  metadata: {
+    orderId, // ← this is ignored by Stripe on `checkout.session`, it must go in `payment_intent_data.metadata`
+  },
+});
+
     console.log("CLIENT_URL:", process.env.CLIENT_URL);
 
     res.json({ url: session.url });
