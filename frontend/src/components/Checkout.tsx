@@ -277,7 +277,7 @@ const handleCheckout = async () => {
       throw new Error("Failed to save order to the database.");
     }
 
-    const { orderId } = await orderResponse.json();
+    // const { orderId } = await orderResponse.json();
 
     // Step 2: Create checkout session
     const stripeResponse = await fetch(`${backendUrl}/payment/create-checkout-session`, {
@@ -285,7 +285,11 @@ const handleCheckout = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderId, lineItems }),
+      body: JSON.stringify({ 
+  userId, 
+  items // or `lineItems` if you want to rename it above
+})
+,
     });
 
     const { url } = await stripeResponse.json();
