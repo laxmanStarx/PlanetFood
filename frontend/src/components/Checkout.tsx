@@ -225,79 +225,67 @@ const Checkout: React.FC = () => {
     }, 0);
   };
 
-const handleCheckout = async () => {
-  const stripe = await stripePromise;
-  const userId = localStorage.getItem("userId");
-
-  if (!userId) {
-    alert("User not logged in. Please log in to continue.");
-    return;
-  }
-
-  const lineItems = cartItems.map((cartItem) => {
-    const menuItem = menuItems.find((menu) => menu.id === cartItem.menuId);
-    if (!menuItem) {
-      console.error("Menu item not found for cart item:", cartItem.menuId);
-      return null;
+  const handleCheckout = async () => {
+    const stripe = await stripePromise;
+    const userId = localStorage.getItem("userId");
+  
+    if (!userId) {
+      alert("User not logged in. Please log in to continue.");
+      return;
     }
-    return {
-      price_data: {
-        currency: "inr",
-        product_data: {
-          name: menuItem.name,
+  
+    const items = cartItems.map((cartItem) => {
+      const menuItem = menuItems.find((menu) => menu.id === cartItem.menuId);
+      if (!menuItem) {
+        console.error("Menu item not found for cart item:", cartItem.menuId);
+        return null;
+      }
+      return {
+        menuId: cartItem.menuId,
+        name: menuItem.name,
+        price: menuItem.price,
+        quantity: cartItem.quantity,
+        image: menuItem.image,
+      };
+    }).filter(Boolean); // Remove null items
+  
+    try {
+      // Step 1: Save order to NeonDB (PostgreSQL)
+      const orderResponse = await fetch(`${backendUrl}/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        unit_amount: Math.round(menuItem.price * 100), // Stripe needs amount in paise
-      },
-      quantity: cartItem.quantity,
-    };
-  }).filter(Boolean);
+        body: JSON.stringify({ userId, items }),
+      
+      });
+  
+      if (!orderResponse.ok) {
+        throw new Error("Failed to save order to the database.");
+      }
 
-  const items = cartItems.map((cartItem) => {
-    const menuItem = menuItems.find((menu) => menu.id === cartItem.menuId);
-    return {
-      menuId: cartItem.menuId,
-      name: menuItem?.name,
-      price: menuItem?.price,
-      quantity: cartItem.quantity,
-      image: menuItem?.image,
-    };
-  });
-
-  try {
-    // Step 1: Save order
-    const orderResponse = await fetch(`${backendUrl}/orders`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId, items }),
-    });
-
-    if (!orderResponse.ok) {
-      throw new Error("Failed to save order to the database.");
+      // navigate("/orders")
+  
+      console.log("Order saved successfully!");
+  
+      // Step 2: Proceed with Stripe Payment
+      const stripeResponse = await fetch(`${backendUrl}/payment/create-checkout-session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ items, userId }),
+      });
+  
+      const { url } = await stripeResponse.json();
+      if (stripe && url) {
+        window.location.href = url;
+      }
+    } catch (err) {
+      console.error("Error during checkout", err);
+      alert("Checkout failed. Please try again.");
     }
-
-    const { orderId } = await orderResponse.json();
-
-    // Step 2: Create checkout session
-    const stripeResponse = await fetch(`${backendUrl}/payment/create-checkout-session`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderId, lineItems }),
-    });
-
-    const { url } = await stripeResponse.json();
-    if (stripe && url) {
-      window.location.href = url;
-    }
-  } catch (err) {
-    console.error("Error during checkout", err);
-    alert("Checkout failed. Please try again.");
-  }
-};
-
+  };
   if (loading) {
     return <div className=" justify-center items-center text-center py-10">Loading...</div>;
   }
@@ -411,97 +399,8 @@ export default Checkout;
 
 
 
-//     const fetchMenuItems = async () => {
-//       try {
-//         const response = await fetch(`${backendUrl}/foodRoute`);
-//         if (!response.ok) {
-//           throw new Error("Failed to fetch menu items");
-//         }
-//         const data = await response.json();
-//         setMenuItems(data);
-//       } catch (err) {
-//         console.error(err);
-//         setError("Failed to load menu items. Please try again later.");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
 
-//     fetchMenuItems();
-//   }, []);
 
-// const handleCheckout = async () => {
-//   const stripe = await stripePromise;
-//   const userId = localStorage.getItem("userId");
-
-//   if (!userId) {
-//     alert("User not logged in. Please log in to continue.");
-//     return;
-//   }
-
-//   const lineItems = cartItems.map((cartItem) => {
-//     const menuItem = menuItems.find((menu) => menu.id === cartItem.menuId);
-//     if (!menuItem) {
-//       console.error("Menu item not found for cart item:", cartItem.menuId);
-//       return null;
-//     }
-//     return {
-//       price_data: {
-//         currency: "inr",
-//         product_data: {
-//           name: menuItem.name,
-//         },
-//         unit_amount: Math.round(menuItem.price * 100), // Stripe needs amount in paise
-//       },
-//       quantity: cartItem.quantity,
-//     };
-//   }).filter(Boolean);
-
-//   const items = cartItems.map((cartItem) => {
-//     const menuItem = menuItems.find((menu) => menu.id === cartItem.menuId);
-//     return {
-//       menuId: cartItem.menuId,
-//       name: menuItem?.name,
-//       price: menuItem?.price,
-//       quantity: cartItem.quantity,
-//       image: menuItem?.image,
-//     };
-//   });
-
-//   try {
-//     // Step 1: Save order
-//     const orderResponse = await fetch(`${backendUrl}/orders`, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ userId, items }),
-//     });
-
-//     if (!orderResponse.ok) {
-//       throw new Error("Failed to save order to the database.");
-//     }
-
-//     const { orderId } = await orderResponse.json();
-
-//     // Step 2: Create checkout session
-//     const stripeResponse = await fetch(`${backendUrl}/payment/create-checkout-session`, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ orderId, lineItems }),
-//     });
-
-//     const { url } = await stripeResponse.json();
-//     if (stripe && url) {
-//       window.location.href = url;
-//     }
-//   } catch (err) {
-//     console.error("Error during checkout", err);
-//     alert("Checkout failed. Please try again.");
-//   }
-// };
 
 
 
