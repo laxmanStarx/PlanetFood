@@ -16,13 +16,16 @@ const cloudinary_1 = __importDefault(require("cloudinary"));
 const uploadRoute_1 = __importDefault(require("./routes/uploadRoute"));
 const orderRoute_1 = __importDefault(require("./routes/orderRoute"));
 const ratingRoute_1 = __importDefault(require("./routes/ratingRoute"));
+const body_parser_1 = __importDefault(require("body-parser"));
 // import paymentRoute from "./routes/paymentRoute"
 const PORT = 8080;
 const app = (0, express_1.default)();
+//  app.use("/payment/webhook", bodyParser.raw({ type: "application/json" }), webhookRoute);
 app.use((0, cors_1.default)({
     origin: "*", // Specify your production frontend domain
     methods: ["GET", "POST", "PUT", "DELETE"],
 }));
+app.use("/payment/webhook", body_parser_1.default.raw({ type: "application/json" }), paymentRoute_1.default);
 app.use(express_1.default.json());
 app.use('/api/v1/user', userRoute_1.default);
 app.use('/', restaurantRoute_1.default);
@@ -32,6 +35,7 @@ app.use('/api/v1/admin', adminRoute_1.default);
 app.use('/api/v1/isAdmin', isAdmin_1.isAdmin);
 app.use('/', cartRoute_1.default);
 app.use("/", uploadRoute_1.default);
+// app.use("/payment", webhookRoute); 
 app.use("/orders", orderRoute_1.default);
 app.use("/api/ratings", ratingRoute_1.default);
 // app.use("/", recommendationRoute)

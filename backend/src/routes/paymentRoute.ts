@@ -262,7 +262,7 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL  }/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `http://localhost:5173//success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
       metadata: {
         userId,
@@ -298,93 +298,95 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
 /** 
  *  Stripe Webhook Route (Uses raw body)
  */
-router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req:any, res:any) => {
-  const sig = req.headers["stripe-signature"];
+// router.post("/",  async (req:any, res:any) => {
+//   const sig = req.headers["stripe-signature"];
 
-  if (!sig) {
-    console.error("❌ No Stripe signature");
-    return res.status(400).send("Webhook Error: No signature.");
-  }
+//   if (!sig) {
+//     console.error("❌ No Stripe signature");
+//     return res.status(400).send("Webhook Error: No signature.");
+//   }
 
-  try {
-    const event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
+//   try {
+//     const event = stripe.webhooks.constructEvent(
+//       req.body,
+//       sig,
+//       process.env.STRIPE_WEBHOOK_SECRET!
+//     );
 
-    console.log("✅ Webhook event received:", event.type);
+//     console.log(" Webhook event received:", event.type);
 
-    // 🔸 Checkout Completed (Recommended for Stripe Checkout)
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object as Stripe.Checkout.Session;
+//     //  Checkout Completed (Recommended for Stripe Checkout)
+//     if (event.type === "checkout.session.completed") {
+//       const session = event.data.object as Stripe.Checkout.Session;
 
-      const userId = session.metadata?.userId;
-      const orderId = session.metadata?.orderId;
+//       const userId = session.metadata?.userId;
+//       const orderId = session.metadata?.orderId;
 
-      if (!userId || !orderId) {
-        console.error("❌ Metadata missing in checkout.session");
-        return res.status(400).json({ error: "Invalid metadata" });
-      }
+//       if (!userId || !orderId) {
+//         console.error(" Metadata missing in checkout.session");
+//         return res.status(400).json({ error: "Invalid metadata" });
+//       }
 
-      // Update order and create payment
-      await prisma.order.update({
-        where: { id: orderId },
-        data: { status: "Paid" },
-      });
+//       // Update order and create payment
+//       await prisma.order.update({
+//         where: { id: orderId },
+//         data: { status: "Paid" },
+//       });
 
-      await prisma.payment.create({
-        data: {
-          userId,
-          orderId,
-          stripePaymentId: session.id,
-          amount: session.amount_total! / 100,
-          currency: session.currency!,
-          status: "Completed",
-        },
-      });
+//       await prisma.payment.create({
+//         data: {
+//           userId,
+//           orderId,
+//           stripePaymentId: session.id,
+//           amount: session.amount_total! / 100,
+//           currency: session.currency!,
+//           status: "Completed",
+//         },
+//       });
 
-      console.log("✅ Payment recorded via checkout.session.completed");
-    }
+//       console.log(" Payment recorded via checkout.session.completed");
+//     }
 
-    // 🔹 PaymentIntent Succeeded (Backup flow)
-    else if (event.type === "payment_intent.succeeded") {
-      const intent = event.data.object as Stripe.PaymentIntent;
+//     // 🔹 PaymentIntent Succeeded (Backup flow)
+//     else if (event.type === "payment_intent.succeeded") {
+//       const intent = event.data.object as Stripe.PaymentIntent;
 
-      const userId = intent.metadata?.userId;
-      const orderId = intent.metadata?.orderId;
+//       const userId = intent.metadata?.userId;
+//       const orderId = intent.metadata?.orderId;
 
-      if (!userId || !orderId) {
-        console.error("❌ Metadata missing in payment_intent");
-        return res.status(400).json({ error: "Invalid metadata" });
-      }
+//       if (!userId || !orderId) {
+//         console.error(" Metadata missing in payment_intent");
+//         return res.status(400).json({ error: "Invalid metadata" });
+//       }
 
-      // Update order and create payment
-      await prisma.order.update({
-        where: { id: orderId },
-        data: { status: "Paid" },
-      });
+//       // Update order and create payment
+//       await prisma.order.update({
+//         where: { id: orderId },
+//         data: { status: "Paid" },
+//       });
 
-      await prisma.payment.create({
-        data: {
-          userId,
-          orderId,
-          stripePaymentId: intent.id,
-          amount: intent.amount / 100,
-          currency: intent.currency,
-          status: "Completed",
-        },
-      });
+//       await prisma.payment.create({
+//         data: {
+//           userId,
+//           orderId,
+//           stripePaymentId: intent.id,
+//           amount: intent.amount / 100,
+//           currency: intent.currency,
+//           status: "Completed",
+//         },
+//       });
 
-      console.log("✅ Payment recorded via payment_intent.succeeded");
-    }
+//       console.log(" Payment recorded via payment_intent.succeeded");
+//     }
 
-    res.status(200).json({ received: true });
-  } catch (err: any) {
-    console.error("❌ Webhook error:", err.message);
-    res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-});
+//     res.status(200).json({ received: true });
+//   } catch (err: any) {
+//     console.error("❌ Webhook error:", err.message);
+//     res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
+// });
+
+
 
 
 

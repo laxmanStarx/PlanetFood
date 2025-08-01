@@ -18,6 +18,10 @@ import ratings from "./routes/ratingRoute";
 import ratingRoute from "./routes/ratingRoute";
 
 
+import webhookRoute from "./routes/webhookRoute";
+import bodyParser from "body-parser";
+
+
 // import paymentRoute from "./routes/paymentRoute"
 
 
@@ -25,10 +29,15 @@ import ratingRoute from "./routes/ratingRoute";
 const PORT = 8080
 const app = express()
 
+//  app.use("/payment/webhook", bodyParser.raw({ type: "application/json" }), webhookRoute);
+
 app.use(cors({
     origin: "*", // Specify your production frontend domain
     methods: ["GET", "POST", "PUT", "DELETE"],
   }));
+
+
+ app.use("/payment/webhook", express.raw({ type: "application/json" }),webhookRoute);
 
  
 
@@ -42,7 +51,9 @@ app.use("/payment", paymentRoute);
 app.use('/api/v1/admin',adminRoute)
 app.use('/api/v1/isAdmin',isAdmin)
 app.use('/',cartRoute)
+
 app.use("/", uploadRoute);
+// app.use("/payment", webhookRoute); 
 app.use("/orders", orderRoute)
 app.use("/api/ratings", ratingRoute)
 // app.use("/", recommendationRoute)
