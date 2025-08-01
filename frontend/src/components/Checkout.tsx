@@ -277,7 +277,7 @@ const handleCheckout = async () => {
       throw new Error("Failed to save order to the database.");
     }
 
-    // const { orderId } = await orderResponse.json();
+    const { orderId } = await orderResponse.json();
 
     // Step 2: Create checkout session
     const stripeResponse = await fetch(`${backendUrl}/payment/create-checkout-session`, {
@@ -285,11 +285,7 @@ const handleCheckout = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ 
-  userId, 
-  items // or `lineItems` if you want to rename it above
-})
-,
+      body: JSON.stringify({ orderId, lineItems }),
     });
 
     const { url } = await stripeResponse.json();
@@ -414,7 +410,7 @@ const handleCheckout = async () => {
 export default Checkout;
 
 
-//  useEffect(() => {
+
 //     const fetchMenuItems = async () => {
 //       try {
 //         const response = await fetch(`${backendUrl}/foodRoute`);
@@ -434,7 +430,78 @@ export default Checkout;
 //     fetchMenuItems();
 //   }, []);
 
+// const handleCheckout = async () => {
+//   const stripe = await stripePromise;
+//   const userId = localStorage.getItem("userId");
 
+//   if (!userId) {
+//     alert("User not logged in. Please log in to continue.");
+//     return;
+//   }
+
+//   const lineItems = cartItems.map((cartItem) => {
+//     const menuItem = menuItems.find((menu) => menu.id === cartItem.menuId);
+//     if (!menuItem) {
+//       console.error("Menu item not found for cart item:", cartItem.menuId);
+//       return null;
+//     }
+//     return {
+//       price_data: {
+//         currency: "inr",
+//         product_data: {
+//           name: menuItem.name,
+//         },
+//         unit_amount: Math.round(menuItem.price * 100), // Stripe needs amount in paise
+//       },
+//       quantity: cartItem.quantity,
+//     };
+//   }).filter(Boolean);
+
+//   const items = cartItems.map((cartItem) => {
+//     const menuItem = menuItems.find((menu) => menu.id === cartItem.menuId);
+//     return {
+//       menuId: cartItem.menuId,
+//       name: menuItem?.name,
+//       price: menuItem?.price,
+//       quantity: cartItem.quantity,
+//       image: menuItem?.image,
+//     };
+//   });
+
+//   try {
+//     // Step 1: Save order
+//     const orderResponse = await fetch(`${backendUrl}/orders`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ userId, items }),
+//     });
+
+//     if (!orderResponse.ok) {
+//       throw new Error("Failed to save order to the database.");
+//     }
+
+//     const { orderId } = await orderResponse.json();
+
+//     // Step 2: Create checkout session
+//     const stripeResponse = await fetch(`${backendUrl}/payment/create-checkout-session`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ orderId, lineItems }),
+//     });
+
+//     const { url } = await stripeResponse.json();
+//     if (stripe && url) {
+//       window.location.href = url;
+//     }
+//   } catch (err) {
+//     console.error("Error during checkout", err);
+//     alert("Checkout failed. Please try again.");
+//   }
+// };
 
 
 
