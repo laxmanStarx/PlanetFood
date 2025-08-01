@@ -82,7 +82,7 @@ router.post("/create-checkout-session", express.json(), async (req:any, res:any)
       payment_method_types: ["card"],
       mode: "payment",
       line_items: lineItems,
-      success_url: `${process.env.FRONTEND_URL} /success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       
       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
       metadata: {
