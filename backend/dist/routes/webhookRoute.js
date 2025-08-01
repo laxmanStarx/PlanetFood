@@ -19,7 +19,7 @@ const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {});
 // Webhook to listen for Stripe events
-router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/webhook", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const sig = req.headers["stripe-signature"];
     if (!sig) {
@@ -38,6 +38,13 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (event.type === "payment_intent.succeeded") {
         const paymentIntent = event.data.object;
         const orderId = (_a = paymentIntent.metadata) === null || _a === void 0 ? void 0 : _a.orderId;
+        console.log("✅ Webhook triggered");
+        console.log("✅ Stripe Metadata:", paymentIntent.metadata);
+        console.log("✅ Extracted orderId:", orderId);
+        if (!orderId) {
+            console.warn("⚠️ Order ID is missing in payment metadata");
+            return res.status(400).send("Order ID not found");
+        }
         if (orderId) {
             try {
                 yield prisma.order.update({
@@ -72,7 +79,7 @@ router.post("/create-checkout-session", express_1.default.json(), (req, res) => 
             payment_method_types: ["card"],
             mode: "payment",
             line_items: lineItems,
-            success_url: `${process.env.FRONTEND_URL} /success?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.CLIENT_URL}/cancel`,
             metadata: {
                 orderId,

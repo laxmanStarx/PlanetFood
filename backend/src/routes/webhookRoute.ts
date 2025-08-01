@@ -45,6 +45,33 @@ router.post(
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       const orderId = paymentIntent.metadata?.orderId;
 
+
+
+        console.log("✅ Webhook triggered");
+
+  console.log("✅ Stripe Metadata:", paymentIntent.metadata);
+  
+  console.log("✅ Extracted orderId:", orderId);
+
+  if (!orderId) {
+    console.warn("⚠️ Order ID is missing in payment metadata");
+    return res.status(400).send("Order ID not found");
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       if (orderId) {
         try {
           await prisma.order.update({
@@ -54,6 +81,7 @@ router.post(
               paymentIntentId: paymentIntent.id,
               paidAt: new Date(),
             },
+
           });
           console.log(`Order ${orderId} marked as paid.`);
         } catch (err) {
@@ -85,9 +113,11 @@ router.post("/create-checkout-session", express.json(), async (req:any, res:any)
       success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       
       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+      payment_intent_data: {
       metadata: {
         orderId,
       },
+    },
     });
     console.log("CLIENT_URL:", process.env.CLIENT_URL);
 
