@@ -47,30 +47,9 @@ router.post(
 
 
 
-        console.log("✅ Webhook triggered");
-
-  console.log("✅ Stripe Metadata:", paymentIntent.metadata);
-  
-  console.log("✅ Extracted orderId:", orderId);
-
-  if (!orderId) {
-    console.warn("⚠️ Order ID is missing in payment metadata");
-    return res.status(400).send("Order ID not found");
-  }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+      
 
       if (orderId) {
         try {
