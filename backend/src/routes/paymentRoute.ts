@@ -76,73 +76,73 @@ router.use(express.json());
 /** 
  *  Stripe Webhook Route (Uses raw body)
  */
-// router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req: any, res: any) => {
-//   const sig = req.headers["stripe-signature"];
+router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req: any, res: any) => {
+  const sig = req.headers["stripe-signature"];
 
-//   if (!sig) {
-//     console.error(" No Stripe signature found!");
-//     return res.status(400).send("Webhook Error: No signature.");
-//   }
+  if (!sig) {
+    console.error(" No Stripe signature found!");
+    return res.status(400).send("Webhook Error: No signature.");
+  }
 
-//   try {
-//     const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
-//     console.log(" Webhook received:", event.type);
-//     console.log(" Event Data:", JSON.stringify(event, null, 2));
+  try {
+    const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+    console.log(" Webhook received:", event.type);
+    console.log(" Event Data:", JSON.stringify(event, null, 2));
 
-//     if (event.type === "checkout.session.completed") {
-//       const session = event.data.object as Stripe.Checkout.Session;
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
 
-//       console.log(" Payment Successful for Session:", session.id);
-//       console.log("🔹 Metadata:", session.metadata);
+      console.log(" Payment Successful for Session:", session.id);
+      console.log("🔹 Metadata:", session.metadata);
 
-//       const userId = session.metadata?.userId;
-//       const orderId = session.metadata?.orderId;
+      const userId = session.metadata?.userId;
+      const orderId = session.metadata?.orderId;
 
-//       if (!userId || !orderId) {
-//         console.error(" Missing userId or orderId in metadata!");
-//         return res.status(400).json({ error: "Invalid metadata" });
-//       }
+      if (!userId || !orderId) {
+        console.error(" Missing userId or orderId in metadata!");
+        return res.status(400).json({ error: "Invalid metadata" });
+      }
 
-//       console.log("🔹 Searching for order with ID:", orderId);
-//       const order = await prisma.order.findUnique({ where: { id: orderId } });
+      console.log("🔹 Searching for order with ID:", orderId);
+      const order = await prisma.order.findUnique({ where: { id: orderId } });
 
-//       if (!order) {
-//         console.error(" Order not found:", orderId);
-//         return res.status(400).json({ error: "Order not found" });
-//       }
+      if (!order) {
+        console.error(" Order not found:", orderId);
+        return res.status(400).json({ error: "Order not found" });
+      }
 
-//       console.log(" Order Found:", order);
+      console.log(" Order Found:", order);
 
-//       //  Update Order Status
-//       console.log("🔹 Updating Order Status...");
-//       await prisma.order.update({
-//         where: { id: order.id },
-//         data: { status: "Paid" },
-//       });
-//       console.log(" Order Updated!");
+      //  Update Order Status
+      console.log("🔹 Updating Order Status...");
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { status: "Paid" },
+      });
+      console.log(" Order Updated!");
 
-//       //  Store Payment Details
-//       console.log(" Storing Payment Details...");
-//       await prisma.payment.create({
-//         data: {
-//           userId,
-//           orderId,
-//           stripePaymentId: session.id,
-//           amount: session.amount_total! / 100,
-//           currency: session.currency!,
-//           status: "Completed",
-//         },
-//       });
+      //  Store Payment Details
+      console.log(" Storing Payment Details...");
+      await prisma.payment.create({
+        data: {
+          userId,
+          orderId,
+          stripePaymentId: session.id,
+          amount: session.amount_total! / 100,
+          currency: session.currency!,
+          status: "Completed",
+        },
+      });
 
-//       console.log(" Payment Details Stored Successfully!");
-//     }
+      console.log(" Payment Details Stored Successfully!");
+    }
 
-//     res.status(200).json({ received: true });
-//   } catch (err: any) {
-//     console.error(" Webhook error:", err);
-//     res.status(400).send(`Webhook Error: ${err.message}`);
-//   }
-// });
+    res.status(200).json({ received: true });
+  } catch (err: any) {
+    console.error(" Webhook error:", err);
+    res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+});
 
 /**
  *  Create Checkout Session Route

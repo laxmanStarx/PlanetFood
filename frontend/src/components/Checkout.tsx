@@ -410,7 +410,25 @@ const handleCheckout = async () => {
 export default Checkout;
 
 
+//  useEffect(() => {
+//     const fetchMenuItems = async () => {
+//       try {
+//         const response = await fetch(`${backendUrl}/foodRoute`);
+//         if (!response.ok) {
+//           throw new Error("Failed to fetch menu items");
+//         }
+//         const data = await response.json();
+//         setMenuItems(data);
+//       } catch (err) {
+//         console.error(err);
+//         setError("Failed to load menu items. Please try again later.");
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
 
+//     fetchMenuItems();
+//   }, []);
 
 
 
