@@ -25,7 +25,7 @@ app.use((0, cors_1.default)({
     origin: "*", // Specify your production frontend domain
     methods: ["GET", "POST", "PUT", "DELETE"],
 }));
-app.use("/payment", express_1.default.raw({ type: "application/json" }), webhookRoute_1.default);
+app.use("/payment/webhook", express_1.default.raw({ type: "application/json" }), webhookRoute_1.default);
 app.use(express_1.default.json());
 app.use('/api/v1/user', userRoute_1.default);
 app.use('/', restaurantRoute_1.default);
