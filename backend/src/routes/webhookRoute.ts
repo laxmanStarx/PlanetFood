@@ -112,11 +112,11 @@ const session = await stripe.checkout.sessions.create({
   line_items: lineItems,
   success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
   cancel_url: `${process.env.FRONTEND_URL}/cancel`,
-  payment_intent_data: {
+  
     metadata: {
       orderId, // ✅ THIS will be available in webhook
     },
-  },
+  
 });
 
     console.log("CLIENT_URL:", process.env.CLIENT_URL);
