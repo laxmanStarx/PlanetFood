@@ -14,22 +14,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const stripe_1 = __importDefault(require("stripe"));
-const dotenv_1 = __importDefault(require("dotenv"));
 const client_1 = require("@prisma/client");
-dotenv_1.default.config();
 const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {});
 // Webhook to listen for Stripe events
-router.post("/webhook", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const sig = req.headers["stripe-signature"];
     if (!sig) {
+        console.log("Hello signature");
         return res.status(400).send("Missing Stripe signature");
     }
     let event;
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+        console.log(" Webhook event received:", event.type);
     }
     catch (err) {
         console.error("Webhook signature verification failed:", err.message);
@@ -72,13 +72,13 @@ router.post("/create-checkout-session", express_1.default.json(), (req, res) => 
             payment_method_types: ["card"],
             mode: "payment",
             line_items: lineItems,
-            success_url: `http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${process.env.FRONTEND_URL} /success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.CLIENT_URL}/cancel`,
             metadata: {
                 orderId,
             },
         });
-        console.log("✅ CLIENT_URL:", process.env.CLIENT_URL);
+        console.log("CLIENT_URL:", process.env.CLIENT_URL);
         res.json({ url: session.url });
     }
     catch (err) {
