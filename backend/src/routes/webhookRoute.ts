@@ -103,8 +103,8 @@ router.post("/", async (req: any, res: any) => {
     console.log(" Webhook received:", event.type);
     console.log(" Event Data:", JSON.stringify(event, null, 2));
 
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object as Stripe.Checkout.Session;
+    if (event.type === "payment_intent.succeeded")  {
+      const session = event.data.object as Stripe.PaymentIntent;
 
       console.log(" Payment Successful for Session:", session.id);
       console.log("🔹 Metadata:", session.metadata);
@@ -137,16 +137,7 @@ router.post("/", async (req: any, res: any) => {
 
       //  Store Payment Details
       console.log(" Storing Payment Details...");
-      await prisma.payment.create({
-        data: {
-          userId,
-          orderId,
-          stripePaymentId: session.id,
-          amount: session.amount_total! / 100,
-          currency: session.currency!,
-          status: "Completed",
-        },
-      });
+ 
 
       console.log(" Payment Details Stored Successfully!");
     }
