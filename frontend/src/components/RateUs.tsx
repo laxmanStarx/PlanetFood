@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 interface RateUsProps {
   onClose?: () => void;
 }
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const RateUs: React.FC<RateUsProps> = ({ onClose }) => {
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState("");
@@ -13,7 +13,7 @@ const RateUs: React.FC<RateUsProps> = ({ onClose }) => {
 
   useEffect(() => {
     const fetchRestaurants = async () => {
-      const res = await fetch("http://localhost:8080/restaurants");
+      const res = await fetch(`${backendUrl}/restaurants`);
       const data = await res.json();
       setRestaurants(data);
     };
@@ -24,7 +24,7 @@ const RateUs: React.FC<RateUsProps> = ({ onClose }) => {
     e.preventDefault();
 
     try {
-      await fetch("http://localhost:8080/api/ratings", {
+      await fetch(`${backendUrl}/api/ratings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
