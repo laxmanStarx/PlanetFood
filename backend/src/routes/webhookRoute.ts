@@ -199,32 +199,32 @@ router.post("/",  async (req: any, res: any) => {
 
 
 
-router.post("/create-checkout-session", async (req:any, res:any) => {
-  try {
-    const { orderId, lineItems, userId } = req.body;
+// router.post("/create-checkout-session", async (req:any, res:any) => {
+//   try {
+//     const { orderId, lineItems, userId } = req.body;
 
-    if (!orderId || !lineItems || !userId) {
-      return res.status(400).json({ error: "Missing orderId, lineItems or userId" });
-    }
+//     if (!orderId || !lineItems || !userId) {
+//       return res.status(400).json({ error: "Missing orderId, lineItems or userId" });
+//     }
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      line_items: lineItems,
-      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/cancel`,
-      metadata: {
-        orderId,   // ✅ orderId exists
-        userId,    // ✅ userId also now exists
-      },
-    });
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ["card"],
+//       mode: "payment",
+//       line_items: lineItems,
+//       success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+//       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+//       metadata: {
+//         orderId,   // ✅ orderId exists
+//         userId,    // ✅ userId also now exists
+//       },
+//     });
 
-    return res.status(200).json({ url: session.url });
-  } catch (err) {
-    console.error("Checkout session error:", err);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
+//     return res.status(200).json({ url: session.url });
+//   } catch (err) {
+//     console.error("Checkout session error:", err);
+//     return res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
 
 
 
