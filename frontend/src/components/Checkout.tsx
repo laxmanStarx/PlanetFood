@@ -269,7 +269,7 @@ const Checkout: React.FC = () => {
       console.log("Order saved successfully!");
   
       // Step 2: Proceed with Stripe Payment
-      const stripeResponse = await fetch(`${backendUrl}/payment/create-checkout-session`, {
+      const stripeResponse = await fetch(`${backendUrl}/paymentorder/create-checkout-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

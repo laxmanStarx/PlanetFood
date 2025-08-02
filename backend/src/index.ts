@@ -47,7 +47,7 @@ app.use(express.json())
 app.use('/api/v1/user',userRoute)
 app.use('/',restaurantRoute)
 app.use('/foodRoute',foodRoute)
-app.use("/payment", paymentRoute);
+app.use("/paymentorder", paymentRoute);
 app.use('/api/v1/admin',adminRoute)
 app.use('/api/v1/isAdmin',isAdmin)
 app.use('/',cartRoute)
