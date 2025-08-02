@@ -76,209 +76,247 @@ router.use(express.json());
 /** 
  *  Stripe Webhook Route (Uses raw body)
  */
-router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req: any, res: any) => {
-  const sig = req.headers["stripe-signature"];
+// router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req: any, res: any) => {
+//   const sig = req.headers["stripe-signature"];
 
-  if (!sig) {
-    console.error(" No Stripe signature found!");
-    return res.status(400).send("Webhook Error: No signature.");
-  }
+//   if (!sig) {
+//     console.error(" No Stripe signature found!");
+//     return res.status(400).send("Webhook Error: No signature.");
+//   }
 
-  try {
-    const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
-    console.log(" Webhook received:", event.type);
-    console.log(" Event Data:", JSON.stringify(event, null, 2));
+//   try {
+//     const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+//     console.log(" Webhook received:", event.type);
+//     console.log(" Event Data:", JSON.stringify(event, null, 2));
 
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object as Stripe.Checkout.Session;
+//     if (event.type === "checkout.session.completed") {
+//       const session = event.data.object as Stripe.Checkout.Session;
 
-      console.log(" Payment Successful for Session:", session.id);
-      console.log("🔹 Metadata:", session.metadata);
+//       console.log(" Payment Successful for Session:", session.id);
+//       console.log("🔹 Metadata:", session.metadata);
 
-      const userId = session.metadata?.userId;
-      const orderId = session.metadata?.orderId;
+//       const userId = session.metadata?.userId;
+//       const orderId = session.metadata?.orderId;
 
-      if (!userId || !orderId) {
-        console.error(" Missing userId or orderId in metadata!");
-        return res.status(400).json({ error: "Invalid metadata" });
-      }
+//       if (!userId || !orderId) {
+//         console.error(" Missing userId or orderId in metadata!");
+//         return res.status(400).json({ error: "Invalid metadata" });
+//       }
 
-      console.log("🔹 Searching for order with ID:", orderId);
-      const order = await prisma.order.findUnique({ where: { id: orderId } });
+//       console.log("🔹 Searching for order with ID:", orderId);
+//       const order = await prisma.order.findUnique({ where: { id: orderId } });
 
-      if (!order) {
-        console.error(" Order not found:", orderId);
-        return res.status(400).json({ error: "Order not found" });
-      }
+//       if (!order) {
+//         console.error(" Order not found:", orderId);
+//         return res.status(400).json({ error: "Order not found" });
+//       }
 
-      console.log(" Order Found:", order);
+//       console.log(" Order Found:", order);
 
-      //  Update Order Status
-      console.log("🔹 Updating Order Status...");
-      await prisma.order.update({
-        where: { id: order.id },
-        data: { status: "Paid" },
-      });
-      console.log(" Order Updated!");
+//       //  Update Order Status
+//       console.log("🔹 Updating Order Status...");
+//       await prisma.order.update({
+//         where: { id: order.id },
+//         data: { status: "Paid" },
+//       });
+//       console.log(" Order Updated!");
 
-      //  Store Payment Details
-      console.log(" Storing Payment Details...");
-      await prisma.payment.create({
-        data: {
-          userId,
-          orderId,
-          stripePaymentId: session.id,
-          amount: session.amount_total! / 100,
-          currency: session.currency!,
-          status: "Completed",
-        },
-      });
+//       //  Store Payment Details
+//       console.log(" Storing Payment Details...");
+//       await prisma.payment.create({
+//         data: {
+//           userId,
+//           orderId,
+//           stripePaymentId: session.id,
+//           amount: session.amount_total! / 100,
+//           currency: session.currency!,
+//           status: "Completed",
+//         },
+//       });
 
-      console.log(" Payment Details Stored Successfully!");
-    }
+//       console.log(" Payment Details Stored Successfully!");
+//     }
 
-    res.status(200).json({ received: true });
-  } catch (err: any) {
-    console.error(" Webhook error:", err);
-    res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-});
+//     res.status(200).json({ received: true });
+//   } catch (err: any) {
+//     console.error(" Webhook error:", err);
+//     res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
+// });
 
 /**
  *  Create Checkout Session Route
  */
-router.post("/create-checkout-session", async (req: any, res: any) => {
+// router.post("/create-checkout-session", async (req: any, res: any) => {
+//   try {
+//     const { items, userId,restaurantId } = req.body;
+
+//     if (!userId) return res.status(400).json({ error: "User ID is required" });
+//     // if (!restaurantId) return res.status(400).json({ error: "Restaurant ID is required" });
+
+//     if (!items || !Array.isArray(items)) return res.status(400).json({ error: "Invalid items" });
+
+//     //  Convert items to Stripe line_items
+//     const lineItems = items.map((item: any) => ({
+//       price_data: {
+//         currency: "inr",
+//         product_data: { name: item.name },
+//         unit_amount: Math.max(item.price * 100, 5000), // Minimum ₹50
+//       },
+//       quantity: item.quantity,
+//     }));
+
+//     //  Calculate total price
+//     const totalAmount = lineItems.reduce((sum, item) => sum + item.price_data.unit_amount * item.quantity, 0);
+
+//     if (totalAmount < 5000) {
+//       return res.status(400).json({ error: "Minimum order amount must be ₹50." });
+//     }
+
+//     //  Create Order in Database
+//     console.log("🔹 Creating Order in DB...");
+//     const order = await prisma.order.create({
+//       data: {
+//         userId: userId,
+//         status: "Pending",
+//         totalPrice: totalAmount / 100, // Convert to INR
+//         // restaurantId: restaurantId,
+//       },
+//     });
+//     console.log(" Order Created with ID:", order.id);
+
+//     // await generateRecommendationsAndUpdateDB(userId);
+
+
+
+
+//   // Utility function to generate and update recommendations
+// // async function generateRecommendationsAndUpdateDB(userId: string) {
+// //   // Fetch past order items for the user
+// //   const userOrders = await prisma.order.findMany({
+// //     where: { userId },
+// //     include: {
+// //       orderItems: {
+// //         include: { menu: true }
+// //       }
+// //     }
+// //   });
+
+//   // Flatten all product IDs purchased by the user
+//   // const purchasedProductIds = userOrders
+//   //   .flatMap(order => order.orderItems.map(item => item.menuId));
+
+//   // // Count frequency or apply your own logic for recommendation
+//   // const freqMap: Record<string, number> = {};
+//   // for (const id of purchasedProductIds) {
+//   //   freqMap[id] = (freqMap[id] || 0) + 1;
+//   // }
+
+//   // // Sort productIds by frequency (most purchased first)
+//   // const sortedProductIds = Object.keys(freqMap).sort(
+//   //   (a, b) => freqMap[b] - freqMap[a]
+//   // );
+
+//   // Save/update recommendations for the user
+// //   await prisma.recommendation.upsert({
+// //     where: { userId },
+// //     update: { products: sortedProductIds },
+// //     create: {
+// //       userId,
+// //       products: sortedProductIds
+// //     },
+// //   });
+
+// //   console.log("✅ Recommendations updated for user:", userId);
+// // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//     //  Create Stripe Checkout Session
+//     console.log("🔹 Creating Stripe Checkout Session...");
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ["card"],
+//       line_items: lineItems,
+//       mode: "payment",
+//       success_url: `${process.env.FRONTEND_URL }/success?session_id={CHECKOUT_SESSION_ID}`,
+//       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+//       metadata: {
+//         userId,
+//         orderId: order.id, // Store orderId in metadata
+//       },
+//     });
+
+//     console.log(" Stripe Session Created:", session.id);
+//     res.status(200).json({ url: session.url });
+//   } 
+  
+//   catch (err: any) {
+//     console.error(" Error in /create-checkout-session:", err.message);
+//     res.status(500).json({ error: err.message || "Internal Server Error" });
+//   }
+// });
+
+
+
+
+
+
+
+
+
+router.post("/create-checkout-session", async (req:any, res:any) => {
   try {
-    const { items, userId,restaurantId } = req.body;
+    const { orderId, lineItems, userId } = req.body;
 
-    if (!userId) return res.status(400).json({ error: "User ID is required" });
-    // if (!restaurantId) return res.status(400).json({ error: "Restaurant ID is required" });
-
-    if (!items || !Array.isArray(items)) return res.status(400).json({ error: "Invalid items" });
-
-    //  Convert items to Stripe line_items
-    const lineItems = items.map((item: any) => ({
-      price_data: {
-        currency: "inr",
-        product_data: { name: item.name },
-        unit_amount: Math.max(item.price * 100, 5000), // Minimum ₹50
-      },
-      quantity: item.quantity,
-    }));
-
-    //  Calculate total price
-    const totalAmount = lineItems.reduce((sum, item) => sum + item.price_data.unit_amount * item.quantity, 0);
-
-    if (totalAmount < 5000) {
-      return res.status(400).json({ error: "Minimum order amount must be ₹50." });
+    if (!orderId || !lineItems || !userId) {
+      return res.status(400).json({ error: "Missing orderId, lineItems or userId" });
     }
 
-    //  Create Order in Database
-    console.log("🔹 Creating Order in DB...");
-    const order = await prisma.order.create({
-      data: {
-        userId: userId,
-        status: "Pending",
-        totalPrice: totalAmount / 100, // Convert to INR
-        // restaurantId: restaurantId,
-      },
-    });
-    console.log(" Order Created with ID:", order.id);
+    //  DO NOT create a new order here
 
-    // await generateRecommendationsAndUpdateDB(userId);
-
-
-
-
-  // Utility function to generate and update recommendations
-// async function generateRecommendationsAndUpdateDB(userId: string) {
-//   // Fetch past order items for the user
-//   const userOrders = await prisma.order.findMany({
-//     where: { userId },
-//     include: {
-//       orderItems: {
-//         include: { menu: true }
-//       }
-//     }
-//   });
-
-  // Flatten all product IDs purchased by the user
-  // const purchasedProductIds = userOrders
-  //   .flatMap(order => order.orderItems.map(item => item.menuId));
-
-  // // Count frequency or apply your own logic for recommendation
-  // const freqMap: Record<string, number> = {};
-  // for (const id of purchasedProductIds) {
-  //   freqMap[id] = (freqMap[id] || 0) + 1;
-  // }
-
-  // // Sort productIds by frequency (most purchased first)
-  // const sortedProductIds = Object.keys(freqMap).sort(
-  //   (a, b) => freqMap[b] - freqMap[a]
-  // );
-
-  // Save/update recommendations for the user
-//   await prisma.recommendation.upsert({
-//     where: { userId },
-//     update: { products: sortedProductIds },
-//     create: {
-//       userId,
-//       products: sortedProductIds
-//     },
-//   });
-
-//   console.log("✅ Recommendations updated for user:", userId);
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //  Create Stripe Checkout Session
-    console.log("🔹 Creating Stripe Checkout Session...");
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL }/success?session_id={CHECKOUT_SESSION_ID}`,
+      line_items: lineItems,
+      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
       metadata: {
+        orderId,
         userId,
-        orderId: order.id, // Store orderId in metadata
       },
     });
 
-    console.log(" Stripe Session Created:", session.id);
-    res.status(200).json({ url: session.url });
-  } 
-  
-  catch (err: any) {
-    console.error(" Error in /create-checkout-session:", err.message);
-    res.status(500).json({ error: err.message || "Internal Server Error" });
+    return res.status(200).json({ url: session.url });
+  } catch (err) {
+    console.error("Checkout session error:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 
 
