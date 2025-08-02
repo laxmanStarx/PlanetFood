@@ -288,6 +288,18 @@ router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 router.post("/create-checkout-session", async (req:any, res:any) => {
   try {
     const { orderId, lineItems, userId } = req.body;
@@ -296,7 +308,7 @@ router.post("/create-checkout-session", async (req:any, res:any) => {
       return res.status(400).json({ error: "Missing orderId, lineItems or userId" });
     }
 
-    //  DO NOT create a new order here
+    // ✅ DO NOT create a new order here
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -316,6 +328,16 @@ router.post("/create-checkout-session", async (req:any, res:any) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+
+
+
+
+
+
+
+
 
 
 
