@@ -30,9 +30,9 @@ router.post("/", async (req: any, res: any) => {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
 
-    console.log("✅ Webhook event received:", event.type);
+    console.log("Webhook event received:", event.type);
   } catch (err: any) {
-    console.error("❌ Webhook signature verification failed:", err.message);
+    console.error(" Webhook signature verification failed:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -41,7 +41,7 @@ router.post("/", async (req: any, res: any) => {
     const orderId = session.metadata?.orderId;
 
     if (!orderId) {
-      console.warn("⚠️ Order ID missing in metadata");
+      console.warn(" Order ID missing in metadata");
       return res.status(400).send("Missing orderId in metadata");
     }
 
@@ -55,7 +55,7 @@ router.post("/", async (req: any, res: any) => {
         },
       });
 
-      console.log(`✅ Order ${orderId} marked as paid.`);
+      console.log(` Order ${orderId} marked as paid.`);
     } catch (err) {
       console.error("❌ Failed to update order:", err);
       return res.status(500).send("Failed to update order");
