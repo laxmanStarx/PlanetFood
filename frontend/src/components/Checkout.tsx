@@ -251,18 +251,18 @@ const Checkout: React.FC = () => {
   
     try {
       // Step 1: Save order to NeonDB (PostgreSQL)
-      const orderResponse = await fetch(`${backendUrl}/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId, items }),
+      // const orderResponse = await fetch(`${backendUrl}/orders`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ userId, items }),
       
-      });
+      // });
   
-      if (!orderResponse.ok) {
-        throw new Error("Failed to save order to the database.");
-      }
+      // if (!orderResponse.ok) {
+      //   throw new Error("Failed to save order to the database.");
+      // }
 
       // navigate("/orders")
   
