@@ -175,15 +175,15 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
 
     //  Create Order in Database
     console.log("🔹 Creating Order in DB...");
-    // const order = await prisma.order.create({
-    //   data: {
-    //     userId: userId,
-    //     status: "Pending",
-    //     totalPrice: totalAmount / 100, // Convert to INR
-    //     // restaurantId: restaurantId,
-    //   },
-    // });
-    // console.log(" Order Created with ID:", order.id);
+    const order = await prisma.order.create({
+      data: {
+        userId: userId,
+        status: "Pending",
+        totalPrice: totalAmount / 100, // Convert to INR
+        // restaurantId: restaurantId,
+      },
+    });
+    console.log(" Order Created with ID:", order.id);
 
     // await generateRecommendationsAndUpdateDB(userId);
 
@@ -266,7 +266,7 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
       metadata: {
         userId,
-        // orderId: order.id, // Store orderId in metadata
+        orderId: order.id, // Store orderId in metadata
       },
     });
 
