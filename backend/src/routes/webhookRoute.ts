@@ -13,162 +13,57 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 // Webhook to listen for Stripe events
-// router.post(
-//   "/",
-  
-//   async (req:any, res:any) => {
-//     const sig = req.headers["stripe-signature"];
-
-//     if (!sig) {
-//        console.log("Hello signature")
-//       return res.status(400).send("Missing Stripe signature");
-      
-//     }
-   
-
-//     let event: Stripe.Event;
-
-//     try {
-//       event = stripe.webhooks.constructEvent(
-//         req.body,
-//         sig,
-//         process.env.STRIPE_WEBHOOK_SECRET!
-//       );
-
-//        console.log(" Webhook event received:", event.type);
-//     } catch (err: any) {
-//       console.error("Webhook signature verification failed:", err.message);
-//       return res.status(400).send(`Webhook Error: ${err.message}`);
-//     }
-
-//     if (event.type === "payment_intent.succeeded") {
-//       const paymentIntent = event.data.object as Stripe.PaymentIntent;
-//       const orderId = paymentIntent.metadata?.orderId;
-
-//       if (orderId) {
-//         try {
-//           await prisma.order.update({
-//             where: { id: orderId },
-//             data: {
-//               isPaid: true,
-//               paymentIntentId: paymentIntent.id,
-//               paidAt: new Date(),
-//             },
-//           });
-//           console.log(`Order ${orderId} marked as paid.`);
-//         } catch (err) {
-//           console.error("Failed to update order:", err);
-//           return res.status(500).send("Failed to update order");
-//         }
-//       } else {
-//         console.warn("Order ID not found in payment metadata");
-//       }
-//     }
-
-//     res.status(200).send("Received");
-//   }
-// );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 router.post("/", async (req: any, res: any) => {
   const sig = req.headers["stripe-signature"];
 
   if (!sig) {
-    console.error(" No Stripe signature found!");
-    return res.status(400).send("Webhook Error: No signature.");
+    console.log("⚠️ Missing Stripe signature");
+    return res.status(400).send("Missing Stripe signature");
   }
+
+  let event: Stripe.Event;
 
   try {
-    const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
-    console.log(" Webhook received:", event.type);
-    console.log(" Event Data:", JSON.stringify(event, null, 2));
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
 
-    if (event.type === "payment_intent.succeeded")  {
-      const session = event.data.object as Stripe.PaymentIntent;
+    console.log("✅ Webhook event received:", event.type);
+  } catch (err: any) {
+    console.error("❌ Webhook signature verification failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
 
-      console.log(" Payment Successful for Session:", session.id);
-      console.log("🔹 Metadata:", session.metadata);
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session;
+    const orderId = session.metadata?.orderId;
 
-      const userId = session.metadata?.userId;
-      const orderId = session.metadata?.orderId;
-
-      if (!userId || !orderId) {
-        console.error(" Missing userId or orderId in metadata!");
-        return res.status(400).json({ error: "Invalid metadata" });
-      }
-
-      console.log("🔹 Searching for order with ID:", orderId);
-      const order = await prisma.order.findUnique({ where: { id: orderId } });
-
-      if (!order) {
-        console.error(" Order not found:", orderId);
-        return res.status(400).json({ error: "Order not found" });
-      }
-
-      console.log(" Order Found:", order);
-
-      //  Update Order Status
-      console.log("🔹 Updating Order Status...");
-      await prisma.order.update({
-        where: { id: order.id },
-        data: { status: "Paid" },
-      });
-      console.log(" Order Updated!");
-
-      //  Store Payment Details
-      console.log(" Storing Payment Details...");
- 
-
-      console.log(" Payment Details Stored Successfully!");
+    if (!orderId) {
+      console.warn("⚠️ Order ID missing in metadata");
+      return res.status(400).send("Missing orderId in metadata");
     }
 
-    res.status(200).json({ received: true });
-  } catch (err: any) {
-    console.error(" Webhook error:", err);
-    res.status(400).send(`Webhook Error: ${err.message}`);
+    try {
+      await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          isPaid: true,
+          paymentIntentId: session.payment_intent?.toString() ?? "",
+          paidAt: new Date(),
+        },
+      });
+
+      console.log(`✅ Order ${orderId} marked as paid.`);
+    } catch (err) {
+      console.error("❌ Failed to update order:", err);
+      return res.status(500).send("Failed to update order");
+    }
   }
+
+  res.status(200).send("Webhook received");
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
