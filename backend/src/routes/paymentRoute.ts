@@ -283,7 +283,7 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
 
 
 
-
+export default router;
 
 
 
@@ -424,7 +424,7 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
 
 
 
-export default router;
+
 
 
 
