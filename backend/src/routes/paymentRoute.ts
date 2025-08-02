@@ -147,43 +147,43 @@ router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req
 /**
  *  Create Checkout Session Route
  */
-// router.post("/create-checkout-session", async (req: any, res: any) => {
-//   try {
-//     const { items, userId,restaurantId } = req.body;
+router.post("/create-checkout-session", async (req: any, res: any) => {
+  try {
+    const { items, userId,restaurantId } = req.body;
 
-//     if (!userId) return res.status(400).json({ error: "User ID is required" });
-//     // if (!restaurantId) return res.status(400).json({ error: "Restaurant ID is required" });
+    if (!userId) return res.status(400).json({ error: "User ID is required" });
+    // if (!restaurantId) return res.status(400).json({ error: "Restaurant ID is required" });
 
-//     if (!items || !Array.isArray(items)) return res.status(400).json({ error: "Invalid items" });
+    if (!items || !Array.isArray(items)) return res.status(400).json({ error: "Invalid items" });
 
-//     //  Convert items to Stripe line_items
-//     const lineItems = items.map((item: any) => ({
-//       price_data: {
-//         currency: "inr",
-//         product_data: { name: item.name },
-//         unit_amount: Math.max(item.price * 100, 5000), // Minimum ₹50
-//       },
-//       quantity: item.quantity,
-//     }));
+    //  Convert items to Stripe line_items
+    const lineItems = items.map((item: any) => ({
+      price_data: {
+        currency: "inr",
+        product_data: { name: item.name },
+        unit_amount: Math.max(item.price * 100, 5000), // Minimum ₹50
+      },
+      quantity: item.quantity,
+    }));
 
-//     //  Calculate total price
-//     const totalAmount = lineItems.reduce((sum, item) => sum + item.price_data.unit_amount * item.quantity, 0);
+    //  Calculate total price
+    const totalAmount = lineItems.reduce((sum, item) => sum + item.price_data.unit_amount * item.quantity, 0);
 
-//     if (totalAmount < 5000) {
-//       return res.status(400).json({ error: "Minimum order amount must be ₹50." });
-//     }
+    if (totalAmount < 5000) {
+      return res.status(400).json({ error: "Minimum order amount must be ₹50." });
+    }
 
-//     //  Create Order in Database
-//     console.log("🔹 Creating Order in DB...");
-//     const order = await prisma.order.create({
-//       data: {
-//         userId: userId,
-//         status: "Pending",
-//         totalPrice: totalAmount / 100, // Convert to INR
-//         // restaurantId: restaurantId,
-//       },
-//     });
-//     console.log(" Order Created with ID:", order.id);
+    //  Create Order in Database
+    console.log("🔹 Creating Order in DB...");
+    const order = await prisma.order.create({
+      data: {
+        userId: userId,
+        status: "Pending",
+        totalPrice: totalAmount / 100, // Convert to INR
+        // restaurantId: restaurantId,
+      },
+    });
+    console.log(" Order Created with ID:", order.id);
 
 //     // await generateRecommendationsAndUpdateDB(userId);
 
@@ -256,78 +256,51 @@ router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req
 
 
 
-//     //  Create Stripe Checkout Session
-//     console.log("🔹 Creating Stripe Checkout Session...");
-//     const session = await stripe.checkout.sessions.create({
-//       payment_method_types: ["card"],
-//       line_items: lineItems,
-//       mode: "payment",
-//       success_url: `${process.env.FRONTEND_URL }/success?session_id={CHECKOUT_SESSION_ID}`,
-//       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
-//       metadata: {
-//         userId,
-//         orderId: order.id, // Store orderId in metadata
-//       },
-//     });
-
-//     console.log(" Stripe Session Created:", session.id);
-//     res.status(200).json({ url: session.url });
-//   } 
-  
-//   catch (err: any) {
-//     console.error(" Error in /create-checkout-session:", err.message);
-//     res.status(500).json({ error: err.message || "Internal Server Error" });
-//   }
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-router.post("/create-checkout-session", async (req:any, res:any) => {
-  try {
-    const { orderId, lineItems, userId } = req.body;
-
-    if (!orderId || !lineItems || !userId) {
-      return res.status(400).json({ error: "Missing orderId, lineItems or userId" });
-    }
-
-    // ✅ DO NOT create a new order here
-
+    //  Create Stripe Checkout Session
+    console.log("🔹 Creating Stripe Checkout Session...");
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      mode: "payment",
       line_items: lineItems,
-      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      mode: "payment",
+      success_url: `${process.env.FRONTEND_URL }/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
       metadata: {
-        orderId,
         userId,
+        orderId: order.id, // Store orderId in metadata
       },
     });
 
-    return res.status(200).json({ url: session.url });
-  } catch (err) {
-    console.error("Checkout session error:", err);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.log(" Stripe Session Created:", session.id);
+    res.status(200).json({ url: session.url });
+  } 
+  
+  catch (err: any) {
+    console.error(" Error in /create-checkout-session:", err.message);
+    res.status(500).json({ error: err.message || "Internal Server Error" });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
