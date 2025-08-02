@@ -185,6 +185,19 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
     });
     console.log(" Order Created with ID:", order.id);
 
+
+    // Save each item as OrderItem
+await Promise.all(items.map(async (item: any) => {
+  await prisma.orderItem.create({
+    data: {
+      menuId: item.menuId,
+      quantity: item.quantity,
+      orderId: order.id,
+    },
+  });
+}));
+
+
 //     // await generateRecommendationsAndUpdateDB(userId);
 
 
