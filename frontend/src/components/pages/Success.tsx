@@ -13,7 +13,7 @@ const PaymentSuccess = () => {
       <div className="bg-white p-8 rounded-lg shadow-md text-center">
 
         <button
-          onClick={() => navigate('/SubmitRating')}
+          onClick={() => navigate('/')}
           className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
         >
           Thankyou For Purchasing
