@@ -147,92 +147,88 @@ router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req
 /**
  *  Create Checkout Session Route
  */
-router.post("/create-checkout-session", async (req: any, res: any) => {
-  try {
-    const { items, userId,restaurantId } = req.body;
+// router.post("/create-checkout-session", async (req: any, res: any) => {
+//   try {
+//     const { items, userId,restaurantId } = req.body;
 
-    if (!userId) return res.status(400).json({ error: "User ID is required" });
-    // if (!restaurantId) return res.status(400).json({ error: "Restaurant ID is required" });
+//     if (!userId) return res.status(400).json({ error: "User ID is required" });
+//     // if (!restaurantId) return res.status(400).json({ error: "Restaurant ID is required" });
 
-    if (!items || !Array.isArray(items)) return res.status(400).json({ error: "Invalid items" });
+//     if (!items || !Array.isArray(items)) return res.status(400).json({ error: "Invalid items" });
 
-    //  Convert items to Stripe line_items
-    const lineItems = items.map((item: any) => ({
-      price_data: {
-        currency: "inr",
-        product_data: { name: item.name },
-        unit_amount: Math.max(item.price * 100, 5000), // Minimum ₹50
-      },
-      quantity: item.quantity,
-    }));
+//     //  Convert items to Stripe line_items
+//     const lineItems = items.map((item: any) => ({
+//       price_data: {
+//         currency: "inr",
+//         product_data: { name: item.name },
+//         unit_amount: Math.max(item.price * 100, 5000), // Minimum ₹50
+//       },
+//       quantity: item.quantity,
+//     }));
 
-    //  Calculate total price
-    const totalAmount = lineItems.reduce((sum, item) => sum + item.price_data.unit_amount * item.quantity, 0);
+//     //  Calculate total price
+//     const totalAmount = lineItems.reduce((sum, item) => sum + item.price_data.unit_amount * item.quantity, 0);
 
-    if (totalAmount < 5000) {
-      return res.status(400).json({ error: "Minimum order amount must be ₹50." });
-    }
-
-    //  Create Order in Database
-    console.log("🔹 Creating Order in DB...");
-    const order = await prisma.order.create({
-      data: {
-        userId: userId,
-        status: "Pending",
-        totalPrice: totalAmount / 100, // Convert to INR
-        // restaurantId: restaurantId,
-      },
-    });
-    console.log(" Order Created with ID:", order.id);
-
-    // await generateRecommendationsAndUpdateDB(userId);
-
-
-
-
-  // Utility function to generate and update recommendations
-// async function generateRecommendationsAndUpdateDB(userId: string) {
-//   // Fetch past order items for the user
-//   const userOrders = await prisma.order.findMany({
-//     where: { userId },
-//     include: {
-//       orderItems: {
-//         include: { menu: true }
-//       }
+//     if (totalAmount < 5000) {
+//       return res.status(400).json({ error: "Minimum order amount must be ₹50." });
 //     }
-//   });
 
-  // Flatten all product IDs purchased by the user
-  // const purchasedProductIds = userOrders
-  //   .flatMap(order => order.orderItems.map(item => item.menuId));
+//     //  Create Order in Database
+//     console.log("🔹 Creating Order in DB...");
+//     const order = await prisma.order.create({
+//       data: {
+//         userId: userId,
+//         status: "Pending",
+//         totalPrice: totalAmount / 100, // Convert to INR
+//         // restaurantId: restaurantId,
+//       },
+//     });
+//     console.log(" Order Created with ID:", order.id);
 
-  // // Count frequency or apply your own logic for recommendation
-  // const freqMap: Record<string, number> = {};
-  // for (const id of purchasedProductIds) {
-  //   freqMap[id] = (freqMap[id] || 0) + 1;
-  // }
-
-  // // Sort productIds by frequency (most purchased first)
-  // const sortedProductIds = Object.keys(freqMap).sort(
-  //   (a, b) => freqMap[b] - freqMap[a]
-  // );
-
-  // Save/update recommendations for the user
-//   await prisma.recommendation.upsert({
-//     where: { userId },
-//     update: { products: sortedProductIds },
-//     create: {
-//       userId,
-//       products: sortedProductIds
-//     },
-//   });
-
-//   console.log("✅ Recommendations updated for user:", userId);
-// }
+//     // await generateRecommendationsAndUpdateDB(userId);
 
 
 
 
+//   // Utility function to generate and update recommendations
+// // async function generateRecommendationsAndUpdateDB(userId: string) {
+// //   // Fetch past order items for the user
+// //   const userOrders = await prisma.order.findMany({
+// //     where: { userId },
+// //     include: {
+// //       orderItems: {
+// //         include: { menu: true }
+// //       }
+// //     }
+// //   });
+
+//   // Flatten all product IDs purchased by the user
+//   // const purchasedProductIds = userOrders
+//   //   .flatMap(order => order.orderItems.map(item => item.menuId));
+
+//   // // Count frequency or apply your own logic for recommendation
+//   // const freqMap: Record<string, number> = {};
+//   // for (const id of purchasedProductIds) {
+//   //   freqMap[id] = (freqMap[id] || 0) + 1;
+//   // }
+
+//   // // Sort productIds by frequency (most purchased first)
+//   // const sortedProductIds = Object.keys(freqMap).sort(
+//   //   (a, b) => freqMap[b] - freqMap[a]
+//   // );
+
+//   // Save/update recommendations for the user
+// //   await prisma.recommendation.upsert({
+// //     where: { userId },
+// //     update: { products: sortedProductIds },
+// //     create: {
+// //       userId,
+// //       products: sortedProductIds
+// //     },
+// //   });
+
+// //   console.log("✅ Recommendations updated for user:", userId);
+// // }
 
 
 
@@ -256,29 +252,33 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
 
 
 
-    //  Create Stripe Checkout Session
-    console.log("🔹 Creating Stripe Checkout Session...");
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      mode: "payment",
-      success_url: `${process.env.FRONTEND_URL }/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/cancel`,
-      metadata: {
-        userId,
-        orderId: order.id, // Store orderId in metadata
-      },
-    });
 
-    console.log(" Stripe Session Created:", session.id);
-    res.status(200).json({ url: session.url });
-  } 
+
+
+
+//     //  Create Stripe Checkout Session
+//     console.log("🔹 Creating Stripe Checkout Session...");
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ["card"],
+//       line_items: lineItems,
+//       mode: "payment",
+//       success_url: `${process.env.FRONTEND_URL }/success?session_id={CHECKOUT_SESSION_ID}`,
+//       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+//       metadata: {
+//         userId,
+//         orderId: order.id, // Store orderId in metadata
+//       },
+//     });
+
+//     console.log(" Stripe Session Created:", session.id);
+//     res.status(200).json({ url: session.url });
+//   } 
   
-  catch (err: any) {
-    console.error(" Error in /create-checkout-session:", err.message);
-    res.status(500).json({ error: err.message || "Internal Server Error" });
-  }
-});
+//   catch (err: any) {
+//     console.error(" Error in /create-checkout-session:", err.message);
+//     res.status(500).json({ error: err.message || "Internal Server Error" });
+//   }
+// });
 
 
 
