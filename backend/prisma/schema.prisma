@@ -21,32 +21,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// model User {
+//   id          String   @id @default(cuid())
+//   name        String
+//   email       String   @unique
+//   password    String
+//   role        String   @default("user")  // Role field, default is 'user'
+//   orders      Order[]
+//   payments    Payment[]
+//   ratings     Rating[]
+
+  
+
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+// }
+
+
+
 model User {
-  id          String   @id @default(cuid())
-  name        String
-  email       String   @unique
-  password    String
-  role        String   @default("user")  // Role field, default is 'user'
-  orders      Order[]
-  payments    Payment[]
-  ratings     Rating[]
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  password  String
+  role      String     @default("user")
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  orders    Order[]
+  payments  Payment[]
+  ratings   Rating[]
+
+
+  restaurants Restaurant[] @relation("AdminRestaurants")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Restaurant {
-  id          String   @id @default(cuid())
-  name        String
-  address     String
-  image       String?
-  menuItems   Menu[]
-  // userId      String?
-  averageRating  Float?   @default(0) // New field
-  ratings     Rating[]   // Relation to store ratings
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
 
 
 
@@ -63,12 +73,39 @@ model Restaurant {
 //   address     String
 //   image       String?
 //   menuItems   Menu[]
-//   userId      String?
+//   // userId      String?
 //   averageRating  Float?   @default(0) // New field
 //   ratings     Rating[]   // Relation to store ratings
 //   createdAt   DateTime @default(now())
 //   updatedAt   DateTime @updatedAt
 // }
+
+
+
+
+
+
+
+
+
+
+model Restaurant {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  image       String?
+  averageRating  Float? @default(0)
+
+  adminId     String?
+  admin       User?     @relation("AdminRestaurants", fields: [adminId], references: [id])
+
+  menuItems   Menu[]
+  ratings     Rating[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 
 
 
