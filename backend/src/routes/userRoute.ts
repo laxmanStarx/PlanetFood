@@ -198,7 +198,7 @@ import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"; // Import bcrypt
 import { JWT_PASSWORD } from "../config";
-// import { authenticateJWT } from "../middleware/authenticateJWT";
+import { authenticateJWT } from "../middleware/authenticateJWT";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -317,9 +317,9 @@ router.post("/login", async (req:any, res:any) => {
 
 
 
-// router.get("/role", authenticateJWT, async (req: any, res: any) => {
-//   res.status(200).json({ role: req.user.role });
-// });
+router.get("/role", authenticateJWT, async (req: any, res: any) => {
+  res.status(200).json({ role: req.user.role });
+});
 
 
 
