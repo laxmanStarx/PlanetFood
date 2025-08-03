@@ -7,6 +7,7 @@ const RestaurantForm: React.FC = () => {
     address: "",
     image: "",
   });
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const navigate = useNavigate();
 
@@ -19,7 +20,7 @@ const RestaurantForm: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/restaurants", {
+      const response = await fetch(`${backendUrl}/restaurants`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(restaurant),
