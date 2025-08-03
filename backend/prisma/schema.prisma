@@ -35,40 +35,40 @@ model User {
   updatedAt   DateTime @updatedAt
 }
 
-// model Restaurant {
-//   id          String   @id @default(cuid())
-//   name        String
-//   address     String
-//   image       String?
-//   menuItems   Menu[]
-//   // userId      String?
-//   averageRating  Float?   @default(0) // New field
-//   ratings     Rating[]   // Relation to store ratings
-//   createdAt   DateTime @default(now())
-//   updatedAt   DateTime @updatedAt
-// }
-
-
-
-
-
-
-
-
-
-
 model Restaurant {
   id          String   @id @default(cuid())
   name        String
   address     String
   image       String?
   menuItems   Menu[]
-  userId      String?
+  // userId      String?
   averageRating  Float?   @default(0) // New field
   ratings     Rating[]   // Relation to store ratings
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+
+
+
+
+
+
+
+
+
+// model Restaurant {
+//   id          String   @id @default(cuid())
+//   name        String
+//   address     String
+//   image       String?
+//   menuItems   Menu[]
+//   userId      String?
+//   averageRating  Float?   @default(0) // New field
+//   ratings     Rating[]   // Relation to store ratings
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+// }
 
 
 
