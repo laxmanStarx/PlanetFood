@@ -198,6 +198,7 @@ import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"; // Import bcrypt
 import { JWT_PASSWORD } from "../config";
+import { authenticateJWT } from "../middleware/authenticateJWT";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -291,27 +292,41 @@ router.post("/login", async (req:any, res:any) => {
 
 
 
-router.get("/role", async (req: any, res: any) => {
-  const token = req.headers.authorization?.split(" ")[1];
+// router.get("/role", async (req: any, res: any) => {
+//   const token = req.headers.authorization?.split(" ")[1];
   
-  if (!token) {
-    return res.status(401).json({ error: "Unauthorized: No token provided" });
-  }
+//   if (!token) {
+//     return res.status(401).json({ error: "Unauthorized: No token provided" });
+//   }
 
-  try {
-    const decoded: any = jwt.verify(token, JWT_PASSWORD!);
-    const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+//   try {
+//     const decoded: any = jwt.verify(token, JWT_PASSWORD!);
+//     const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
 
-    res.status(200).json({ role: user.role });
-  } catch (error) {
-    console.error("Error fetching user role:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
+//     res.status(200).json({ role: user.role });
+//   } catch (error) {
+//     console.error("Error fetching user role:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
+
+
+
+
+router.get("/role", authenticateJWT, async (req: any, res: any) => {
+  res.status(200).json({ role: req.user.role });
 });
+
+
+
+
+
+
+
 
 
 

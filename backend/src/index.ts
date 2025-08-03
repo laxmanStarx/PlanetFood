@@ -74,3 +74,18 @@ cloudinary.v2.config({
   api_key: process.env.CLOUDINARY_API_KEY, // Add to your .env
   api_secret: process.env.CLOUDINARY_API_SECRET, // Add to your .env
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// i had different menu id,  for different restaurants, based on that menuId and price tag, i want to show total sales with amount in admin dashboard , and this sales only visible to admins only

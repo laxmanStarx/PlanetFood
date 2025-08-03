@@ -74,3 +74,28 @@ export const isAdmin = router.post("/assign-admin", async (req: any, res: any) =
 //     }
 
 // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

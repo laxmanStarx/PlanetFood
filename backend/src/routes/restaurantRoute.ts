@@ -89,6 +89,7 @@ router.post("/restaurants", async (req:any, res:any) => {
     return res.status(400).json({ error: "Name and address are required" });
   }
 
+
   try {
     const newRestaurant = await prisma.restaurant.create({
       data: {
