@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 
@@ -6,14 +6,35 @@ import axios from "axios";
 
 
 const AddFoodForm: React.FC = () => {
+  const [restaurantId, setRestaurantId] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
-  const [restaurantId, setRestaurantId] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+  useEffect(() => {
+    const fetchRestaurant = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const response = await axios.get(`${backendUrl}/admin/restaurant`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setRestaurantId(response.data.id); // ✅ Set the restaurantId automatically
+      } catch (err: any) {
+        console.error("Failed to fetch restaurant for admin", err);
+        setError("Could not fetch your restaurant.");
+      }
+    };
+
+    fetchRestaurant();
+  }, []);
 
   
 const handleSubmit = async (e: React.FormEvent) => {
