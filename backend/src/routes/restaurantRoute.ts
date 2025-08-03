@@ -84,35 +84,29 @@ router.get("/restaurants", async (req, res) => {
   
 // POST to add a new restaurant
 // POST to add a new restaurant (admin only)
-router.post("/restaurants", authenticateJWT, async (req: any, res: any) => {
-  const { name, address, image } = req.body;
-  const { role, userId } = req.user; // decoded by authenticateJWT middleware
+router.get("/admin/restaurant", authenticateJWT, async (req: any, res:any) => {
+  const { userId, role } = req.user;
 
   if (role !== "admin") {
-    return res.status(403).json({ error: "Only admins can add restaurants" });
-  }
-
-  if (!name || !address) {
-    return res.status(400).json({ error: "Name and address are required" });
+    return res.status(403).json({ error: "Only admin can access this." });
   }
 
   try {
-    const newRestaurant = await prisma.restaurant.create({
-      data: {
-        name,
-        address,
-        image: image || null,
-        // Save the admin userId for tracking
-        adminId: userId,
-      },
+    const restaurant = await prisma.restaurant.findFirst({
+      where: { adminId: userId },
     });
 
-    res.status(201).json(newRestaurant);
-  } catch (error) {
-    console.error("Error adding restaurant:", error);
-    res.status(500).json({ error: "Failed to add restaurant" });
+    if (!restaurant) {
+      return res.status(404).json({ error: "No restaurant found for this admin." });
+    }
+
+    res.json(restaurant);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch restaurant" });
   }
 });
+
 
 
 
