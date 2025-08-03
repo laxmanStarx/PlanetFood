@@ -6,16 +6,14 @@ import axios from "axios";
 
 
 const AddFoodForm: React.FC = () => {
-  const [restaurantId, setRestaurantId] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
+  const [restaurantId, setRestaurantId] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
- 
 
   
 const handleSubmit = async (e: React.FormEvent) => {
@@ -47,7 +45,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     setError(err.response?.data?.error || "Failed to add food item.");
   }
 };
-
 
   return (
     <div>
@@ -90,7 +87,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             required
           />
         </div>
-        <div>
+        {/* <div>
           <label>Restaurant ID:</label>
           <input
             type="text"
@@ -98,7 +95,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             onChange={(e) => setRestaurantId(e.target.value)}
             required
           />
-        </div>
+        </div> */}
         <button type="submit">Add Food</button>
       </form>
     </div>
