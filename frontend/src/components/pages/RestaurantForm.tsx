@@ -16,27 +16,38 @@ const RestaurantForm: React.FC = () => {
     setRestaurant({ ...restaurant, [name]: value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    try {
-      const response = await fetch(`${backendUrl}/restaurants`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(restaurant),
-      });
+  const token = localStorage.getItem("token"); // Or from your auth context
 
-      if (!response.ok) {
-        throw new Error("Failed to add restaurant");
-      }
+  if (!token) {
+    alert("Please log in as admin to add a restaurant.");
+    return;
+  }
 
-      alert("Restaurant added successfully!");
-      setRestaurant({ name: "", address: "", image: "" });
-    } catch (error) {
-      console.error("Error adding restaurant:", error);
-      alert("Failed to add restaurant.");
+  try {
+    const response = await fetch(`${backendUrl}/restaurants`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // ✅ Add token for auth
+      },
+      body: JSON.stringify(restaurant),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to add restaurant");
     }
-  };
+
+    alert("Restaurant added successfully!");
+    setRestaurant({ name: "", address: "", image: "" });
+  } catch (error: any) {
+    console.error("Error adding restaurant:", error);
+    alert(error.message || "Failed to add restaurant.");
+  }
+};
 
   return (
     <div className="container mx-auto">
