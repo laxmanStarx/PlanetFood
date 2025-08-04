@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const client_1 = require("@prisma/client");
+const authenticateJWT_1 = require("../middleware/authenticateJWT");
 const router = (0, express_1.Router)();
 const prisma = new client_1.PrismaClient();
 router.get("/restaurants", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -68,24 +69,24 @@ router.get("/menu/:restaurantId", (req, res) => __awaiter(void 0, void 0, void 0
 //   }
 // });
 // POST to add a new restaurant
-router.post("/restaurants", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, address, image } = req.body;
-    if (!name || !address) {
-        return res.status(400).json({ error: "Name and address are required" });
+// POST to add a new restaurant (admin only)
+router.get("/admin/restaurant", authenticateJWT_1.authenticateJWT, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId, role } = req.user;
+    if (role !== "admin") {
+        return res.status(403).json({ error: "Only admin can access this." });
     }
     try {
-        const newRestaurant = yield prisma.restaurant.create({
-            data: {
-                name,
-                address,
-                image: image || null, // Optional field
-            },
+        const restaurant = yield prisma.restaurant.findFirst({
+            where: { adminId: userId },
         });
-        res.status(201).json(newRestaurant);
+        if (!restaurant) {
+            return res.status(404).json({ error: "No restaurant found for this admin." });
+        }
+        res.json(restaurant);
     }
-    catch (error) {
-        console.error("Error adding restaurant:", error);
-        res.status(500).json({ error: "Failed to add restaurant" });
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to fetch restaurant" });
     }
 }));
 router.get("/api/restaurant/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {

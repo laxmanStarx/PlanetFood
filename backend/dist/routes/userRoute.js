@@ -155,6 +155,7 @@ const client_1 = require("@prisma/client");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt")); // Import bcrypt
 const config_1 = require("../config");
+const authenticateJWT_1 = require("../middleware/authenticateJWT");
 const router = (0, express_1.Router)();
 const prisma = new client_1.PrismaClient();
 // User signup
@@ -228,24 +229,25 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(500).json({ error: "Failed to login" });
     }
 }));
-router.get("/role", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
-    if (!token) {
-        return res.status(401).json({ error: "Unauthorized: No token provided" });
-    }
-    try {
-        const decoded = jsonwebtoken_1.default.verify(token, config_1.JWT_PASSWORD);
-        const user = yield prisma.user.findUnique({ where: { id: decoded.userId } });
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        res.status(200).json({ role: user.role });
-    }
-    catch (error) {
-        console.error("Error fetching user role:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
+// router.get("/role", async (req: any, res: any) => {
+//   const token = req.headers.authorization?.split(" ")[1];
+//   if (!token) {
+//     return res.status(401).json({ error: "Unauthorized: No token provided" });
+//   }
+//   try {
+//     const decoded: any = jwt.verify(token, JWT_PASSWORD!);
+//     const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+//     res.status(200).json({ role: user.role });
+//   } catch (error) {
+//     console.error("Error fetching user role:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
+router.get("/role", authenticateJWT_1.authenticateJWT, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.status(200).json({ role: req.user.role });
 }));
 router.get("/menu", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

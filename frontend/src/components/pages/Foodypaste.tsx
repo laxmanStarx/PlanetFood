@@ -15,6 +15,10 @@ const Foodypaste = () => {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
+
+  const date = new Date();
+  const time = date.getHours();
+
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
@@ -132,7 +136,10 @@ const Foodypaste = () => {
     </div>
 
     {/* Optional: status or distance */}
-    <p className="text-sm text-red-600 mt-1">Opens tomorrow at 12noon</p>
+    { time > 24 && time <= 12 ? ( <p className="text-sm text-red-600 mt-1">Opens tomorrow at 12noon</p>):  <p className="text-sm text-green-600 mt-1">Opened</p> }
+  
+    {/* <p className="text-sm text-red-600 mt-1">Opens tomorrow at 12noon</p> */}
+
   </div>
 </div>
         ))}

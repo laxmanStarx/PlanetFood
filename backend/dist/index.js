@@ -30,7 +30,7 @@ app.use(express_1.default.json());
 app.use('/api/v1/user', userRoute_1.default);
 app.use('/', restaurantRoute_1.default);
 app.use('/foodRoute', foodRoute_1.default);
-app.use("/payment", paymentRoute_1.default);
+app.use("/paymentorder", paymentRoute_1.default);
 app.use('/api/v1/admin', adminRoute_1.default);
 app.use('/api/v1/isAdmin', isAdmin_1.isAdmin);
 app.use('/', cartRoute_1.default);
@@ -48,3 +48,4 @@ cloudinary_1.default.v2.config({
     api_key: process.env.CLOUDINARY_API_KEY, // Add to your .env
     api_secret: process.env.CLOUDINARY_API_SECRET, // Add to your .env
 });
+// i had different menu id,  for different restaurants, based on that menuId and price tag, i want to show total sales with amount in admin dashboard , and this sales only visible to admins only

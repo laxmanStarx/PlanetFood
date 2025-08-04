@@ -50,6 +50,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // export default router;
 const express_1 = __importDefault(require("express"));
 const stripe_1 = __importDefault(require("stripe"));
+const body_parser_1 = __importDefault(require("body-parser"));
 const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
@@ -63,60 +64,62 @@ router.use(express_1.default.json());
 /**
  *  Stripe Webhook Route (Uses raw body)
  */
-// router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req: any, res: any) => {
-//   const sig = req.headers["stripe-signature"];
-//   if (!sig) {
-//     console.error(" No Stripe signature found!");
-//     return res.status(400).send("Webhook Error: No signature.");
-//   }
-//   try {
-//     const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
-//     console.log(" Webhook received:", event.type);
-//     console.log(" Event Data:", JSON.stringify(event, null, 2));
-//     if (event.type === "checkout.session.completed") {
-//       const session = event.data.object as Stripe.Checkout.Session;
-//       console.log(" Payment Successful for Session:", session.id);
-//       console.log("🔹 Metadata:", session.metadata);
-//       const userId = session.metadata?.userId;
-//       const orderId = session.metadata?.orderId;
-//       if (!userId || !orderId) {
-//         console.error(" Missing userId or orderId in metadata!");
-//         return res.status(400).json({ error: "Invalid metadata" });
-//       }
-//       console.log("🔹 Searching for order with ID:", orderId);
-//       const order = await prisma.order.findUnique({ where: { id: orderId } });
-//       if (!order) {
-//         console.error(" Order not found:", orderId);
-//         return res.status(400).json({ error: "Order not found" });
-//       }
-//       console.log(" Order Found:", order);
-//       //  Update Order Status
-//       console.log("🔹 Updating Order Status...");
-//       await prisma.order.update({
-//         where: { id: order.id },
-//         data: { status: "Paid" },
-//       });
-//       console.log(" Order Updated!");
-//       //  Store Payment Details
-//       console.log(" Storing Payment Details...");
-//       await prisma.payment.create({
-//         data: {
-//           userId,
-//           orderId,
-//           stripePaymentId: session.id,
-//           amount: session.amount_total! / 100,
-//           currency: session.currency!,
-//           status: "Completed",
-//         },
-//       });
-//       console.log(" Payment Details Stored Successfully!");
-//     }
-//     res.status(200).json({ received: true });
-//   } catch (err: any) {
-//     console.error(" Webhook error:", err);
-//     res.status(400).send(`Webhook Error: ${err.message}`);
-//   }
-// });
+router.post("/webhook", body_parser_1.default.raw({ type: "application/json" }), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const sig = req.headers["stripe-signature"];
+    if (!sig) {
+        console.error(" No Stripe signature found!");
+        return res.status(400).send("Webhook Error: No signature.");
+    }
+    try {
+        const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+        console.log(" Webhook received:", event.type);
+        console.log(" Event Data:", JSON.stringify(event, null, 2));
+        if (event.type === "checkout.session.completed") {
+            const session = event.data.object;
+            console.log(" Payment Successful for Session:", session.id);
+            console.log("🔹 Metadata:", session.metadata);
+            const userId = (_a = session.metadata) === null || _a === void 0 ? void 0 : _a.userId;
+            const orderId = (_b = session.metadata) === null || _b === void 0 ? void 0 : _b.orderId;
+            if (!userId || !orderId) {
+                console.error(" Missing userId or orderId in metadata!");
+                return res.status(400).json({ error: "Invalid metadata" });
+            }
+            console.log("🔹 Searching for order with ID:", orderId);
+            const order = yield prisma.order.findUnique({ where: { id: orderId } });
+            if (!order) {
+                console.error(" Order not found:", orderId);
+                return res.status(400).json({ error: "Order not found" });
+            }
+            console.log(" Order Found:", order);
+            //  Update Order Status
+            console.log("🔹 Updating Order Status...");
+            yield prisma.order.update({
+                where: { id: order.id },
+                data: { status: "Paid" },
+            });
+            console.log(" Order Updated!");
+            //  Store Payment Details
+            console.log(" Storing Payment Details...");
+            yield prisma.payment.create({
+                data: {
+                    userId,
+                    orderId,
+                    stripePaymentId: session.id,
+                    amount: session.amount_total / 100,
+                    currency: session.currency,
+                    status: "Completed",
+                },
+            });
+            console.log(" Payment Details Stored Successfully!");
+        }
+        res.status(200).json({ received: true });
+    }
+    catch (err) {
+        console.error(" Webhook error:", err);
+        res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+}));
 /**
  *  Create Checkout Session Route
  */
@@ -153,41 +156,51 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
             },
         });
         console.log(" Order Created with ID:", order.id);
-        // await generateRecommendationsAndUpdateDB(userId);
-        // Utility function to generate and update recommendations
-        // async function generateRecommendationsAndUpdateDB(userId: string) {
-        //   // Fetch past order items for the user
-        //   const userOrders = await prisma.order.findMany({
-        //     where: { userId },
-        //     include: {
-        //       orderItems: {
-        //         include: { menu: true }
-        //       }
-        //     }
-        //   });
-        // Flatten all product IDs purchased by the user
-        // const purchasedProductIds = userOrders
-        //   .flatMap(order => order.orderItems.map(item => item.menuId));
-        // // Count frequency or apply your own logic for recommendation
-        // const freqMap: Record<string, number> = {};
-        // for (const id of purchasedProductIds) {
-        //   freqMap[id] = (freqMap[id] || 0) + 1;
-        // }
-        // // Sort productIds by frequency (most purchased first)
-        // const sortedProductIds = Object.keys(freqMap).sort(
-        //   (a, b) => freqMap[b] - freqMap[a]
-        // );
-        // Save/update recommendations for the user
-        //   await prisma.recommendation.upsert({
-        //     where: { userId },
-        //     update: { products: sortedProductIds },
-        //     create: {
-        //       userId,
-        //       products: sortedProductIds
-        //     },
-        //   });
-        //   console.log("✅ Recommendations updated for user:", userId);
-        // }
+        // Save each item as OrderItem
+        yield Promise.all(items.map((item) => __awaiter(void 0, void 0, void 0, function* () {
+            yield prisma.orderItem.create({
+                data: {
+                    menuId: item.menuId,
+                    quantity: item.quantity,
+                    orderId: order.id,
+                },
+            });
+        })));
+        //     // await generateRecommendationsAndUpdateDB(userId);
+        //   // Utility function to generate and update recommendations
+        // // async function generateRecommendationsAndUpdateDB(userId: string) {
+        // //   // Fetch past order items for the user
+        // //   const userOrders = await prisma.order.findMany({
+        // //     where: { userId },
+        // //     include: {
+        // //       orderItems: {
+        // //         include: { menu: true }
+        // //       }
+        // //     }
+        // //   });
+        //   // Flatten all product IDs purchased by the user
+        //   // const purchasedProductIds = userOrders
+        //   //   .flatMap(order => order.orderItems.map(item => item.menuId));
+        //   // // Count frequency or apply your own logic for recommendation
+        //   // const freqMap: Record<string, number> = {};
+        //   // for (const id of purchasedProductIds) {
+        //   //   freqMap[id] = (freqMap[id] || 0) + 1;
+        //   // }
+        //   // // Sort productIds by frequency (most purchased first)
+        //   // const sortedProductIds = Object.keys(freqMap).sort(
+        //   //   (a, b) => freqMap[b] - freqMap[a]
+        //   // );
+        //   // Save/update recommendations for the user
+        // //   await prisma.recommendation.upsert({
+        // //     where: { userId },
+        // //     update: { products: sortedProductIds },
+        // //     create: {
+        // //       userId,
+        // //       products: sortedProductIds
+        // //     },
+        // //   });
+        // //   console.log("✅ Recommendations updated for user:", userId);
+        // // }
         //  Create Stripe Checkout Session
         console.log("🔹 Creating Stripe Checkout Session...");
         const session = yield stripe.checkout.sessions.create({
@@ -209,6 +222,7 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
         res.status(500).json({ error: err.message || "Internal Server Error" });
     }
 }));
+exports.default = router;
 /**
  *  Stripe Webhook Route (Uses raw body)
  */
@@ -283,7 +297,6 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
 //     res.status(400).send(`Webhook Error: ${err.message}`);
 //   }
 // });
-exports.default = router;
 // export default router;
 // import express from "express";
 // import Stripe from "stripe";
