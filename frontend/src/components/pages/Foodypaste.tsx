@@ -34,7 +34,7 @@ const Foodypaste = () => {
   }, []);
 
   // Get unique categories from menu
-  const categories = ["All", ...Array.from(new Set(menu.map(item => item.category)))];
+  const categories = [ ...Array.from(new Set(menu.map(item => item.category)))];
 
   const navigate = useNavigate()
 
