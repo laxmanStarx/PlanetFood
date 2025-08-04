@@ -39,7 +39,7 @@ const Foodypaste = () => {
   const navigate = useNavigate()
 
   // Filtered menu based on selectedCategory
-  const filteredMenu = selectedCategory === "All"
+  const filteredMenu = selectedCategory === "Veg"
     ? menu
     : menu.filter(item => item.category === selectedCategory);
 
