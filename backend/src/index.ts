@@ -6,6 +6,7 @@ import adminRoute from "./routes/adminRoute";
 import jwt from "jsonwebtoken";
 import cors from 'cors'
 import { isAdmin } from "./middleware/isAdmin";
+
 import restaurantRoute from "./routes/restaurantRoute";
 import cartRoute from "./routes/cartRoute";
 import paymentRoute from "./routes/paymentRoute";
