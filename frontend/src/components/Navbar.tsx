@@ -1,181 +1,149 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../contextApi/CartContext";
 import { useState, useEffect } from "react";
-import RateUs from "./RateUs"
-
 import { IoBagAddOutline } from "react-icons/io5";
-// Define the User type
+import { FiMenu, FiX } from "react-icons/fi";
+import RateUs from "./RateUs";
+
 interface User {
   name: string;
   email: string;
-  // Add any other properties if needed
 }
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(false);
   const [showRateUs, setShowRateUs] = useState(false);
- 
-  const { cartItems = [],clearCart } = useCart();
   const [showCart, setShowCart] = useState(false);
-  const [user, setUser] = useState<User | null>(null); // Type the state as User or null
+  const [user, setUser] = useState<User | null>(null);
+
+  const { cartItems = [], clearCart } = useCart();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser)); // Parse and set user details
+      setUser(JSON.parse(storedUser));
     }
   }, []);
 
-  const handleToggleCart = () => {
-    setShowCart(!showCart);
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("user");
-    localStorage.removeItem("token"); // Remove token if stored
-    clearCart()
-    setUser(null); // Clear user state
-    navigate("/login"); // Redirect to login page
+    localStorage.removeItem("token");
+    clearCart();
+    setUser(null);
+    navigate("/login");
   };
 
-  const checkout = () => {
-    navigate("/checkout");
-  };
+  const checkout = () => navigate("/checkout");
 
-  const calculateTotalItems = () => {
-    return cartItems.reduce((total, item) => total + (item.quantity || 0), 0);
-  };
+  const calculateTotalItems = () =>
+    cartItems.reduce((total, item) => total + (item.quantity || 0), 0);
 
   return (
-    <nav className="flex items-center justify-between bg-white shadow-md shadow-blue-100 min-h-16 px-4">
-      <div className="text-3xl">
-
-        <button onClick={() => navigate("/")}>foodStarX</button>
-
-      </div>
-      <div className="flex items-center space-x-4">
-        <span onClick={() => navigate("/about")}>About Us</span>
-          <button
-        className="text-black cursor-pointer"
-        onClick={() => setShowRateUs(true)}
-      >
-        Rate Us
-      </button>
-
-      {/* {showRateUs && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative lg:max-w-[full]">
-            <button
-              onClick={() => setShowRateUs(false)}
-              className="absolute top-2 right-2 text-red-600 font-bold"
-            >
-              ✕
-            </button>
-            <RateUs onClose={() => setShowRateUs(false)} />
-          </div>
+    <nav className="bg-white shadow-md px-4 py-3">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        {/* Logo */}
+        <div className="text-2xl font-bold cursor-pointer" onClick={() => navigate("/")}>
+          foodStarX
         </div>
-      )} */}
-        <div className="relative">
 
+        {/* Hamburger Menu (Mobile) */}
+        <div className="lg:hidden">
+          <button onClick={() => setShowMenu(!showMenu)}>
+            {showMenu ? <FiX size={24} /> : <FiMenu size={24} />}
+          </button>
+        </div>
 
-                {showRateUs && (
+        {/* Nav Links (Desktop) */}
+        <div className="hidden lg:flex items-center space-x-6">
+          <span onClick={() => navigate("/about")} className="cursor-pointer">
+            About Us
+          </span>
+          <button onClick={() => setShowRateUs(true)} className="cursor-pointer">
+            Rate Us
+          </button>
+
+          {/* Cart */}
+          <div className="relative">
+            <button onClick={() => setShowCart(!showCart)} className="flex items-center space-x-1 bg-green-400 px-3 py-1 rounded-full">
+              <IoBagAddOutline />
+              <span>{calculateTotalItems()}</span>
+            </button>
+            {showCart && (
+              <div className="absolute right-0 mt-2 w-64 bg-white border shadow-lg rounded-lg p-4 z-50">
+                {cartItems.length === 0 ? (
+                  <p className="text-gray-500">Cart is empty</p>
+                ) : (
+                  cartItems.map(cartItem => (
+                    <div key={cartItem.menuId} className="flex items-center space-x-4 mb-4">
+                      <img src={cartItem.image || ""} alt={cartItem.name} className="w-12 h-12 object-cover rounded" />
+                      <div className="flex-1">
+                        <p className="font-bold">{cartItem.name}</p>
+                        <p className="text-sm text-gray-600">
+                          {cartItem.quantity} x ₹{cartItem.price?.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+                <button onClick={checkout} className="bg-blue-500 text-white px-3 py-1 rounded mt-2 w-full">
+                  Submit
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Auth Buttons */}
+          {user ? (
+            <>
+              <span className="font-semibold">{user.name}</span>
+              <button onClick={handleLogout} className="bg-fuchsia-500 text-white px-3 py-1  rgb-animate rounded-md ">
+                Logout
+              </button>
+            </>
+          ) : (
+            <button onClick={() => navigate("/login")} className="bg-blue-500 text-white px-3 py-1 rounded">
+              Login
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Dropdown Menu */}
+      {showMenu && (
+        <div className="lg:hidden mt-3 space-y-2">
+          <button onClick={() => navigate("/about")} className="block w-full text-left px-2 py-1">
+            About Us
+          </button>
+          <button onClick={() => setShowRateUs(true)} className="block w-full text-left px-2 py-1">
+            Rate Us
+          </button>
+          {user ? (
+            <>
+              <span className="block px-2 py-1 font-semibold text-black">{user.name}</span>
+              <button onClick={handleLogout} className="block max-lg:rgb-animate w-full text-center px-2 py-1 rgb-animate rounded-md bg-red-400 text-white ">
+                Logout
+              </button>
+            </>
+          ) : (
+            <button onClick={() => navigate("/login")} className="block w-full text-center px-2 py-1  rgb-animate bg-blue-500 text-white rounded">
+              Login
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Rate Us Modal */}
+      {showRateUs && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative lg:max-w-[full]">
-            <button
-              onClick={() => setShowRateUs(false)}
-              className="absolute top-2 right-2 text-red-600 font-bold"
-            >
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
+            <button onClick={() => setShowRateUs(false)} className="absolute top-2 right-2 text-red-600 font-bold">
               ✕
             </button>
             <RateUs onClose={() => setShowRateUs(false)} />
           </div>
         </div>
       )}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          <button onClick={handleToggleCart} className="flex items-center space-x-2 bg-green-400  rounded-full">
-          <IoBagAddOutline  />{calculateTotalItems()}
-          </button>
-          {showCart && (
-            <div className="absolute right-0 mt-2 w-64 bg-white border shadow-lg rounded-lg p-4 z-50">
-              {cartItems.length === 0 ? (
-                <p className="text-gray-500">Cart is empty</p>
-              ) : (
-                cartItems.map((cartItem) =>
-                  cartItem?.menuId ? (
-                    <div key={cartItem.menuId} className="flex items-center space-x-4 mb-4">
-                      <img
-                        src={cartItem.image || ""}
-                        alt={cartItem.name || "Item"}
-                        className="w-12 h-12 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <p className="font-bold">{cartItem.name}</p>
-                        <p className="text-gray-600 text-sm">
-                          {cartItem.quantity} x Rs{cartItem.price?.toFixed(2) || "0.00"}
-                        </p>
-                      </div>
-                    </div>
-                  ) : null
-                )
-              )}
-              <button onClick={checkout}>Submit</button>
-            </div>
-          )}
-
-        </div>
-       
-        {user ? (
-          <div className="flex items-center space-x-4">
-            <span className="font-bold"> {user.name}!</span>
-            <button
-              className="rgb-animate rounded-md bg-fuchsia-400"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded rgb-animate"
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </button>
-        )}
-      </div>
     </nav>
   );
 };
