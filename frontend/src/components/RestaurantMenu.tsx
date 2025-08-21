@@ -87,10 +87,11 @@
 
 
 
+// how can i display ratings in this cards 
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RecommendationSection from "./Recommendatin";
-import { BackgroundGradient } from "./ui/background-gradient";
 
 
 
@@ -109,7 +110,6 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const RestaurantMenu = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-
  
 
   // const [recommendations, setRecommendations] = useState<string[]>([]);
@@ -147,23 +147,6 @@ const RestaurantMenu = () => {
 
 
 
-
-
-
-
-
-
-
-    
-
-    
-
-  
-
-
-
-
-
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold text-center mb-8">Restaurants</h1>
@@ -173,10 +156,11 @@ const RestaurantMenu = () => {
     .map((restaurant) => (
       <div
         key={restaurant.id}
-        className=""
+        className="bg-white shadow-lg rounded-lg overflow-hidden 
+        hover:shadow-xl transition-shadow duration-300 cursor-pointer 
+        animate-rgbGlow"
         onClick={() => navigate(`/restaurant/${restaurant.id}/menu`)}
       >
-        <BackgroundGradient className="rounded-[22px] max-w-sm p-4 sm:p-10 bg-white cursor-pointer ">
         <img
           src={restaurant.image}
           alt={restaurant.name}
@@ -187,15 +171,13 @@ const RestaurantMenu = () => {
             {restaurant.name}
           </h2>
           <p className="text-sm text-gray-500">{restaurant.address}</p>
-         
 
           {restaurant.averageRating !== undefined && (
             <p className=" text-red-900 text-md mt-1">
 <div className="flex items-center mt-2 space-x-1">
   {[1, 2, 3, 4, 5].map((i) => (
     <div key={i} className="flex">
-        {/* {ratings.map((item) => (  */}
-       {(restaurant.averageRating ?? 0) >= i ? (
+      {(restaurant.averageRating ?? 0) >= i ? (
         <img
           src="https://res.cloudinary.com/dykahal7o/image/upload/v1753708074/Screenshot_2025-07-28_183741_jbe6nr.png"
           alt="rating bubble"
@@ -206,9 +188,7 @@ const RestaurantMenu = () => {
       )}
     </div>
   ))}
-  
 </div>
-
 
 
             </p>
@@ -216,17 +196,9 @@ const RestaurantMenu = () => {
         </div>
         <div className="p-4 border-t text-center text-yellow-500 font-semibold">
           View Details
-         
         </div>
-
-        </BackgroundGradient>
-      
-      
-      
       </div>
-
     ))}
-    
 </div>
 
 
