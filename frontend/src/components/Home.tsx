@@ -25,6 +25,7 @@ const Home = () => {
       {/* Header Navigation */}
     <main>
       <Hero />
+     
 
                 {/* <div className="flex justify-center items-center mb-8">
            {isAdmin && (
@@ -38,7 +39,7 @@ const Home = () => {
            </div> */}
 
       {/* Stats Section */}
-      <section className="relative">
+      {/* <section className="relative bg-black">
         <img
           src="https://res.cloudinary.com/dykahal7o/image/upload/v1753452625/112315676_y1myor.jpg"
           alt="Background Croissants"
@@ -54,7 +55,8 @@ const Home = () => {
             <div><strong className="text-2xl">15k+</strong><br />Happy customers</div>
           </div>
         </div>
-      </section>
+      </section> */}
+     
     </main>
 
     <Foodypaste />

@@ -90,6 +90,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RecommendationSection from "./Recommendatin";
+import { BackgroundGradient } from "./ui/background-gradient";
 
 
 
@@ -172,11 +173,10 @@ const RestaurantMenu = () => {
     .map((restaurant) => (
       <div
         key={restaurant.id}
-        className="bg-white shadow-lg rounded-lg overflow-hidden 
-        hover:shadow-xl transition-shadow duration-300 cursor-pointer 
-        animate-rgbGlow"
+        className=""
         onClick={() => navigate(`/restaurant/${restaurant.id}/menu`)}
       >
+        <BackgroundGradient className="rounded-[22px] max-w-sm p-4 sm:p-10 bg-white cursor-pointer ">
         <img
           src={restaurant.image}
           alt={restaurant.name}
@@ -187,6 +187,7 @@ const RestaurantMenu = () => {
             {restaurant.name}
           </h2>
           <p className="text-sm text-gray-500">{restaurant.address}</p>
+         
 
           {restaurant.averageRating !== undefined && (
             <p className=" text-red-900 text-md mt-1">
@@ -205,7 +206,9 @@ const RestaurantMenu = () => {
       )}
     </div>
   ))}
+  
 </div>
+
 
 
             </p>
@@ -213,9 +216,17 @@ const RestaurantMenu = () => {
         </div>
         <div className="p-4 border-t text-center text-yellow-500 font-semibold">
           View Details
+         
         </div>
+
+        </BackgroundGradient>
+      
+      
+      
       </div>
+
     ))}
+    
 </div>
 
 
