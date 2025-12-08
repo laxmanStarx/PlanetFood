@@ -55,16 +55,17 @@ const Navbar = () => {
         </div>
 
         {/* Nav Links (Desktop) */}
-        <div className="hidden lg:flex items-center space-x-6">
+        <div className="hidden lg:flex items-center space-x-6 sm:flex ">
           <span onClick={() => navigate("/about")} className="cursor-pointer">
             About Us
           </span>
           <button onClick={() => setShowRateUs(true)} className="cursor-pointer">
             Rate Us
           </button>
+          
 
           {/* Cart */}
-          <div className="relative">
+          <div className="relative ">
             <button onClick={() => setShowCart(!showCart)} className="flex items-center space-x-1 bg-green-400 px-3 py-1 rounded-full">
               <IoBagAddOutline />
               <span>{calculateTotalItems()}</span>
@@ -118,6 +119,40 @@ const Navbar = () => {
           <button onClick={() => setShowRateUs(true)} className="block w-full text-left px-2 py-1">
             Rate Us
           </button>
+
+          <button
+  onClick={() => setShowCart(!showCart)}
+  className="flex items-center space-x-1 bg-green-500 text-white px-3 py-1 rounded-full w-full justify-center"
+>
+ 
+  <IoBagAddOutline />
+  <span>{calculateTotalItems()}</span>
+</button>
+            {showCart && (
+              <div className="absolute right-0 mt-2 w-64 bg-white border shadow-lg rounded-lg p-4 z-50">
+                {cartItems.length === 0 ? (
+                  <p className="text-gray-500">Cart is empty</p>
+                ) : (
+                  cartItems.map(cartItem => (
+                    <div key={cartItem.menuId} className="flex items-center space-x-4 mb-4">
+                      <img src={cartItem.image || ""} alt={cartItem.name} className="w-12 h-12 object-cover rounded" />
+                      <div className="flex-1">
+                        <p className="font-bold">{cartItem.name}</p>
+                        <p className="text-sm text-gray-600">
+                          {cartItem.quantity} x ₹{cartItem.price?.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+                <button onClick={checkout} className="bg-blue-500 text-white px-3 py-1 rounded mt-2 w-full">
+                  Submit
+                </button>
+              </div>
+            )}
+
+
+
           {user ? (
             <>
               <span className="block px-2 py-1 font-semibold text-black">{user.name}</span>

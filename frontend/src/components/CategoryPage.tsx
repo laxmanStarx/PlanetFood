@@ -14,8 +14,7 @@ const categoryImages: { [key: string]: string } = {
 };
 
   // replace the banner img src with a dynamic category image if needed.
-
-   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     axios.get(`${backendUrl}/foodRoute`).then((res) => {
