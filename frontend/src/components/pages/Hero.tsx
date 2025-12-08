@@ -68,14 +68,14 @@ export default function Hero() {
           {/*  */}
 
           {/* Buttons */}
-          <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+          {/* <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <button className="bg-orange-500 text-white px-6 py-3 rounded-full hover:bg-orange-600 transition">
               Order Now
             </button>
             <button className="border border-white px-6 py-3 rounded-full hover:bg-white hover:text-black transition">
               Reservation
             </button>
-          </div>
+          </div> */}
         </div>
 
 
