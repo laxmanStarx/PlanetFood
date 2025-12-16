@@ -62,7 +62,7 @@ const Home = () => {
     {/* <Foodypaste /> */}
 
 
-    {/* <RestaurantMenu /> */}
+    <RestaurantMenu />
     
                     <div className="flex justify-center items-center mb-8">
            {isAdmin && (
