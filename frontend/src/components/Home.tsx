@@ -59,7 +59,7 @@ const Home = () => {
      
     </main>
 
-    <Foodypaste />
+    {/* <Foodypaste /> */}
 
 
     <RestaurantMenu />

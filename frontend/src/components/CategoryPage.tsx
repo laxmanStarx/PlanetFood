@@ -1,19 +1,22 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useCart } from "../contextApi/CartContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 
 const CategoryPage = () => {
   const { categoryName } = useParams();
   const [items, setItems] = useState([]);
 
-const categoryImages: { [key: string]: string } = {
-  Pizza: "https://res.cloudinary.com/dykahal7o/image/upload/v1737967371/pizzas_dhkq9l.jpg",
-  NonVeg: "https://res.cloudinary.com/dykahal7o/image/upload/v1753548026/Screenshot_2025-07-26_221011_avpfas.png",
-  Veg: "https://res.cloudinary.com/dykahal7o/image/upload/v1753728673/Screenshot_2025-07-29_002104_cfgebm.png",
-  // Add more categories as needed
-};
+  const { cartItems, addToCart, updateQuantity } = useCart();
 
-  // replace the banner img src with a dynamic category image if needed.
+  const categoryImages: { [key: string]: string } = {
+    Pizza: "https://res.cloudinary.com/dykahal7o/image/upload/v1737967371/pizzas_dhkq9l.jpg",
+    NonVeg: "https://res.cloudinary.com/dykahal7o/image/upload/v1753548026/Screenshot_2025-07-26_221011_avpfas.png",
+    Veg: "https://res.cloudinary.com/dykahal7o/image/upload/v1753728673/Screenshot_2025-07-29_002104_cfgebm.png",
+  };
+
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
@@ -25,12 +28,28 @@ const categoryImages: { [key: string]: string } = {
     });
   }, [categoryName]);
 
+  const handleAddToCart = (id: string, name: string, image: string, price: number) => {
+    addToCart(id, name, image, price, 1);
+  };
+
+  const handleDecrease = (id: string) => {
+    const item = cartItems.find((c) => c.menuId === id);
+    if (item && item.quantity > 1) {
+      updateQuantity(id, item.quantity - 1);
+    } else {
+      updateQuantity(id, 0);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Banner Section */}
+      {/* Banner */}
       <div className="relative h-[300px] w-full mb-10">
         <img
-          src={categoryImages[categoryName || ""] || "https://res.cloudinary.com/dykahal7o/image/upload/v1753548026/Screenshot_2025-07-26_221011_avpfas.png"}
+          src={
+            categoryImages[categoryName || ""] ||
+            "https://res.cloudinary.com/dykahal7o/image/upload/v1753548026/Screenshot_2025-07-26_221011_avpfas.png"
+          }
           alt="Banner"
           className="w-full h-full object-cover rounded-b-xl"
         />
@@ -38,8 +57,7 @@ const categoryImages: { [key: string]: string } = {
           <p className="text-sm uppercase">Food Collections</p>
           <h1 className="text-4xl font-bold mb-2">Insta-worthy Spots</h1>
           <p className="max-w-lg">
-            We've picked out the best Instagrammable cafes to help you build a
-            picture-perfect feed. After all, our phones eat first!
+            We've picked out the best Instagrammable cafes to help you build a picture-perfect feed.
           </p>
         </div>
       </div>
@@ -51,39 +69,73 @@ const categoryImages: { [key: string]: string } = {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {items.map((item: any) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition"
-            >
-              <img
-                src={item.image}
-                alt={item.name}
-                className="h-48 w-full object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {item.name}
-                </h3>
-                <p className="text-xs text-green-700 font-bold mb-1">
-                  4.2 ★ DINING
-                </p>
-                <p className="text-sm text-gray-600 truncate">
-                  {item.description}
-                </p>
-                <p className="text-sm text-gray-700 mt-1 font-semibold">
-                  ₹{item.price}
-                </p>
+          {items.map((item: any) => {
+            const exists = cartItems.find((c) => c.menuId === item.id);
+
+            return (
+              <div
+                key={item.id}
+                className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition"
+              >
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="h-48 w-full object-cover"
+                />
+
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    {item.name}
+                  </h3>
+                  <p className="text-xs text-green-700 font-bold mb-1">
+                    4.2 ★ DINING
+                  </p>
+                  <p className="text-sm text-gray-600 truncate">
+                    {item.description}
+                  </p>
+                  <p className="text-sm text-gray-700 mt-1 font-semibold">
+                    ₹{item.price}
+                  </p>
+
+                  {/* Add / Increase / Decrease */}
+                  <div className="mt-3 flex items-center justify-between">
+                    {!exists ? (
+                      <button
+                        className="px-3 py-1 bg-green-500 text-white rounded-lg text-sm"
+                        onClick={() =>
+                          handleAddToCart(item.id, item.name, item.image, item.price)
+                        }
+                      >
+                        Add to Cart
+                      </button>
+                    ) : (
+                      <div className="flex items-center gap-3">
+                        <FontAwesomeIcon
+                          icon={faMinus}
+                          className="text-red-500 cursor-pointer text-xl"
+                          onClick={() => handleDecrease(item.id)}
+                        />
+
+                        <span className="font-semibold">{exists.quantity}</span>
+
+                        <FontAwesomeIcon
+                          icon={faPlus}
+                          className="text-green-500 cursor-pointer text-xl"
+                          onClick={() =>
+                            handleAddToCart(item.id, item.name, item.image, item.price)
+                          }
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
   );
 };
-
-
-
 
 export default CategoryPage;

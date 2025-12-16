@@ -35,7 +35,7 @@ const Menu = () => {
 
   
 
-  // ✅ Optional: retrieve userId from local storage (or Auth Context)
+  //  Optional: retrieve userId from local storage (or Auth Context)
 
   useEffect(() => {
     const fetchMenuItems = async () => {

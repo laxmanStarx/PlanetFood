@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../contextApi/CartContext";
 import { useState, useEffect } from "react";
 import { IoBagAddOutline } from "react-icons/io5";
@@ -62,6 +62,12 @@ const Navbar = () => {
           <button onClick={() => setShowRateUs(true)} className="cursor-pointer">
             Rate Us
           </button>
+
+
+
+                    <div className="relative">
+            <Link to= "/Diningout"> Diningout</Link>
+          </div>
           
 
           {/* Cart */}
@@ -93,6 +99,8 @@ const Navbar = () => {
               </div>
             )}
           </div>
+
+
 
           {/* Auth Buttons */}
           {user ? (
