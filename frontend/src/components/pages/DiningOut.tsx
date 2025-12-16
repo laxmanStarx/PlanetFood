@@ -22,7 +22,6 @@
 
 
 
-import React from "react";
 import Foodypaste from "./Foodypaste";
 
 export default function FoodInspiration() {
