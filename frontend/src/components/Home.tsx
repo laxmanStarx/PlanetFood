@@ -3,7 +3,7 @@ import RestaurantMenu from "./RestaurantMenu"
 import { useEffect, useState } from "react";
 
 import Hero from "./pages/Hero";
-import Foodypaste from "./pages/Foodypaste";
+
 
 
 const Home = () => {
