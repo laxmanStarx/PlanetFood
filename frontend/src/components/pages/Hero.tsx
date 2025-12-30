@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 export default function Hero() {
   const carouselImages = [
     "https://res.cloudinary.com/dykahal7o/image/upload/v1753633505/Screenshot_2025-07-27_215345_ft1z5v.png",
-    "https://res.cloudinary.com/dykahal7o/image/upload/v1753548026/Screenshot_2025-07-26_221011_avpfas.png",
+    "https://res.cloudinary.com/dykahal7o/image/upload/v1753547653/Screenshot_2025-07-26_220130_b9ur7q.png",
     "https://res.cloudinary.com/dykahal7o/image/upload/v1737802470/rasgulla_uoquhz.jpg",
     "https://res.cloudinary.com/dykahal7o/image/upload/v1767104329/Screenshot_2025-12-30_194835_tfssfv.png",
     "https://res.cloudinary.com/dykahal7o/image/upload/v1753452625/112315676_y1myor.jpg",
