@@ -6,9 +6,12 @@ const PromoteToAdmin: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
 
+
+
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const promoteUser = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/isAdmin/assign-admin`, {
+      const response = await fetch(`${backendUrl}/api/v1/isAdmin/assign-admin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
