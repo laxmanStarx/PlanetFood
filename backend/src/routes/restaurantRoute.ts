@@ -78,6 +78,49 @@ router.get("/restaurants", async (req, res) => {
   //     res.status(500).json({ message: "Failed to save feedback." });
   //   }
   // });
+
+
+
+
+
+
+
+
+
+
+
+
+
+router.post(
+  "/restaurants",
+  authenticateJWT,
+  async (req: Request, res: Response): Promise<void> => {
+    const { name, address, image } = req.body;
+    const { userId, role } = req.user!;
+
+    if (role !== "admin") {
+      res.status(403).json({ error: "Only admin can add restaurants" });
+      return;
+    }
+
+    if (!name || !address) {
+      res.status(400).json({ error: "Name and address are required" });
+      return;
+    }
+
+    const restaurant = await prisma.restaurant.create({
+      data: {
+        name,
+        address,
+        image,
+        adminId: userId,
+      },
+    });
+
+    res.status(201).json(restaurant);
+  }
+);
+
   
   
   
