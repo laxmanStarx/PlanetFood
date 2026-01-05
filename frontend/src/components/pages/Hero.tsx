@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 
 export default function Hero() {
   const carouselImages = [
-    "https://res.cloudinary.com/dykahal7o/image/upload/v1753633505/Screenshot_2025-07-27_215345_ft1z5v.png",
+    "https://res.cloudinary.com/dykahal7o/image/upload/v1767613689/Screenshot_2026-01-05_171757_jyckmx.png",
     "https://res.cloudinary.com/dykahal7o/image/upload/v1765908609/Screenshot_2025-12-16_233844_n8gljm.png",
     "https://res.cloudinary.com/dykahal7o/image/upload/v1737802470/rasgulla_uoquhz.jpg",
-    "https://res.cloudinary.com/dykahal7o/image/upload/v1767104329/Screenshot_2025-12-30_194835_tfssfv.png",
+    "https://res.cloudinary.com/dykahal7o/image/upload/v1767613447/Screenshot_2026-01-05_171353_nhj5wj.png",
     "https://res.cloudinary.com/dykahal7o/image/upload/v1753452625/112315676_y1myor.jpg",
     "https://res.cloudinary.com/dykahal7o/image/upload/v1737967371/pizzas_dhkq9l.jpg"
   ];
