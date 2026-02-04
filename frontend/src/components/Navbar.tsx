@@ -56,7 +56,7 @@ const Navbar = () => {
         </div>
 
         {/* Nav Links (Desktop) */}
-        <div className="hidden lg:flex items-center space-x-6">
+        <div className="hidden lg:flex items-center space-x-6 sm:flex ">
           <span onClick={() => navigate("/about")} className="cursor-pointer">
             About Us
           </span>
@@ -140,14 +140,18 @@ const Navbar = () => {
           </button>
 
           {/* Admin notifications link (mobile) */}
-          {user?.role === "admin" && (
-            <button
-              onClick={() => navigate("/admin/notifications")}
-              className="block w-full text-left px-2 py-1 text-blue-600"
-            >
-              Notifications
-            </button>
-          )}
+{/* Admin notifications link (mobile) */}
+{user?.role === "admin" && (
+  <button
+    onClick={() => {
+      navigate("/admin/notifications");
+      setShowMenu(false); // Close menu after navigation
+    }}
+    className="block w-full text-left px-2 py-1 text-blue-600 font-semibold"
+  >
+    Notifications
+  </button>
+)}
 
           <button
   onClick={() => setShowCart(!showCart)}
