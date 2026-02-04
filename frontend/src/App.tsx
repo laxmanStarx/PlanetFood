@@ -20,6 +20,7 @@ import RateUs from "./components/RateUs"
 import 'react-toastify/dist/ReactToastify.css';
  import { ToastContainer} from 'react-toastify';
 import DiningOut from "./components/pages/DiningOut"
+import AdminNotifications from "./components/AdminNotifications"
 
 
 
@@ -73,6 +74,7 @@ function App() {
 
       <Route path="/restaurant-form" element={<RestaurantForm />} />
       <Route path="/orders" element={<OrderPage />} />
+      <Route path="/admin/notifications" element={<AdminNotifications />} />
       
 
       

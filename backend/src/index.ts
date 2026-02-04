@@ -34,7 +34,7 @@ const app = express()
 
 app.use(cors({
     origin: "*", // Specify your production frontend domain
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   }));
 
 

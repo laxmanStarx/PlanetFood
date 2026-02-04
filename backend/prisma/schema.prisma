@@ -49,7 +49,7 @@ model User {
   orders    Order[]
   payments  Payment[]
   ratings   Rating[]
-
+  notifications Notification[]
 
   restaurants Restaurant[] @relation("AdminRestaurants")
 
@@ -102,6 +102,8 @@ model Restaurant {
   menuItems   Menu[]
   ratings     Rating[]
 
+  notifications Notification[]
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -147,6 +149,7 @@ model Order {
   isPaid      Boolean     @default(false) 
   paymentIntentId String?
   paidAt    DateTime?
+  notifications Notification[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -176,6 +179,24 @@ model Payment {
   status          String   @default("Pending") // e.g., Pending, Completed, Failed
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model Notification {
+  id           String      @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+
+  orderId      String
+  order        Order       @relation(fields: [orderId], references: [id])
+
+  message      String
+  isRead       Boolean     @default(false)
+
+  createdAt    DateTime    @default(now())
 }
 
 

@@ -124,6 +124,7 @@ router.post("/webhook", body_parser_1.default.raw({ type: "application/json" }),
  *  Create Checkout Session Route
  */
 router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
     try {
         const { items, userId, restaurantId } = req.body;
         if (!userId)
@@ -152,7 +153,6 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
                 userId: userId,
                 status: "Pending",
                 totalPrice: totalAmount / 100, // Convert to INR
-                // restaurantId: restaurantId,
             },
         });
         console.log(" Order Created with ID:", order.id);
@@ -166,6 +166,30 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
                 },
             });
         })));
+        // Create notification for the restaurant
+        try {
+            let targetRestaurantId = restaurantId;
+            if (!targetRestaurantId && ((_c = items[0]) === null || _c === void 0 ? void 0 : _c.menuId)) {
+                const menu = yield prisma.menu.findUnique({
+                    where: { id: items[0].menuId },
+                    select: { restaurantId: true },
+                });
+                targetRestaurantId = menu === null || menu === void 0 ? void 0 : menu.restaurantId;
+            }
+            if (targetRestaurantId) {
+                yield prisma.notification.create({
+                    data: {
+                        restaurantId: targetRestaurantId,
+                        userId,
+                        orderId: order.id,
+                        message: "New order placed.",
+                    },
+                });
+            }
+        }
+        catch (notifyError) {
+            console.error("Error creating restaurant notification (payment route):", notifyError);
+        }
         //     // await generateRecommendationsAndUpdateDB(userId);
         //   // Utility function to generate and update recommendations
         // // async function generateRecommendationsAndUpdateDB(userId: string) {
@@ -207,7 +231,7 @@ router.post("/create-checkout-session", (req, res) => __awaiter(void 0, void 0, 
             payment_method_types: ["card"],
             line_items: lineItems,
             mode: "payment",
-            success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.FRONTEND_URL}/cancel`,
             metadata: {
                 userId,

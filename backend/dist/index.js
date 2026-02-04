@@ -23,7 +23,7 @@ const app = (0, express_1.default)();
 //  app.use("/payment/webhook", bodyParser.raw({ type: "application/json" }), webhookRoute);
 app.use((0, cors_1.default)({
     origin: "*", // Specify your production frontend domain
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 }));
 app.use("/payment/webhook", express_1.default.raw({ type: "application/json" }), webhookRoute_1.default);
 app.use(express_1.default.json());

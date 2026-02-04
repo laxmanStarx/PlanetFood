@@ -279,9 +279,11 @@ interface Restaurant {
   name: string;
   address: string;
   image: string;
+  adminId?: string;
   averageRating?: number;
   totalRevenue?: number;  // Add this
   totalOrders?: number;   // Add this
+  unreadNotifications?: number;
 }
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -290,6 +292,7 @@ const RestaurantMenu = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -304,6 +307,56 @@ const RestaurantMenu = () => {
 
     fetchRestaurants();
   }, [userId]);
+
+  // Read and mark notifications as read for this admin's restaurant
+  const handleNotificationClick = async (restaurantId: string) => {
+    if (!token) {
+      console.warn("No auth token found; cannot read notifications.");
+      return;
+    }
+
+    try {
+      // Fetch all notifications for this admin's restaurant
+      const res = await fetch(`${backendUrl}/admin/notifications`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        console.error("Failed to fetch notifications");
+        return;
+      }
+
+      const notifications: { id: string; isRead: boolean }[] = await res.json();
+
+      // Mark all unread as read
+      const unread = notifications.filter((n) => !n.isRead);
+
+      await Promise.all(
+        unread.map((n) =>
+          fetch(`${backendUrl}/admin/notifications/${n.id}/read`, {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+        )
+      );
+
+      // Optionally log or handle the notifications list here
+      console.log("Notifications:", notifications);
+
+      // Update local state so the badge disappears
+      setRestaurants((prev) =>
+        prev.map((r) =>
+          r.id === restaurantId ? { ...r, unreadNotifications: 0 } : r
+        )
+      );
+    } catch (err) {
+      console.error("Error reading notifications:", err);
+    }
+  };
 
   // Format currency
   const formatCurrency = (amount: number) => {
@@ -339,6 +392,22 @@ const RestaurantMenu = () => {
                 </h2>
                 <p className="text-sm text-gray-500">{restaurant.address}</p>
 
+                {/* Admin notification badge */}
+                {userId === restaurant.adminId &&
+                  (restaurant.unreadNotifications ?? 0) > 0 && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNotificationClick(restaurant.id);
+                      }}
+                      className="mt-2 inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold hover:bg-red-200"
+                    >
+                      {restaurant.unreadNotifications} new order
+                      {restaurant.unreadNotifications! > 1 ? "s" : ""} - View
+                    </button>
+                  )}
+
                 {/* Rating Display */}
                 {restaurant.averageRating !== undefined && (
                   <div className="flex items-center mt-2 space-x-1">
@@ -359,26 +428,28 @@ const RestaurantMenu = () => {
                 )}
 
                 {/* Revenue Display */}
-                {restaurant.totalRevenue !== undefined && (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-gray-500">Total Revenue</p>
-                        <p className="text-lg font-bold text-green-600">
-                          {formatCurrency(restaurant.totalRevenue)}
-                        </p>
-                      </div>
-                      {restaurant.totalOrders !== undefined && (
-                        <div className="text-right">
-                          <p className="text-xs text-gray-500">Orders</p>
-                          <p className="text-lg font-semibold text-blue-600">
-                            {restaurant.totalOrders}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+{/* Revenue Display - Ensure it shows even if revenue is 0 */}
+{(userId === restaurant.adminId && restaurant.totalRevenue !== undefined && restaurant.totalRevenue !== null) && (
+  <div className="mt-3 pt-3 border-t border-gray-200">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-xs text-gray-500">Total Revenue</p>
+        <p className="text-lg font-bold text-green-600">
+          {/* Ensure we pass a number to the formatter */}
+          {formatCurrency(restaurant.totalRevenue || 0)}
+        </p>
+      </div>
+      {(restaurant.totalOrders !== undefined && restaurant.totalOrders !== null) && (
+        <div className="text-right">
+          <p className="text-xs text-gray-500">Orders</p>
+          <p className="text-lg font-semibold text-blue-600">
+            {restaurant.totalOrders || 0}
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
+)}
               </div>
               <div className="p-4 border-t text-center text-yellow-500 font-semibold">
                 View Details

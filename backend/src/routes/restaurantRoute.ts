@@ -211,14 +211,14 @@ router.get("/restaurants", async (req, res) => {
       },
     });
 
-    // Calculate revenue for each restaurant
+    // Calculate revenue and notifications for each restaurant
     const restaurantsWithStats = await Promise.all(
       restaurants.map(async (restaurant) => {
         // Get all completed and paid orders for this restaurant
         const orders = await prisma.order.findMany({
           where: {
-            isPaid: true,
-            status: "Completed",
+            // isPaid: true,
+            // status: "Completed",
             orderItems: {
               some: {
                 menu: {
@@ -249,14 +249,24 @@ router.get("/restaurants", async (req, res) => {
           return sum + orderRevenue;
         }, 0);
 
+        // Count unread notifications for this restaurant
+        const unreadNotifications = await prisma.notification.count({
+          where: {
+            restaurantId: restaurant.id,
+            isRead: false,
+          },
+        });
+
         return {
           id: restaurant.id,
           name: restaurant.name,
           address: restaurant.address,
           image: restaurant.image,
+          adminId: restaurant.adminId,
           averageRating: restaurant.averageRating,
           totalRevenue: totalRevenue,
           totalOrders: orders.length,
+          unreadNotifications,
           menuItems: restaurant.menuItems,
         };
       })
@@ -415,6 +425,95 @@ router.get("/admin/restaurant", authenticateJWT, async (req: any, res: any) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch restaurant" });
+  }
+});
+
+// GET notifications for logged-in admin's restaurant
+router.get("/admin/notifications", authenticateJWT, async (req: any, res: any) => {
+  const { userId, role } = req.user;
+
+  if (role !== "admin") {
+    return res.status(403).json({ error: "Only admin can access this." });
+  }
+
+  try {
+    const restaurant = await prisma.restaurant.findFirst({
+      where: { adminId: userId },
+    });
+
+    if (!restaurant) {
+      return res
+        .status(404)
+        .json({ error: "No restaurant found for this admin." });
+    }
+
+    const notifications = await prisma.notification.findMany({
+      where: { restaurantId: restaurant.id },
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+        order: {
+          include: {
+            orderItems: {
+              include: {
+                menu: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    res.json(notifications);
+  } catch (err) {
+    console.error("Error fetching notifications:", err);
+    res.status(500).json({ error: "Failed to fetch notifications" });
+  }
+});
+
+// Mark a notification as read for the logged-in admin's restaurant
+router.patch("/admin/notifications/:id/read", authenticateJWT, async (req: any, res: any) => {
+  const { userId, role } = req.user;
+  const { id } = req.params;
+
+  if (role !== "admin") {
+    return res.status(403).json({ error: "Only admin can access this." });
+  }
+
+  try {
+    const restaurant = await prisma.restaurant.findFirst({
+      where: { adminId: userId },
+    });
+
+    if (!restaurant) {
+      return res
+        .status(404)
+        .json({ error: "No restaurant found for this admin." });
+    }
+
+    const result = await prisma.notification.updateMany({
+      where: {
+        id,
+        restaurantId: restaurant.id,
+      },
+      data: {
+        isRead: true,
+      },
+    });
+
+    if (result.count === 0) {
+      return res.status(404).json({ error: "Notification not found" });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error marking notification as read:", err);
+    res.status(500).json({ error: "Failed to update notification" });
   }
 });
 

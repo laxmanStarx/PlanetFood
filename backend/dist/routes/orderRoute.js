@@ -60,6 +60,29 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 },
             },
         });
+        // Create a notification for the restaurant of the first item
+        try {
+            const firstItem = items[0];
+            if (firstItem && firstItem.menuId) {
+                const menu = yield prisma.menu.findUnique({
+                    where: { id: firstItem.menuId },
+                    select: { restaurantId: true },
+                });
+                if (menu === null || menu === void 0 ? void 0 : menu.restaurantId) {
+                    yield prisma.notification.create({
+                        data: {
+                            restaurantId: menu.restaurantId,
+                            userId,
+                            orderId: order.id,
+                            message: "New order placed.",
+                        },
+                    });
+                }
+            }
+        }
+        catch (notifyError) {
+            console.error("Error creating restaurant notification:", notifyError);
+        }
         // Return the created order ID
         return res.status(201).json({ orderId: order.id });
     }

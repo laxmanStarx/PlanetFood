@@ -88,6 +88,30 @@ router.get("/", async (req:any, res:any) => {
           },
         },
       });
+
+      // Create a notification for the restaurant of the first item
+      try {
+        const firstItem = items[0];
+        if (firstItem && firstItem.menuId) {
+          const menu = await prisma.menu.findUnique({
+            where: { id: firstItem.menuId },
+            select: { restaurantId: true },
+          });
+
+          if (menu?.restaurantId) {
+            await prisma.notification.create({
+              data: {
+                restaurantId: menu.restaurantId,
+                userId,
+                orderId: order.id,
+                message: "New order placed.",
+              },
+            });
+          }
+        }
+      } catch (notifyError) {
+        console.error("Error creating restaurant notification:", notifyError);
+      }
   
       // Return the created order ID
       return res.status(201).json({ orderId: order.id });

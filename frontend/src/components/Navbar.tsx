@@ -8,6 +8,7 @@ import RateUs from "./RateUs";
 interface User {
   name: string;
   email: string;
+  role?: string;
 }
 
 const Navbar = () => {
@@ -65,9 +66,19 @@ const Navbar = () => {
 
 
 
-                    <div className="relative">
+          <div className="relative">
             <Link to= "/Diningout"> Diningout</Link>
           </div>
+
+          {/* Admin notifications link (desktop) */}
+          {user?.role === "admin" && (
+            <button
+              onClick={() => navigate("/admin/notifications")}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Notifications
+            </button>
+          )}
           
 
           {/* Cart */}
@@ -127,6 +138,16 @@ const Navbar = () => {
           <button onClick={() => setShowRateUs(true)} className="block w-full text-left px-2 py-1">
             Rate Us
           </button>
+
+          {/* Admin notifications link (mobile) */}
+          {user?.role === "admin" && (
+            <button
+              onClick={() => navigate("/admin/notifications")}
+              className="block w-full text-left px-2 py-1 text-blue-600"
+            >
+              Notifications
+            </button>
+          )}
 
           <button
   onClick={() => setShowCart(!showCart)}

@@ -149,7 +149,7 @@ router.post("/webhook", bodyParser.raw({ type: "application/json" }), async (req
  */
 router.post("/create-checkout-session", async (req: any, res: any) => {
   try {
-    const { items, userId,restaurantId } = req.body;
+    const { items, userId, restaurantId } = req.body;
 
     if (!userId) return res.status(400).json({ error: "User ID is required" });
     // if (!restaurantId) return res.status(400).json({ error: "Restaurant ID is required" });
@@ -180,22 +180,47 @@ router.post("/create-checkout-session", async (req: any, res: any) => {
         userId: userId,
         status: "Pending",
         totalPrice: totalAmount / 100, // Convert to INR
-        // restaurantId: restaurantId,
       },
     });
     console.log(" Order Created with ID:", order.id);
 
 
     // Save each item as OrderItem
-await Promise.all(items.map(async (item: any) => {
-  await prisma.orderItem.create({
-    data: {
-      menuId: item.menuId,
-      quantity: item.quantity,
-      orderId: order.id,
-    },
-  });
-}));
+    await Promise.all(items.map(async (item: any) => {
+      await prisma.orderItem.create({
+        data: {
+          menuId: item.menuId,
+          quantity: item.quantity,
+          orderId: order.id,
+        },
+      });
+    }));
+
+    // Create notification for the restaurant
+    try {
+      let targetRestaurantId = restaurantId;
+
+      if (!targetRestaurantId && items[0]?.menuId) {
+        const menu = await prisma.menu.findUnique({
+          where: { id: items[0].menuId },
+          select: { restaurantId: true },
+        });
+        targetRestaurantId = menu?.restaurantId;
+      }
+
+      if (targetRestaurantId) {
+        await prisma.notification.create({
+          data: {
+            restaurantId: targetRestaurantId,
+            userId,
+            orderId: order.id,
+            message: "New order placed.",
+          },
+        });
+      }
+    } catch (notifyError) {
+      console.error("Error creating restaurant notification (payment route):", notifyError);
+    }
 
 
 //     // await generateRecommendationsAndUpdateDB(userId);
@@ -275,7 +300,7 @@ await Promise.all(items.map(async (item: any) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL }/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.FRONTEND_URL  }/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
       metadata: {
         userId,
