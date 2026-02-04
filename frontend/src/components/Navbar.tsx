@@ -56,7 +56,7 @@ const Navbar = () => {
         </div>
 
         {/* Nav Links (Desktop) */}
-        <div className="hidden lg:flex items-center space-x-6 sm:flex ">
+        <div className="hidden lg:flex items-center space-x-6">
           <span onClick={() => navigate("/about")} className="cursor-pointer">
             About Us
           </span>
