@@ -131,7 +131,7 @@ const Navbar = () => {
 
       {/* Mobile Dropdown Menu */}
       {showMenu && (
-        <div className="lg:hidden mt-3 space-y-2">
+        <div className="lg:hidden mt-3 space-y-6">
           <button onClick={() => navigate("/about")} className="block w-full text-left px-2 py-1">
             About Us
           </button>
