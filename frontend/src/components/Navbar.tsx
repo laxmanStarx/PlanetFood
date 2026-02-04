@@ -125,73 +125,99 @@ return (
     </div>
 
     {/* Mobile Dropdown Menu */}
-    {showMenu && (
-      <div className="lg:hidden mt-3 space-y-2">
-        <button onClick={() => { navigate("/about"); setShowMenu(false); }} className="block w-full text-left px-2 py-1">
-          About Us
-        </button>
-        <button onClick={() => { setShowRateUs(true); setShowMenu(false); }} className="block w-full text-left px-2 py-1">
-          Rate Us
-        </button>
-        <button onClick={() => { navigate("/Diningout"); setShowMenu(false); }} className="block w-full text-left px-2 py-1">
-          Diningout
-        </button>
+{/* Mobile Dropdown Menu */}
+{showMenu && (
+  <div className="lg:hidden mt-3 space-y-2 bg-white p-2 rounded shadow-lg">
+    <button 
+      onClick={() => { navigate("/about"); setShowMenu(false); }} 
+      className="block w-full text-left px-2 py-1 hover:bg-gray-100 rounded"
+    >
+      About Us
+    </button>
+    
+    <button 
+      onClick={() => { setShowRateUs(true); setShowMenu(false); }} 
+      className="block w-full text-left px-2 py-1 hover:bg-gray-100 rounded"
+    >
+      Rate Us
+    </button>
+    
+    <button 
+      onClick={() => { navigate("/Diningout"); setShowMenu(false); }} 
+      className="block w-full text-left px-2 py-1 hover:bg-gray-100 rounded"
+    >
+      Diningout
+    </button>
 
-        {/* Admin notifications link (mobile) */}
-        {user?.role === "admin" && (
-          <button
-            onClick={() => { navigate("/admin/notifications"); setShowMenu(false); }}
-            className="block w-full text-left px-2 py-1 bg-blue-50 text-blue-600 font-semibold rounded"
-          >
-            Notifications
-          </button>
-        )}
+    {/* Admin notifications - MOVED BEFORE CART */}
+    {user?.role === "admin" && (
+      <button
+        onClick={() => { 
+          navigate("/admin/notifications"); 
+          setShowMenu(false); 
+        }}
+        className="block w-full text-left px-2 py-1 bg-blue-100 text-blue-700 font-semibold rounded border-2 border-blue-300"
+      >
+        🔔 Notifications
+      </button>
+    )}
 
-        <button
-          onClick={() => setShowCart(!showCart)}
-          className="flex items-center space-x-1 bg-green-500 text-white px-3 py-1 rounded-full w-full justify-center"
-        >
-          <IoBagAddOutline />
-          <span>{calculateTotalItems()}</span>
-        </button>
-        
-        {showCart && (
-          <div className="mt-2 w-full bg-white border shadow-lg rounded-lg p-4">
-            {cartItems.length === 0 ? (
-              <p className="text-gray-500">Cart is empty</p>
-            ) : (
-              cartItems.map(cartItem => (
-                <div key={cartItem.menuId} className="flex items-center space-x-4 mb-4">
-                  <img src={cartItem.image || ""} alt={cartItem.name} className="w-12 h-12 object-cover rounded" />
-                  <div className="flex-1">
-                    <p className="font-bold">{cartItem.name}</p>
-                    <p className="text-sm text-gray-600">
-                      {cartItem.quantity} x ₹{cartItem.price?.toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              ))
-            )}
-            <button onClick={checkout} className="bg-blue-500 text-white px-3 py-1 rounded mt-2 w-full">
-              Submit
-            </button>
-          </div>
-        )}
-
-        {user ? (
-          <>
-            <span className="block px-2 py-1 font-semibold text-black">{user.name}</span>
-            <button onClick={handleLogout} className="block w-full text-center px-2 py-1 bg-red-400 text-white rounded-md">
-              Logout
-            </button>
-          </>
+    {/* Cart Button */}
+    <button
+      onClick={() => setShowCart(!showCart)}
+      className="flex items-center space-x-1 bg-green-500 text-white px-3 py-1 rounded-full w-full justify-center"
+    >
+      <IoBagAddOutline />
+      <span>{calculateTotalItems()}</span>
+    </button>
+    
+    {showCart && (
+      <div className="mt-2 w-full bg-white border shadow-lg rounded-lg p-4">
+        {cartItems.length === 0 ? (
+          <p className="text-gray-500">Cart is empty</p>
         ) : (
-          <button onClick={() => { navigate("/login"); setShowMenu(false); }} className="block w-full text-center px-2 py-1 bg-blue-500 text-white rounded">
-            Login
-          </button>
+          cartItems.map(cartItem => (
+            <div key={cartItem.menuId} className="flex items-center space-x-4 mb-4">
+              <img src={cartItem.image || ""} alt={cartItem.name} className="w-12 h-12 object-cover rounded" />
+              <div className="flex-1">
+                <p className="font-bold">{cartItem.name}</p>
+                <p className="text-sm text-gray-600">
+                  {cartItem.quantity} x ₹{cartItem.price?.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          ))
         )}
+        <button onClick={checkout} className="bg-blue-500 text-white px-3 py-1 rounded mt-2 w-full">
+          Submit
+        </button>
       </div>
     )}
+
+    {/* Divider */}
+    <div className="border-t border-gray-200 my-2"></div>
+
+    {/* User Section */}
+    {user ? (
+      <>
+        <span className="block px-2 py-1 font-semibold text-black">👤 {user.name}</span>
+        <button 
+          onClick={handleLogout} 
+          className="block w-full text-center px-2 py-1 bg-red-400 text-white rounded-md hover:bg-red-500"
+        >
+          Logout
+        </button>
+      </>
+    ) : (
+      <button 
+        onClick={() => { navigate("/login"); setShowMenu(false); }} 
+        className="block w-full text-center px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Login
+      </button>
+    )}
+  </div>
+)}
 
     {/* Rate Us Modal */}
     {showRateUs && (
