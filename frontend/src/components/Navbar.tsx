@@ -66,9 +66,6 @@ const Navbar = () => {
 
 
 
-          <div className="relative">
-            <Link to= "/Diningout"> Diningout</Link>
-          </div>
 
           {/* Admin notifications link (desktop) */}
           {user?.role === "admin" && (
