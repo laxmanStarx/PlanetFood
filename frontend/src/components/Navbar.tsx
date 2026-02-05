@@ -70,7 +70,7 @@ return (
       {/* Nav Links (Desktop) - REMOVE sm:flex */}
       <div className="hidden lg:flex items-center space-x-6">
         <span onClick={() => navigate("/aboutus")} className="cursor-pointer">
-          About Us hellos
+          About Us
         </span>
         <button onClick={() => setShowRateUs(true)} className="cursor-pointer">
           Rate Us
