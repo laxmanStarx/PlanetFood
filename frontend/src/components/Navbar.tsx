@@ -3,6 +3,7 @@ import { useCart } from "../contextApi/CartContext";
 import { useState, useEffect } from "react";
 import { IoBagAddOutline } from "react-icons/io5";
 import { FiMenu, FiX } from "react-icons/fi";
+
 import RateUs from "./RateUs";
 
 interface User {
@@ -68,7 +69,7 @@ return (
 
       {/* Nav Links (Desktop) - REMOVE sm:flex */}
       <div className="hidden lg:flex items-center space-x-6">
-        <span onClick={() => navigate("/about")} className="cursor-pointer">
+        <span onClick={() => navigate("/aboutus")} className="cursor-pointer">
           About Us
         </span>
         <button onClick={() => setShowRateUs(true)} className="cursor-pointer">
