@@ -26,10 +26,10 @@ const About = () => {
         <div className="border p-6 rounded-lg shadow-sm">
           <h3 className="font-bold text-lg mb-2">Our Promise</h3>
           <p>Fresh ingredients, transparent pricing, and a delivery experience that never lets you down.</p>
+                  <h2 className=" text-2xl font-bold">Our Phone number</h2>
+        <span>626123489990</span>
         </div>
 
-        <h2>Our Phone number</h2>
-        <span>626123489990</span>
       </div>
     </div>
   );
