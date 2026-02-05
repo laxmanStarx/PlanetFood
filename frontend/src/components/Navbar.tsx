@@ -138,7 +138,7 @@ return (
     {/* Mobile Dropdown Menu */}
     {showMenu && (
       <div className="lg:hidden mt-3 space-y-2">
-        <button onClick={() => { navigate("/about"); setShowMenu(false); }} className="block w-full text-left px-2 py-1">
+        <button onClick={() => { navigate("/aboutus"); setShowMenu(false); }} className="block w-full text-left px-2 py-1">
           About Us
         </button>
         <button onClick={() => { setShowRateUs(true); setShowMenu(false); }} className="block w-full text-left px-2 py-1">
