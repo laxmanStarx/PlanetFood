@@ -28,9 +28,9 @@ const About = () => {
           <p>Fresh ingredients, transparent pricing, and a delivery experience that never lets you down.</p>
 
         </div>
-        <div className="flex justify-center mx-5">
-       <h2 className="  text-center text-2xl font-bold">Our Phone number</h2>
-        <span className=" text-2xl">629999999</span>
+        <div className="flex justify-center mx-5 gap-8">
+       <h2 className="  text-center text-2xl font-bold mb-2">Our Phone number</h2>
+        <span className=" text-2xl ">629999999</span>
         </div>
 
       </div>
