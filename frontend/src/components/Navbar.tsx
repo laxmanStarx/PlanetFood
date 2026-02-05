@@ -1,8 +1,8 @@
-import {  useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../contextApi/CartContext";
 import { useState, useEffect } from "react";
 import { IoBagAddOutline } from "react-icons/io5";
-// import { FiMenu, FiX } from "react-icons/fi";
+import { FiMenu, FiX } from "react-icons/fi";
 
 import RateUs from "./RateUs";
 
@@ -54,7 +54,94 @@ return (
     alt="logo"
     className="h-8 w-auto object-contain rounded-sm" 
   />
+
+
+{/* Hamburger Menu & Admin Notifications (Mobile) */}
+<div className="lg:hidden flex items-center space-x-4">
+  {/* Admin notifications icon for mobile top bar */}
+  {user?.role === "admin" && (
+    <button
+      onClick={() => navigate("/admin/notifications")}
+      className="relative p-1 text-blue-600"
+    >
+      {/* You can use a Bell icon here from react-icons */}
+      <span className="text-sm font-bold">Notifications</span>
+    </button>
+  )}
+
+  <button onClick={() => setShowMenu(!showMenu)}>
+    {showMenu ? <FiX size={24} /> : <FiMenu size={24} />}
+  </button>
 </div>
+
+      {/* Nav Links (Desktop) - REMOVE sm:flex */}
+      <div className="hidden lg:flex items-center space-x-6">
+        <span onClick={() => navigate("/aboutus")} className="cursor-pointer">
+          About Us
+        </span>
+        <button onClick={() => setShowRateUs(true)} className="cursor-pointer">
+          Rate Us
+        </button>
+
+        <div className="relative">
+          <Link to="/Diningout">Diningout</Link>
+        </div>
+
+        {/* Admin notifications link (desktop) */}
+        {user?.role === "admin" && (
+          <button
+            onClick={() => navigate("/admin/notifications")}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Notifications
+          </button>
+        )}
+
+        {/* Cart */}
+        <div className="relative">
+          <button onClick={() => setShowCart(!showCart)} className="flex items-center space-x-1 bg-green-400 px-3 py-1 rounded-full">
+            <IoBagAddOutline />
+            <span>{calculateTotalItems()}</span>
+          </button>
+          {showCart && (
+            <div className="absolute right-0 mt-2 w-64 bg-white border shadow-lg rounded-lg p-4 z-50">
+              {cartItems.length === 0 ? (
+                <p className="text-gray-500">Cart is empty</p>
+              ) : (
+                cartItems.map(cartItem => (
+                  <div key={cartItem.menuId} className="flex items-center space-x-4 mb-4">
+                    <img src={cartItem.image || ""} alt={cartItem.name} className="w-12 h-12 object-cover rounded" />
+                    <div className="flex-1">
+                      <p className="font-bold">{cartItem.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {cartItem.quantity} x ₹{cartItem.price?.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+              <button onClick={checkout} className="bg-blue-500 text-white px-3 py-1 rounded mt-2 w-full">
+                Submit
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Auth Buttons */}
+        {user ? (
+          <>
+            <span className="font-semibold">{user.name}</span>
+            <button onClick={handleLogout} className="bg-fuchsia-500 text-white px-3 py-1 rgb-animate rounded-md">
+              Logout
+            </button>
+          </>
+        ) : (
+          <button onClick={() => navigate("/login")} className="bg-blue-500 text-white px-3 py-1 rounded">
+            Login
+          </button>
+        )}
+      </div>
+    </div>
 
     {/* Mobile Dropdown Menu */}
     {showMenu && (
