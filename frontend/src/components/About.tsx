@@ -1,7 +1,7 @@
 const About = () => {
   return (
     <div className="max-w-4xl mx-auto px-6 py-12 text-gray-800">
-      <h1 className="text-4xl font-bold text-center mb-8">About foodStarX</h1>
+      <h1 className="text-4xl font-bold text-center mb-8">About FlavorDash</h1>
       
       <div className="bg-green-50 p-8 rounded-2xl mb-12 text-center">
         <p className="text-xl italic">"Delightful Dining, Nourishing Nutrients & Delicious Food."</p>

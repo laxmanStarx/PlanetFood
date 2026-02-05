@@ -46,7 +46,7 @@ return (
     <div className="max-w-7xl mx-auto flex justify-between items-center">
       {/* Logo */}
       <div className="text-2xl font-bold cursor-pointer" onClick={() => navigate("/")}>
-        foodStarX
+        FlavorDash <img src ="https://res.cloudinary.com/dykahal7o/image/upload/v1770278680/Screenshot_2026-02-05_133310_qcner9.png" />
       </div>
 
 {/* Hamburger Menu & Admin Notifications (Mobile) */}
