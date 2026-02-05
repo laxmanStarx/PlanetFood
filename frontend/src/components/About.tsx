@@ -1,5 +1,3 @@
-
-
 const About = () => {
   return (
     <div className="max-w-4xl mx-auto px-6 py-12 text-gray-800">
@@ -9,7 +7,7 @@ const About = () => {
         <p className="text-xl italic">"Delightful Dining, Nourishing Nutrients & Delicious Food."</p>
       </div>
 
-      <section className="mb-10">
+      <section className="mb-10 text-center md:text-left">
         <h2 className="text-2xl font-semibold mb-4 text-fuchsia-600">Our Story</h2>
         <p className="leading-relaxed">
           Launched in 2024, foodStarX was born out of a desire to bridge the gap between 
@@ -18,24 +16,31 @@ const About = () => {
         </p>
       </section>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="border p-6 rounded-lg shadow-sm">
-          <h3 className="font-bold text-lg mb-2">Our Vision</h3>
+      {/* Grid for Vision and Promise */}
+      <div className="grid md:grid-cols-2 gap-8 mb-12">
+        <div className="border p-6 rounded-lg shadow-sm bg-white">
+          <h3 className="font-bold text-lg mb-2 text-green-600">Our Vision</h3>
           <p>To become the world's most loved food destination by focusing on nutrition and taste.</p>
         </div>
-        <div className="border p-6 rounded-lg shadow-sm">
-          <h3 className="font-bold text-lg mb-2">Our Promise</h3>
+        
+        <div className="border p-6 rounded-lg shadow-sm bg-white">
+          <h3 className="font-bold text-lg mb-2 text-green-600">Our Promise</h3>
           <p>Fresh ingredients, transparent pricing, and a delivery experience that never lets you down.</p>
-
         </div>
-        <div className="flex justify-center mx-5 gap-8">
-       <h2 className="  text-center text-2xl font-bold mb-2">Our Phone number</h2>
-        <span className=" text-2xl ">629999999</span>
-        </div>
+      </div>
 
+      {/* Centered Phone Number Section */}
+      <div className="flex flex-col items-center justify-center border-t pt-8">
+        <h2 className="text-2xl font-bold text-gray-700">Our Phone Number</h2>
+        <a 
+          href="tel:629999999" 
+          className="text-3xl font-extrabold text-fuchsia-600 hover:text-fuchsia-700 transition-colors"
+        >
+          629999999
+        </a>
       </div>
     </div>
   );
 }
 
-export default About
+export default About;
