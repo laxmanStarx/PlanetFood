@@ -43,18 +43,11 @@ const Navbar = () => {
 
 return (
   <nav className="bg-white shadow-md px-4 py-3">
-{/* Logo */}
-<div 
-  className="text-2xl font-bold cursor-pointer flex items-center gap-2" 
-  onClick={() => navigate("/")}
->
-  <span>FlavorDash</span>
-  <img 
-    src="https://res.cloudinary.com/dykahal7o/image/upload/v1770278680/Screenshot_2026-02-05_133310_qcner9.png" 
-    alt="logo"
-    className="h-8 w-auto object-contain rounded-sm" 
-  />
-
+    <div className="max-w-7xl mx-auto flex justify-between items-center">
+      {/* Logo */}
+      <div className="text-2xl font-bold cursor-pointer" onClick={() => navigate("/")}>
+        FlavorDash
+      </div>
 
 {/* Hamburger Menu & Admin Notifications (Mobile) */}
 <div className="lg:hidden flex items-center space-x-4">
