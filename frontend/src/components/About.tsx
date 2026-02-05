@@ -27,6 +27,9 @@ const About = () => {
           <h3 className="font-bold text-lg mb-2">Our Promise</h3>
           <p>Fresh ingredients, transparent pricing, and a delivery experience that never lets you down.</p>
         </div>
+
+        <h2>Our Phone number</h2>
+        <span>6261234890</span>
       </div>
     </div>
   );
