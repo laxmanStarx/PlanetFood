@@ -48,12 +48,23 @@ return (
         foodStarX
       </div>
 
-      {/* Hamburger Menu (Mobile) */}
-      <div className="lg:hidden">
-        <button onClick={() => setShowMenu(!showMenu)}>
-          {showMenu ? <FiX size={24} /> : <FiMenu size={24} />}
-        </button>
-      </div>
+{/* Hamburger Menu & Admin Notifications (Mobile) */}
+<div className="lg:hidden flex items-center space-x-4">
+  {/* Admin notifications icon for mobile top bar */}
+  {user?.role === "admin" && (
+    <button
+      onClick={() => navigate("/admin/notifications")}
+      className="relative p-1 text-blue-600"
+    >
+      {/* You can use a Bell icon here from react-icons */}
+      <span className="text-sm font-bold">Notifications</span>
+    </button>
+  )}
+
+  <button onClick={() => setShowMenu(!showMenu)}>
+    {showMenu ? <FiX size={24} /> : <FiMenu size={24} />}
+  </button>
+</div>
 
       {/* Nav Links (Desktop) - REMOVE sm:flex */}
       <div className="hidden lg:flex items-center space-x-6">
@@ -69,14 +80,14 @@ return (
         </div>
 
         {/* Admin notifications link (desktop) */}
-        {user?.role === "admin" && (
+        {/* {user?.role === "admin" && (
           <button
             onClick={() => navigate("/admin/notifications")}
             className="text-sm text-blue-600 hover:underline"
           >
             Notifications
           </button>
-        )}
+        )} */}
 
         {/* Cart */}
         <div className="relative">
