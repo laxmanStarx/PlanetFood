@@ -21,6 +21,7 @@ import 'react-toastify/dist/ReactToastify.css';
  import { ToastContainer} from 'react-toastify';
 import DiningOut from "./components/pages/DiningOut"
 import AdminNotifications from "./components/AdminNotifications"
+import About from "./components/About"
 
 
 
@@ -67,6 +68,8 @@ function App() {
 
       <Route path="/category/:categoryName" element={<CategoryPage />} />
        <Route path="/rateus" element={<RateUs  />} />
+       <Route path="/aboutus" element={<About  />} />
+       
 
        <Route path= "/Diningout" element ={<DiningOut />} />
          
