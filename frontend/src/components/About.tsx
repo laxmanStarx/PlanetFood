@@ -29,7 +29,7 @@ const About = () => {
         </div>
 
         <h2>Our Phone number</h2>
-        <span>6261234890</span>
+        <span>626123489990</span>
       </div>
     </div>
   );
