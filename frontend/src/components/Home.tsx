@@ -64,7 +64,7 @@ const Home = () => {
 
     <RestaurantMenu />
 
-    <button>hello</button>
+    {/* <button>hello</button> */}
     
                     <div className="flex justify-center items-center mb-8">
            {isAdmin && (
