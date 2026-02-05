@@ -80,14 +80,14 @@ return (
         </div>
 
         {/* Admin notifications link (desktop) */}
-        {/* {user?.role === "admin" && (
+        {user?.role === "admin" && (
           <button
             onClick={() => navigate("/admin/notifications")}
             className="text-sm text-blue-600 hover:underline"
           >
             Notifications
           </button>
-        )} */}
+        )}
 
         {/* Cart */}
         <div className="relative">
