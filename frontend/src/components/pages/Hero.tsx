@@ -11,7 +11,7 @@ export default function Hero() {
   ];
 
   const [current, setCurrent] = useState(0);
-  const duration = 4000; // 4 seconds per slide
+  const duration = 4000;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -21,81 +21,76 @@ export default function Hero() {
   }, []);
 
   return (
-    <div className="w-full">
-      {/* HERO SECTION */}
-      <section className="relative w-full min-h-[100vh] flex shadow-md shadow-slate-200 flex-col md:flex-row items-center cursor-pointer justify-between px-6 md:px-16 py-10 bg-gradient-to-r from-black/60 via-black/30 to-transparent text-white overflow-hidden">
+    <div className="w-full font-serif">
+      <section className="relative w-full min-h-screen flex flex-col md:flex-row items-center justify-between px-8 md:px-20 py-20 overflow-hidden bg-[#0a0a0a]">
         
-        {/* Background Carousel */}
+        {/* Background Layer with Soft Floral Blur */}
         <div className="absolute inset-0 z-0">
           <img
             src={carouselImages[current]}
-            alt="Food Banner"
-            className="w-full h-full object-cover transition-all duration-1000 ease-in-out"
+            alt="Background"
+            className="w-full h-full object-cover opacity-30 blur-sm transition-opacity duration-1000"
           />
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent" />
         </div>
 
-        {/* Progress Bars */}
-        {/* <div className="absolute top-5 left-1/2 -translate-x-1/2 z-20 flex gap-2 w-[80%] max-w-xl">
-          {carouselImages.map((_, index) => (
-            <div
-              key={index}
-              className="relative h-2 flex-1 bg-gray-400 rounded overflow-hidden"
-            >
-              {index === current && (
-                <div
-                  className="absolute top-0 left-0 h-full bg-orange-500"
-                  style={{
-                    animation: `fill ${duration}ms linear forwards`,
-                  }}
-                />
-              )}
-              {index < current && (
-                <div className="absolute top-0 left-0 h-full bg-orange-500 w-full" />
-              )}
-            </div>
-          ))}
-        </div> */}
-
-        {/* Left Content */}
-        <div className="relative z-10 w-full md:w-1/2 space-y-6 text-center md:text-left">
-          <p className="uppercase tracking-wider text-sm text-gray-200">
-            Welcome to our restaurant
-          </p>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold leading-tight">
-            Delightful Dining <br /> Nourishing Nutrients <br /> & Delicious Food.
+        {/* Left Content: Typography & Flare */}
+        <div className="relative z-10 w-full md:w-3/5 space-y-8 text-center md:text-left">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-orange-400 text-xs uppercase tracking-[0.2em]">
+            <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+            Fine Dining Experience
+          </div>
+          
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold leading-[1.1] text-white">
+            Cultivating <span className="text-orange-500 italic">Flavor</span>, <br />
+            Harvesting <span className="text-orange-500">Joy.</span>
           </h1>
-          {/*  */}
+          
+          <p className="max-w-lg text-gray-300 text-lg font-light leading-relaxed font-sans">
+            Where culinary craftsmanship meets nature's finest ingredients. 
+            Discover a menu designed to bloom on your palate.
+          </p>
 
-          {/* Buttons */}
-          {/* <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-            <button className="bg-orange-500 text-white px-6 py-3 rounded-full hover:bg-orange-600 transition">
-              Order Now
+          <div className="flex flex-col sm:flex-row gap-5 justify-center md:justify-start pt-4 font-sans">
+            <button className="group relative px-8 py-4 bg-orange-500 text-white font-bold rounded-full overflow-hidden transition-all hover:pr-12">
+              <span className="relative z-10">Explore Menu</span>
+              <span className="absolute right-4 opacity-0 group-hover:opacity-100 transition-all">→</span>
             </button>
-            <button className="border border-white px-6 py-3 rounded-full hover:bg-white hover:text-black transition">
-              Reservation
+            <button className="px-8 py-4 border border-white/30 text-white rounded-full hover:bg-white hover:text-black transition-colors backdrop-blur-sm">
+              Book a Table
             </button>
-          </div> */}
+          </div>
         </div>
 
+        {/* Right Content: The "Flower" Frame */}
+        <div className="relative z-10 w-full md:w-2/5 flex justify-center items-center mt-12 md:mt-0">
+          {/* Rotating Decorative Border */}
+          <div className="absolute w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] border-t-2 border-b-2 border-orange-500/30 rounded-full animate-[spin_10s_linear_infinite]" />
+          <div className="absolute w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] border-l-2 border-r-2 border-white/10 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
+          
+          {/* Main Image in Petal-like Frame */}
+          <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-[400px] md:h-[400px] overflow-hidden rounded-[40%_60%_70%_30%/40%_50%_60%_40%] border-8 border-white/10 shadow-2xl transition-all duration-1000 transform hover:scale-105">
+            <img
+              src={carouselImages[current]}
+              alt="Culinary Dish"
+              className="w-full h-full object-cover scale-110"
+            />
+          </div>
 
-
-        {/* Right Image */}
-        <div className="relative z-10 w-full md:w-1/2 flex justify-center md:justify-end mt-8 md:mt-0">
-          <img
-            src={carouselImages[current]}
-            alt="Food"
-            className="w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 object-cover rounded-full drop-shadow-2xl border-4 border-white"
-          />
+          {/* Floating Badge */}
+          <div className="absolute -bottom-4 -right-4 bg-white p-4 rounded-2xl shadow-xl hidden sm:block rotate-12">
+            <p className="text-black text-xs font-bold uppercase tracking-tighter">Freshly Picked</p>
+            <p className="text-orange-600 text-xl font-serif">100% Organic</p>
+          </div>
         </div>
 
-
-                {/* Progress Bars */}
-        {/* <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-2 w-[80%]  max-w-xl">
+        {/* Bottom Progress Bars: "The Roots" */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-3 w-[60%] max-w-md">
           {carouselImages.map((_, index) => (
             <div
               key={index}
-              className="relative h-2 flex-1 bg-gray-400 rounded overflow-hidden"
+              className="relative h-1 flex-1 bg-white/20 rounded-full overflow-hidden"
+              onClick={() => setCurrent(index)}
             >
               {index === current && (
                 <div
@@ -106,68 +101,23 @@ export default function Hero() {
                 />
               )}
               {index < current && (
-                <div className="absolute top-0 left-0 h-full bg-orange-500 w-full" />
+                <div className="absolute top-0 left-0 h-full bg-orange-400/50 w-full" />
               )}
             </div>
           ))}
-        </div> */}
-
-
-
-
-
-
-
-
-
-
-
+        </div>
       </section>
-      
 
-      {/* CSS for progress animation */}
       <style>{`
         @keyframes fill {
           from { width: 0%; }
           to { width: 100%; }
         }
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
       `}</style>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // const topPicks = [
-  //   { id: 1, img: "https://res.cloudinary.com/dykahal7o/image/upload/v1753452625/112315676_y1myor.jpg", name: "Pizza" },
-  //   { id: 2, img: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f", name: "Burger" },
-  //   { id: 3, img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836", name: "Pasta" },
-  //   { id: 4, img: "https://images.unsplash.com/photo-1521305916504-4a1121188589", name: "Salad" },
-  // ];
