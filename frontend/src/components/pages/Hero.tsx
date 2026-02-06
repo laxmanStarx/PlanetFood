@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 export default function Hero() {
   const carouselImages = [
@@ -53,7 +54,7 @@ export default function Hero() {
 
           <div className="flex flex-col sm:flex-row gap-5 justify-center md:justify-start pt-4 font-sans">
             <button className="group relative px-8 py-4 bg-orange-500 text-white font-bold rounded-full overflow-hidden transition-all hover:pr-12">
-              <span className="relative z-10">Explore Menu</span>
+              <span className="relative z-10"> <Link to="/Diningout">Explore Menu</Link></span>
               <span className="absolute right-4 opacity-0 group-hover:opacity-100 transition-all">→</span>
             </button>
             <button className="px-8 py-4 border border-white/30 text-white rounded-full hover:bg-white hover:text-black transition-colors backdrop-blur-sm">
