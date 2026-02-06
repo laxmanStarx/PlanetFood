@@ -55,7 +55,7 @@ function App() {
       <Route path="/signup" element={<SignUp />}/>
       <Route path ="/login" element={<Login />} />
       <Route path ="/checkout" element={ <Checkout />} />
-      <Route path ="/admin" element={<Admin />} />
+      <Route path ="/v1/admin" element={<Admin />} />
       <Route path ="/" element={<Home />} />
       <Route path = "/usser" element ={ <CheckUserRole />} />
      
