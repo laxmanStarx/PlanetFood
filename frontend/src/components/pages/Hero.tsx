@@ -23,7 +23,7 @@ export default function Hero() {
 
   return (
     <div className="w-full font-serif">
-      <section className="relative w-full min-h-screen flex flex-col md:flex-row items-center justify-between px-8 md:px-20 py-20 overflow-hidden bg-[#0a0a0a]">
+      <section className="relative w-full min-h-screen flex flex-col md:flex-row items-center cursor-pointer justify-between px-8 md:px-20 py-20 overflow-hidden bg-[#0a0a0a]">
         
         {/* Background Layer with Soft Floral Blur */}
         <div className="absolute inset-0 z-0">
@@ -36,7 +36,7 @@ export default function Hero() {
         </div>
 
         {/* Left Content: Typography & Flare */}
-        <div className="relative z-10 w-full md:w-3/5 space-y-8 text-center md:text-left">
+        <div className="relative z-10 w-full md:w-3/5 space-y-8 text-center md:text-left cursor-pointer">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-orange-400 text-xs uppercase tracking-[0.2em]">
             <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
             Fine Dining Experience
@@ -52,14 +52,12 @@ export default function Hero() {
             Discover a menu designed to bloom on your palate.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-5 justify-center md:justify-start pt-4 font-sans">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center md:justify-start pt-4 font-sans cursor-pointer">
             <button className="group relative px-8 py-4 bg-orange-500 text-white font-bold rounded-full overflow-hidden transition-all hover:pr-12">
               <span className="relative z-10"> <Link to="/Diningout">Explore Menu</Link></span>
               <span className="absolute right-4 opacity-0 group-hover:opacity-100 transition-all">→</span>
             </button>
-            <button className="px-8 py-4 border border-white/30 text-white rounded-full hover:bg-white hover:text-black transition-colors backdrop-blur-sm">
-              Book a Table
-            </button>
+
           </div>
         </div>
 
@@ -86,7 +84,7 @@ export default function Hero() {
         </div>
 
         {/* Bottom Progress Bars: "The Roots" */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-3 w-[60%] max-w-md">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-3 w-[60%] max-w-md cursor-pointer">
           {carouselImages.map((_, index) => (
             <div
               key={index}
