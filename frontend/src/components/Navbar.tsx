@@ -2,8 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../contextApi/CartContext";
 import { useState, useEffect } from "react";
 import { IoBagAddOutline } from "react-icons/io5";
-import { FiMenu, FiX } from "react-icons/fi";
-
+import { FiMenu, FiX, FiBell, FiLogOut, } from "react-icons/fi";
 import RateUs from "./RateUs";
 
 interface User {
@@ -18,14 +17,18 @@ const Navbar = () => {
   const [showRateUs, setShowRateUs] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [scrolled, setScrolled] = useState(false);
 
   const { cartItems = [], clearCart } = useCart();
 
   useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    if (storedUser) setUser(JSON.parse(storedUser));
+    
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleLogout = () => {
@@ -36,193 +39,163 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  const checkout = () => navigate("/checkout");
-
   const calculateTotalItems = () =>
     cartItems.reduce((total, item) => total + (item.quantity || 0), 0);
 
-return (
-  <nav className="bg-white shadow-md px-4 py-3">
-    <div className="max-w-7xl mx-auto flex justify-between items-center">
-      {/* Logo */}
-      <div className="text-2xl font-bold cursor-pointer" onClick={() => navigate("/")}>
-        FlavorDash
-      </div>
-
-{/* Hamburger Menu & Admin Notifications (Mobile) */}
-<div className="lg:hidden flex items-center space-x-4">
-  {/* Admin notifications icon for mobile top bar */}
-  {user?.role === "admin" && (
-    <button
-      onClick={() => navigate("/admin/notifications")}
-      className="relative p-1 text-blue-600"
-    >
-      {/* You can use a Bell icon here from react-icons */}
-      <span className="text-sm font-bold">Notifications</span>
-    </button>
-  )}
-
-  <button onClick={() => setShowMenu(!showMenu)}>
-    {showMenu ? <FiX size={24} /> : <FiMenu size={24} />}
-  </button>
-</div>
-
-      {/* Nav Links (Desktop) - REMOVE sm:flex */}
-      <div className="hidden lg:flex items-center space-x-6">
-        <span onClick={() => navigate("/aboutus")} className="cursor-pointer">
-          About Us
-        </span>
-        <button onClick={() => setShowRateUs(true)} className="cursor-pointer">
-          Rate Us
-        </button>
-
-        <div className="relative">
-          <Link to="/Diningout">Diningout</Link>
+  return (
+    <nav className={`fixed top-0 w-full z-[100] transition-all duration-300 px-4 py-3 ${
+      scrolled ? "bg-white/80 backdrop-blur-md shadow-lg" : "bg-transparent"
+    }`}>
+      <div className="max-w-7xl mx-auto flex justify-between items-center bg-white/40 p-2 rounded-2xl md:rounded-full px-6 border border-white/20">
+        
+        {/* Logo */}
+        <div 
+          className="text-2xl font-black italic tracking-tighter cursor-pointer text-gray-900 group" 
+          onClick={() => navigate("/")}
+        >
+          Flavor<span className="text-orange-500 group-hover:text-black transition-colors">Dash</span>
         </div>
 
-        {/* Admin notifications link (desktop) */}
-        {user?.role === "admin" && (
-          <button
-            onClick={() => navigate("/admin/notifications")}
-            className="text-sm text-blue-600 hover:underline"
-          >
-            Notifications
-          </button>
-        )}
-
-        {/* Cart */}
-        <div className="relative">
-          <button onClick={() => setShowCart(!showCart)} className="flex items-center space-x-1 bg-green-400 px-3 py-1 rounded-full">
-            <IoBagAddOutline />
-            <span>{calculateTotalItems()}</span>
-          </button>
-          {showCart && (
-            <div className="absolute right-0 mt-2 w-64 bg-white border shadow-lg rounded-lg p-4 z-50">
-              {cartItems.length === 0 ? (
-                <p className="text-gray-500">Cart is empty</p>
-              ) : (
-                cartItems.map(cartItem => (
-                  <div key={cartItem.menuId} className="flex items-center space-x-4 mb-4">
-                    <img src={cartItem.image || ""} alt={cartItem.name} className="w-12 h-12 object-cover rounded" />
-                    <div className="flex-1">
-                      <p className="font-bold">{cartItem.name}</p>
-                      <p className="text-sm text-gray-600">
-                        {cartItem.quantity} x ₹{cartItem.price?.toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
-              <button onClick={checkout} className="bg-blue-500 text-white px-3 py-1 rounded mt-2 w-full">
-                Submit
-              </button>
-            </div>
+        {/* Desktop Links */}
+        <div className="hidden lg:flex items-center space-x-8 font-bold text-sm text-gray-600 uppercase tracking-widest">
+          <span onClick={() => navigate("/aboutus")} className="hover:text-orange-500 cursor-pointer transition-colors">About</span>
+          <button onClick={() => setShowRateUs(true)} className="hover:text-orange-500 transition-colors uppercase">Rate Us</button>
+          <Link to="/Diningout" className="hover:text-orange-500 transition-colors">Dining</Link>
+          
+          {user?.role === "admin" && (
+            <button
+              onClick={() => navigate("/admin/notifications")}
+              className="flex items-center gap-1 text-blue-600 hover:scale-105 transition-transform"
+            >
+              <FiBell /> <span>Alerts</span>
+            </button>
           )}
         </div>
 
-        {/* Auth Buttons */}
-        {user ? (
-          <>
-            <span className="font-semibold">{user.name}</span>
-            <button onClick={handleLogout} className="bg-fuchsia-500 text-white px-3 py-1 rgb-animate rounded-md">
-              Logout
+        {/* Action Buttons */}
+        <div className="flex items-center space-x-4">
+          {/* Cart Dropdown Logic */}
+          <div className="relative">
+            <button 
+              onClick={() => setShowCart(!showCart)} 
+              className="relative flex items-center justify-center w-10 h-10 bg-black text-white rounded-full hover:bg-orange-500 transition-all shadow-xl active:scale-90"
+            >
+              <IoBagAddOutline size={20} />
+              {calculateTotalItems() > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
+                  {calculateTotalItems()}
+                </span>
+              )}
             </button>
-          </>
-        ) : (
-          <button onClick={() => navigate("/login")} className="bg-blue-500 text-white px-3 py-1 rounded">
-            Login
-          </button>
-        )}
-      </div>
-    </div>
 
-    {/* Mobile Dropdown Menu */}
-    {showMenu && (
-      <div className="lg:hidden mt-3 space-y-2">
-        <button onClick={() => { navigate("/aboutus"); setShowMenu(false); }} className="block w-full text-left px-2 py-1">
-          About Us
-        </button>
-        <button onClick={() => { setShowRateUs(true); setShowMenu(false); }} className="block w-full text-left px-2 py-1">
-          Rate Us
-        </button>
-        <button onClick={() => { navigate("/Diningout"); setShowMenu(false); }} className="block w-full text-left px-2 py-1">
-          Diningout
-        </button>
-
-        {/* Admin notifications link (mobile) */}
-        {user?.role === "admin" && (
-          <button
-            onClick={() => { navigate("/admin/notifications"); setShowMenu(false); }}
-            className="block w-full text-left px-2 py-1 bg-blue-50 text-blue-600 font-semibold rounded"
-          >
-            Notifications
-          </button>
-        )}
-
-        <button
-          onClick={() => setShowCart(!showCart)}
-          className="flex items-center space-x-1 bg-green-500 text-white px-3 py-1 rounded-full w-full justify-center"
-        >
-          <IoBagAddOutline />
-          <span>{calculateTotalItems()}</span>
-        </button>
-        
-        {showCart && (
-          <div className="mt-2 w-full bg-white border shadow-lg rounded-lg p-4">
-            {cartItems.length === 0 ? (
-              <p className="text-gray-500">Cart is empty</p>
-            ) : (
-              cartItems.map(cartItem => (
-                <div key={cartItem.menuId} className="flex items-center space-x-4 mb-4">
-                  <img src={cartItem.image || ""} alt={cartItem.name} className="w-12 h-12 object-cover rounded" />
-                  <div className="flex-1">
-                    <p className="font-bold">{cartItem.name}</p>
-                    <p className="text-sm text-gray-600">
-                      {cartItem.quantity} x ₹{cartItem.price?.toFixed(2)}
-                    </p>
+            {showCart && (
+              <div className="absolute right-0 mt-4 w-72 bg-white border-0 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[2rem] p-6 z-50 overflow-hidden animate-in fade-in slide-in-from-top-5">
+                <h3 className="text-lg font-black mb-4">Your Bag</h3>
+                {cartItems.length === 0 ? (
+                  <p className="text-gray-400 text-sm italic">Nothing here yet...</p>
+                ) : (
+                  <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                    {cartItems.map(item => (
+                      <div key={item.menuId} className="flex items-center gap-3 mb-4 last:mb-0">
+                        <img src={item.image || ""} alt={item.name} className="w-12 h-12 object-cover rounded-xl" />
+                        <div className="flex-1 overflow-hidden">
+                          <p className="font-bold text-xs truncate uppercase tracking-tight">{item.name}</p>
+                          <p className="text-[10px] text-gray-500 font-bold tracking-widest">
+                            QTY: {item.quantity} • ₹{item.price?.toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              ))
+                )}
+                <button 
+                  onClick={() => { navigate("/checkout"); setShowCart(false); }} 
+                  className="bg-black text-white text-xs font-black uppercase tracking-widest py-4 rounded-xl mt-6 w-full hover:bg-orange-500 transition-all shadow-lg"
+                >
+                  Checkout Now
+                </button>
+              </div>
             )}
-            <button onClick={checkout} className="bg-blue-500 text-white px-3 py-1 rounded mt-2 w-full">
-              Submit
-            </button>
           </div>
-        )}
 
-        {user ? (
-          <>
-            <span className="block px-2 py-1 font-semibold text-black">{user.name}</span>
-            <button onClick={handleLogout} className="block w-full text-center px-2 py-1 bg-red-400 text-white rounded-md">
-              Logout
-            </button>
-          </>
-        ) : (
-          <button onClick={() => { navigate("/login"); setShowMenu(false); }} className="block w-full text-center px-2 py-1 bg-blue-500 text-white rounded">
-            Login
-          </button>
-        )}
-      </div>
-    )}
+          {/* User Section */}
+          <div className="hidden lg:flex items-center gap-3 border-l pl-4 border-gray-200">
+            {user ? (
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col items-end">
+                  <span className="text-[10px] font-black uppercase text-gray-400">Welcome</span>
+                  <span className="text-xs font-bold text-gray-900 leading-none tracking-tight">{user.name}</span>
+                </div>
+                <button 
+                  onClick={handleLogout} 
+                  className="w-10 h-10 flex items-center justify-center bg-gray-100 text-gray-400 rounded-full hover:bg-red-50 hover:text-red-500 transition-all"
+                >
+                  <FiLogOut />
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => navigate("/login")} 
+                className="bg-gray-100 text-gray-900 px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-sm"
+              >
+                Login
+              </button>
+            )}
+          </div>
 
-    {/* Rate Us Modal */}
-    {showRateUs && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
-          <button onClick={() => setShowRateUs(false)} className="absolute top-2 right-2 text-red-600 font-bold">
-            ✕
+          {/* Mobile Toggle */}
+          <button 
+            className="lg:hidden w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full"
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            {showMenu ? <FiX size={20} /> : <FiMenu size={20} />}
           </button>
-          <RateUs onClose={() => setShowRateUs(false)} />
         </div>
       </div>
-    )}
-  </nav>
-);
+
+      {/* Mobile Menu Overlay */}
+      {showMenu && (
+        <div className="lg:hidden absolute top-20 left-4 right-4 bg-white rounded-[2rem] shadow-2xl p-8 space-y-6 border border-gray-100 animate-in zoom-in-95 duration-200">
+          <div className="flex flex-col space-y-4 font-black uppercase tracking-[0.2em] text-sm">
+            <Link to="/aboutus" onClick={() => setShowMenu(false)}>About Us</Link>
+            <button onClick={() => { setShowRateUs(true); setShowMenu(false); }} className="text-left">Rate Us</button>
+            <Link to="/Diningout" onClick={() => setShowMenu(false)}>Dining Out</Link>
+            {user?.role === "admin" && (
+              <Link to="/admin/notifications" className="text-blue-600">Admin Alerts</Link>
+            )}
+          </div>
+          
+          <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+            {user ? (
+              <>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-black italic">
+                    {user.name[0]}
+                  </div>
+                  <span className="font-bold text-sm tracking-tight">{user.name}</span>
+                </div>
+                <button onClick={handleLogout} className="text-red-500 text-xs font-black uppercase tracking-widest">Logout</button>
+              </>
+            ) : (
+              <button onClick={() => { navigate("/login"); setShowMenu(false); }} className="w-full bg-black text-white py-4 rounded-2xl font-black uppercase tracking-widest">Login</button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Rate Us Modal - Keeping your logic but updating style */}
+      {showRateUs && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[200]">
+          <div className="bg-white rounded-[3rem] shadow-2xl max-w-md w-[90%] p-10 relative animate-in fade-in zoom-in-95">
+            <button onClick={() => setShowRateUs(false)} className="absolute top-6 right-8 text-gray-300 hover:text-red-500 transition-colors">
+              <FiX size={24}/>
+            </button>
+            <RateUs onClose={() => setShowRateUs(false)} />
+          </div>
+        </div>
+      )}
+    </nav>
+  );
 };
 
-export default Navbar; 
-
-
-
-
-
+export default Navbar;
