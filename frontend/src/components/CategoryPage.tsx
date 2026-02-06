@@ -17,7 +17,7 @@ const CategoryPage = () => {
     Veg: "https://res.cloudinary.com/dykahal7o/image/upload/v1753728673/Screenshot_2025-07-29_002104_cfgebm.png",
     Cake: "https://res.cloudinary.com/dykahal7o/image/upload/v1767104329/Screenshot_2025-12-30_194835_tfssfv.png",
     Juice: "https://res.cloudinary.com/dykahal7o/image/upload/v1765908609/Screenshot_2025-12-16_233844_n8gljm.png",
-    Dessert: "https://res.cloudinary.com/dykahal7o/image/upload/v1753452625/112315676_y1myor.jpg"
+    dessert: "https://res.cloudinary.com/dykahal7o/image/upload/v1753452625/112315676_y1myor.jpg"
   };
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
