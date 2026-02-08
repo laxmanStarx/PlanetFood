@@ -46,6 +46,8 @@ interface AnalyticsData {
   averageOrderValue: number;
   topSellingItems: TopSellingItem[];
 }
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
 const AnalyticsPage = () => {
   const { restaurantId } = useParams<{ restaurantId: string }>();
@@ -57,7 +59,7 @@ const AnalyticsPage = () => {
     const fetchAnalytics = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/analytics/${restaurantId}`
+          `${backendUrl}/api/analytics/${restaurantId}`
         );
         const data = await response.json();
 
