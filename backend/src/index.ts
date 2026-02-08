@@ -17,9 +17,10 @@ import orderRoute from "./routes/orderRoute";
 import ratingRoutes from "./routes/ratingRoute";
 import ratings from "./routes/ratingRoute";
 import ratingRoute from "./routes/ratingRoute";
-
+import analyticsRoute from "./routes/analyticsRoute";
 
 import webhookRoute from "./routes/webhookRoute";
+
 import bodyParser from "body-parser";
 
 
@@ -57,6 +58,7 @@ app.use("/", uploadRoute);
 // app.use("/payment", webhookRoute); 
 app.use("/orders", orderRoute)
 app.use("/api/ratings", ratingRoute)
+app.use('/api/analytics', analyticsRoute);
 // app.use("/", recommendationRoute)
 
 

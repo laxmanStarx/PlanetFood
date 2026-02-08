@@ -16,6 +16,7 @@ const cloudinary_1 = __importDefault(require("cloudinary"));
 const uploadRoute_1 = __importDefault(require("./routes/uploadRoute"));
 const orderRoute_1 = __importDefault(require("./routes/orderRoute"));
 const ratingRoute_1 = __importDefault(require("./routes/ratingRoute"));
+const analyticsRoute_1 = __importDefault(require("./routes/analyticsRoute"));
 const webhookRoute_1 = __importDefault(require("./routes/webhookRoute"));
 // import paymentRoute from "./routes/paymentRoute"
 const PORT = 8080;
@@ -38,6 +39,7 @@ app.use("/", uploadRoute_1.default);
 // app.use("/payment", webhookRoute); 
 app.use("/orders", orderRoute_1.default);
 app.use("/api/ratings", ratingRoute_1.default);
+app.use('/api/analytics', analyticsRoute_1.default);
 // app.use("/", recommendationRoute)
 app.listen(PORT, () => {
     console.log(`Your Server is listening at hello ${PORT}`);

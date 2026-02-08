@@ -22,6 +22,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import DiningOut from "./components/pages/DiningOut"
 import AdminNotifications from "./components/AdminNotifications"
 import About from "./components/About"
+import AnalyticsPage from "./components/Analytics"
 
 
 
@@ -72,6 +73,8 @@ function App() {
        
 
        <Route path= "/Diningout" element ={<DiningOut />} />
+
+       <Route path="/restaurant/:restaurantId/analytics" element={<AnalyticsPage />} />
          
    
 
