@@ -1,19 +1,26 @@
 import React, { useState } from "react";
-
-
+import { Link, useNavigate } from "react-router-dom";
 
 const AdminLogin: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const [userDetails, setUserDetails] = useState<any>(null);
+  const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-
+  // Handle input changes for the whole form
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
 
     try {
       const response = await fetch(`${backendUrl}/api/v1/user/login`, {
@@ -21,61 +28,135 @@ const AdminLogin: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
         setError(data.error || "Login failed");
+        setIsLoading(false);
         return;
       }
 
-      console.log("User details:", data.user); // Display user details in the console
-      localStorage.setItem("token", data.token); // Save token for future requests
-      setUserDetails(data.user);
+      // Store Auth Details
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
       
-      setError("");
-    } catch (error) {
-      console.error("Error during login:", error);
-      setError("An error occurred. Please try again.");
+      setSuccess("Welcome back! Entering the kitchen...");
+      
+      // Redirect after a short delay to show success state
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
+
+    } catch (err) {
+      console.error("Error during login:", err);
+      setError("Connection failed. Please check your internet.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div>
-      <h2>Admin Login</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="input"
-        />
-        <input
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="input"
-        />
-        <button type="submit" className="btn" onClick={()=>{
-          
-        }}>
-          Login
-        </button>
-      </form>
-
-      {userDetails && (
-        <div>
-          <h3>Welcome, {userDetails.name}</h3>
-          <p>Role: {userDetails.role}</p>
-          <p>Email: {userDetails.email}</p>
-
+    <div className="min-h-screen flex items-center justify-center bg-[#fffcf7] p-4 lg:p-0">
+      {/* Main Card Container */}
+      <div className="max-w-5xl w-full bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[600px]">
+        
+        {/* Left Side: Floral Food Banner */}
+        <div className="lg:w-1/2 relative hidden lg:block">
+          <img 
+            src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=1000" 
+            alt="Healthy Food" 
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-900/40 to-emerald-900/40 flex flex-col justify-center items-center text-center p-12 backdrop-blur-[2px]">
+            <div className="mb-6 p-4 bg-white/20 rounded-full backdrop-blur-md border border-white/30">
+               <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12,22A10,10,0,1,1,22,12,10,10,0,0,1,12,22Zm0-18a8,8,0,1,0,8,8A8,8,0,0,0,12,4Z" opacity="0.3"/>
+                  <path d="M12,7a5,5,0,0,1,5,5,5,5,0,0,1-5,5,5,5,0,0,1-5-5A5,5,0,0,1,12,7Z"/>
+                  <path d="M12,2c1,3,4,3,4,6s-3,4-4,7c-1-3-4-4-4-7S11,5,12,2Z"/>
+                  <path d="M22,12c-3,1-3,4-6,4s-4-3-7-4c3-1,4-4,7-4S19,11,22,12Z"/>
+               </svg>
+            </div>
+            <h2 className="text-4xl font-serif font-bold text-white mb-4 italic">Fresh & Floral</h2>
+            <p className="text-white/90 text-lg font-light leading-relaxed">
+              Experience the art of fine dining, where every ingredient is picked with love.
+            </p>
+          </div>
         </div>
-      )}
+
+        {/* Right Side: Form */}
+        <div className="lg:w-1/2 p-8 lg:p-16 flex flex-col justify-center relative">
+          <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+             <svg className="w-32 h-32 text-orange-600" fill="currentColor" viewBox="0 0 100 100">
+               <path d="M50 0 C60 30 90 40 90 50 C90 60 60 70 50 100 C40 70 10 60 10 50 C10 40 40 30 50 0" />
+             </svg>
+          </div>
+
+          <div className="relative z-10">
+            <h1 className="text-3xl font-serif font-bold text-gray-800 mb-2">Admin Portal</h1>
+            <p className="text-gray-500 mb-8">Sign in to manage your culinary empire</p>
+
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 text-red-600 text-sm rounded-2xl border border-red-100 flex items-center">
+                <span className="mr-2">⚠️</span> {error}
+              </div>
+            )}
+            
+            {success && (
+              <div className="mb-6 p-4 bg-emerald-50 text-emerald-600 text-sm rounded-2xl border border-emerald-100 flex items-center">
+                <span className="mr-2">✨</span> {success}
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-400 ml-2">Admin Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="admin@restaurant.com"
+                  className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-200 outline-none transition-all placeholder:text-gray-300"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-400 ml-2">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="••••••••"
+                  className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-200 outline-none transition-all placeholder:text-gray-300"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-2xl shadow-lg shadow-orange-200 transition-all active:scale-95 flex justify-center items-center"
+              >
+                {isLoading ? (
+                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : "Login to Dashboard"}
+              </button>
+            </form>
+
+            <div className="mt-8 text-center text-gray-500 text-sm">
+              Need access?{" "}
+              <Link to="/contact" className="text-orange-600 font-bold hover:underline">
+                Contact System Admin
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

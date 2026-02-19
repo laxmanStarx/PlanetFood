@@ -43,7 +43,7 @@ const PromoteToAdmin: React.FC = () => {
   };
 
   return (
-    <div className="container">
+    <div className="  justify-between py-24">
       <h2>Promote User to Admin</h2>
       {error && <p className="text-red-500">{error}</p>}
       {message && <p className="text-green-500">{message}</p>}

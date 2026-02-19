@@ -295,7 +295,7 @@ const Checkout: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 py-24">
       <h1 className="text-3xl text-center font-bold mb-8">Checkout</h1>
       {cartItems.length === 0 ? (
         <p>Your cart is empty.</p>

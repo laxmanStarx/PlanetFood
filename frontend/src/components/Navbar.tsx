@@ -143,6 +143,10 @@ const Navbar = () => {
             )}
           </div>
 
+  
+
+
+
           {/* Mobile Toggle */}
           <button 
             className="lg:hidden w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full"
