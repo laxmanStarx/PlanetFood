@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../contextApi/CartContext";
 import { useState, useEffect } from "react";
 import { IoBagAddOutline } from "react-icons/io5";
-import { FiMenu, FiX, FiBell, FiLogOut, } from "react-icons/fi";
+import { FiMenu, FiX, FiBell, FiLogOut, FiUser, FiShield } from "react-icons/fi"; // Added some icons
 import RateUs from "./RateUs";
 
 interface User {
@@ -25,15 +25,28 @@ const Navbar = () => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) setUser(JSON.parse(storedUser));
+    // Check for user on mount and when localstorage changes
+    const checkUser = () => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) setUser(JSON.parse(storedUser));
+      else setUser(null);
+    };
+
+    checkUser();
     
-    return () => window.removeEventListener("scroll", handleScroll);
+    // Listen for storage changes (helpful if logging in from another tab)
+    window.addEventListener("storage", checkUser);
+    
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("storage", checkUser);
+    };
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     clearCart();
     setUser(null);
     navigate("/login");
@@ -74,7 +87,7 @@ const Navbar = () => {
 
         {/* Action Buttons */}
         <div className="flex items-center space-x-4">
-          {/* Cart Dropdown Logic */}
+          {/* Cart Dropdown */}
           <div className="relative">
             <button 
               onClick={() => setShowCart(!showCart)} 
@@ -118,12 +131,14 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* User Section */}
+          {/* User Section (Modified for Two Logins) */}
           <div className="hidden lg:flex items-center gap-3 border-l pl-4 border-gray-200">
             {user ? (
               <div className="flex items-center gap-4">
                 <div className="flex flex-col items-end">
-                  <span className="text-[10px] font-black uppercase text-gray-400">Welcome</span>
+                  <span className="text-[10px] font-black uppercase text-gray-400">
+                    {user.role === "admin" ? "Admin Panel" : "Welcome"}
+                  </span>
                   <span className="text-xs font-bold text-gray-900 leading-none tracking-tight">{user.name}</span>
                 </div>
                 <button 
@@ -134,18 +149,24 @@ const Navbar = () => {
                 </button>
               </div>
             ) : (
-              <button 
-                onClick={() => navigate("/login")} 
-                className="bg-gray-100 text-gray-900 px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-sm"
-              >
-                Login
-              </button>
+              <div className="flex items-center gap-2">
+                {/* User Login Button */}
+                <button 
+                  onClick={() => navigate("/login")} 
+                  className="flex items-center gap-2 bg-gray-100 text-gray-900 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-sm"
+                >
+                  <FiUser size={14}/> Login
+                </button>
+                {/* Admin Login Button */}
+                <button 
+                  onClick={() => navigate("/admi-form")} 
+                  className="flex items-center gap-2 bg-orange-50 text-orange-600 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all shadow-sm border border-orange-100"
+                >
+                  <FiShield size={14}/> Admin
+                </button>
+              </div>
             )}
           </div>
-
-  
-
-
 
           {/* Mobile Toggle */}
           <button 
@@ -165,29 +186,35 @@ const Navbar = () => {
             <button onClick={() => { setShowRateUs(true); setShowMenu(false); }} className="text-left">Rate Us</button>
             <Link to="/Diningout" onClick={() => setShowMenu(false)}>Dining Out</Link>
             {user?.role === "admin" && (
-              <Link to="/admin/notifications" className="text-blue-600">Admin Alerts</Link>
+              <Link to="/admin/notifications" className="text-blue-600" onClick={() => setShowMenu(false)}>Admin Alerts</Link>
             )}
           </div>
           
-          <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+          <div className="pt-6 border-t border-gray-100">
             {user ? (
-              <>
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-black italic">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black italic ${user.role === 'admin' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>
                     {user.name[0]}
                   </div>
-                  <span className="font-bold text-sm tracking-tight">{user.name}</span>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-sm tracking-tight">{user.name}</span>
+                    <span className="text-[10px] text-gray-400 uppercase">{user.role || 'user'}</span>
+                  </div>
                 </div>
                 <button onClick={handleLogout} className="text-red-500 text-xs font-black uppercase tracking-widest">Logout</button>
-              </>
+              </div>
             ) : (
-              <button onClick={() => { navigate("/login"); setShowMenu(false); }} className="w-full bg-black text-white py-4 rounded-2xl font-black uppercase tracking-widest">Login</button>
+              <div className="flex flex-col gap-3">
+                <button onClick={() => { navigate("/login"); setShowMenu(false); }} className="w-full bg-black text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs">User Login</button>
+                <button onClick={() => { navigate("/admi-form"); setShowMenu(false); }} className="w-full bg-orange-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs">Admin Login</button>
+              </div>
             )}
           </div>
         </div>
       )}
 
-      {/* Rate Us Modal - Keeping your logic but updating style */}
+      {/* Rate Us Modal */}
       {showRateUs && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[200]">
           <div className="bg-white rounded-[3rem] shadow-2xl max-w-md w-[90%] p-10 relative animate-in fade-in zoom-in-95">
