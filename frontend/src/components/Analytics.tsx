@@ -148,7 +148,7 @@ const AnalyticsPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
+    <div className="container mx-auto py-20  p-6 bg-gray-50 min-h-screen">
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-2">
           Restaurant Analytics
